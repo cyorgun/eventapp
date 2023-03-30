@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "288393393189",
+    "project_id": "sport-event-a637a",
+    "storage_bucket": "sport-event-a637a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288393393189:android:3db21a28d97d67e9843bcc",
+        "android_client_info": {
+          "package_name": "com.event.eventsport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288393393189-cb16bjd3suu7k8a8goapvuu3k8fjcmmt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwxIagzTzSjVuefsXcfjkeveYJithlHVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288393393189-cb16bjd3suu7k8a8goapvuu3k8fjcmmt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

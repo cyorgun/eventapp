@@ -1,0 +1,1110 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:event_app/app/controller/controller.dart';
+import 'package:event_app/app/dialog/event_publish_dialog.dart';
+import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
+import 'package:event_app/base/constant.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import '../../../base/color_data.dart';
+import '../../../base/widget_utils.dart';
+import '../../service/app_service.dart';
+
+class CreateEventScreen extends StatefulWidget {
+  const CreateEventScreen({Key? key}) : super(key: key);
+
+  @override
+  State<CreateEventScreen> createState() => _CreateEventScreenState();
+}
+
+class _CreateEventScreenState extends State<CreateEventScreen> {
+  CreateEventController controller = Get.put(CreateEventController());
+  String dropdownvalue = 'running';
+  String dropdownvalue2 = 'trending';
+  var items = ['running',"skating", "skydiving","hockey","equestrian","soccer","football","climbing","hiking","cycling","combat","swimming","kayakhing"];
+   var items2 = ['trending',"feature","popular"];
+
+  _onPictureSelection1() async {
+    controller.getImage1();
+  }
+
+  _onPictureSelection2() async {
+    controller.getImage2();
+  }
+
+  String? imageUrl;
+
+
+  bool loading = false;
+
+  var formKey = GlobalKey<FormState>();
+  File? imageFile;
+  String? fileName;
+
+  var dateCtrl = TextEditingController();
+  var descCtrl = TextEditingController();
+  var locCtrl = TextEditingController();
+  var priceCtrl = TextEditingController();
+  var titleCtrl = TextEditingController();
+  var typeCtrl = TextEditingController();
+  var timeCtrl = TextEditingController();
+
+  // final Completer<GoogleMapController> _controller = Completer();
+  
+  final Completer<GoogleMapController> _controller = Completer();
+  LatLng? currentPosition;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  var markerIdCounter = 0;
+  final TextEditingController _controllerNamaLokasi = TextEditingController();
+  final TextEditingController _controllerLatitude = TextEditingController();
+  final TextEditingController _controllerLongitude = TextEditingController();
+
+
+  String markerIdVal({bool increment = false}) {
+    String val = 'marker_id_$markerIdCounter';
+    if (increment) markerIdCounter++;
+    return val;
+  }
+
+
+  void onMapCreated(GoogleMapController controller) {
+    _controller.complete(controller);
+    Geolocator.getCurrentPosition().then((value) {
+      setState(() {
+        currentPosition = LatLng(value.latitude, value.longitude);
+        if (currentPosition != null) {
+          MarkerId markerId = MarkerId(markerIdVal());
+          LatLng position = currentPosition!;
+          Marker marker = Marker(
+            markerId: markerId,
+            position: position,
+            draggable: false,
+          );
+          markersgm(markerId, marker);
+
+          Future.delayed(
+            const Duration(seconds: 1),
+            () async {
+              GoogleMapController controller = await _controller.future;
+              controller.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                    target: position,
+                    zoom: 15.0,
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      });
+    });
+  }
+
+  void markersgm(MarkerId markerId, Marker updateMarker) {
+    markers[markerId] = updateMarker;
+    print(markers);
+    _controllerLatitude.text = updateMarker.position.latitude.toString();
+    _controllerLongitude.text = updateMarker.position.longitude.toString();
+    // update();
+  }
+  
+   Future pickImage() async {
+    final  _imagePicker = ImagePicker();
+    //var imagepicked = await _imagePicker.getImage(source: ImageSource.gallery, maxHeight: 200, maxWidth: 200);
+    var imagepicked = await _imagePicker.pickImage(source: ImageSource.gallery, maxHeight: 1080, maxWidth: 920);
+
+    
+    if (imagepicked != null) {
+      setState(() {
+      imageFile = File(imagepicked.path);
+      fileName = (imageFile!.path);
+    });
+      
+    } else {
+      print('No image selected!');
+      
+    }
+}
+
+  Future uploadPicture() async {
+    final SignInBloc sb = context.read<SignInBloc>();
+    Reference storageReference = FirebaseStorage.instance.ref().child('Profile Pictures/${DateTime.now()}');
+    UploadTask uploadTask = storageReference.putFile(imageFile!);
+
+    await uploadTask.whenComplete(()async{
+      var _url = await storageReference.getDownloadURL();
+      var _imageUrl = _url.toString();
+      setState(() {
+        imageUrl = _imageUrl;
+      });
+      });
+      
+    }
+
+     handleUpdateData () async {
+    final sb = context.read<SignInBloc>();
+    await AppService().checkInternet().then((hasInternet) async {
+      if(hasInternet == false){       ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'No internet',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        
+      }
+      else{
+
+        if(formKey.currentState!.validate()){
+          formKey.currentState!.save();
+          setState(()=> loading = true);
+          
+          imageFile == null ?
+          await  FirebaseFirestore.instance
+          .runTransaction((Transaction transaction) async {
+        SharedPreferences prefs;
+        prefs = await SharedPreferences.getInstance();
+        FirebaseFirestore.instance
+            .collection("event") .add({
+             "category": dropdownvalue.toString(),
+              "date":timeCtrl.text+", "+dateCtrl.text,
+              "description":descCtrl.text,
+              "id":sb.name ??''+titleCtrl.text,
+              "image":imageUrl,
+              "location":locCtrl.text,
+              "loves":"",
+              "mapsLangLink":43.8877866,
+              "mapsLatLink":-108.9674244,
+              "price": int.tryParse(priceCtrl.text)??0 ,
+              "title":titleCtrl.text,
+              "type":dropdownvalue2.toString(),
+              "userDesc":"Organizer",
+              "userName":sb.name,
+              "userProfile":sb.imageUrl
+               });
+      })
+          .then((value){
+               ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Upload Success',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        
+          setState(()=> loading = false);})
+
+
+          : await uploadPicture()
+            .then((value) =>  FirebaseFirestore.instance
+          .runTransaction((Transaction transaction) async {
+        SharedPreferences prefs;
+        prefs = await SharedPreferences.getInstance();
+        FirebaseFirestore.instance
+            .collection("event") .add({
+              "category": dropdownvalue.toString(),
+              "date":dateCtrl.text +", " +timeCtrl.text,
+              "description":descCtrl.text,
+              "id":sb.name ??''+DateTime.now().toString(),
+              "image":imageUrl,
+              "location":locCtrl.text,
+              "loves":"",
+              "mapsLangLink":43.8877866,
+              "mapsLatLink":-108.9674244,
+              "price":int.tryParse(priceCtrl.text)??0 ,
+              "title":titleCtrl.text,
+              "type":dropdownvalue2.toString(),
+              "userDesc":"Organizer",
+              "userName":sb.name,
+              "userProfile":sb.imageUrl
+        });
+      })
+            .then((_) {
+        //        ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     backgroundColor: Colors.blue,
+        //     content: Text(
+        //       'Update Success',
+        //       textAlign: TextAlign.center,
+        //     ),
+        //   ),
+        // );
+
+          showDialog(
+                        builder: (context) {
+                          return const EventpublishDialog();
+                        },
+                        context: context);
+            setState(()=> loading = false );}));
+        }   
+      }
+    });
+  }
+
+  void permission() async{
+     LocationPermission permission;
+   permission = await Geolocator.requestPermission();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+permission();
+     Geolocator.getCurrentPosition().then((value) {
+      setState(() {
+        currentPosition = LatLng(value.latitude, value.longitude);
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    
+    
+    return Form(
+              key: formKey,
+      child: Column(
+        children: [
+          buildAppBar(),
+          Divider(color: dividerColor, thickness: 1.h, height: 1.h),
+          Expanded(
+              flex: 1,
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 20.h),
+                primary: true,
+                shrinkWrap: true,
+                children: [
+                  getVerSpace(20.h),
+                  // buildImageWidget(),
+                  GestureDetector(
+            onTap: () {
+            
+                  pickImage();
+            },
+            child: GetBuilder<CreateEventController>(
+              init: CreateEventController(),
+              builder: (controller) => imageFile == null
+                  ? Container(
+                      height: 155.h,
+                      decoration: BoxDecoration(
+                          color: lightColor,
+                          borderRadius: BorderRadius.circular(22.h)),
+                      child: DottedBorder(
+                          dashPattern: const [6, 6],
+                          color: accentColor,
+                          strokeWidth: 1.h,
+                          radius: Radius.circular(22.h),
+                          borderType: BorderType.RRect,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: Container(
+                                  height: 48.h,
+                                  width: 48.h,
+                                  padding: EdgeInsets.all(14.h),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: accentColor, width: 1.h),
+                                      borderRadius: BorderRadius.circular(13.h)),
+                                  child: getSvgImage("add.svg",
+                                      color: accentColor,
+                                      width: 20.h,
+                                      height: 20.h),
+                                ),
+                              ),
+                              getVerSpace(10.h),
+                              getCustomFont(
+                                  "Add Cover Image", 15.sp, greyColor, 1,
+                                  fontWeight: FontWeight.w500, txtHeight: 1.46.h),
+                            ],
+                          )),
+                    )
+                  : Container(
+                      height: 155,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(22.h),
+                          image: DecorationImage(
+                              image: FileImage(imageFile!),
+                              fit: BoxFit.cover)),
+                    ),
+            ),
+          ),
+
+          Text(imageUrl??'dsa'),
+                  getVerSpace(20.h),
+                  getCustomFont("Enter event title", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  getDefaultTextFiledWithLabel(
+                      context, "Enter event title", titleCtrl,
+                      isEnable: false, height: 60.h),
+                  getVerSpace(20.h),
+                  getCustomFont("Event Category", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22.h),
+                        border: Border.all(color: borderColor, width: 1.h)),
+                    padding: EdgeInsets.symmetric(horizontal: 18.h),
+                    alignment: Alignment.center,
+                    child: DropdownButton(
+                      value: dropdownvalue,
+                      underline: Container(),
+                      isDense: true,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5.h,
+                          fontFamily: Constant.fontsFamily),
+                      icon: getSvgImage("arrow_down.svg",
+                          width: 20.h, height: 20.h),
+                      isExpanded: true,
+                      items: items.map((String items) {
+                        return DropdownMenuItem(
+                          value: items,
+                          child: Text(items),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownvalue = newValue!;
+                        });
+                      },
+                    ),
+                  ),
+                  getVerSpace(20.h),
+                  getCustomFont("Event Type", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  Container(
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22.h),
+                        border: Border.all(color: borderColor, width: 1.h)),
+                    padding: EdgeInsets.symmetric(horizontal: 18.h),
+                    alignment: Alignment.center,
+                    child: DropdownButton(
+                      value: dropdownvalue2,
+                      underline: Container(),
+                      isDense: true,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5.h,
+                          fontFamily: Constant.fontsFamily),
+                      icon: getSvgImage("arrow_down.svg",
+                          width: 20.h, height: 20.h),
+                      isExpanded: true,
+                      items: items2.map((String items2) {
+                        return DropdownMenuItem(
+                          value: items2,
+                          child: Text(items2),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownvalue2 = newValue!;
+                        });
+                      },
+                    ),
+                  ),
+             
+                  getVerSpace(20.h),
+                  getCustomFont("Venue Address", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  getDefaultTextFiledWithLabel(
+                      context, "Enter address", locCtrl,
+                      isEnable: false, height: 60.h, minLines: true),
+                          getVerSpace(20.h),
+                  getCustomFont("Enter Description", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  getDefaultTextFiledWithLabel(
+                      context, "Enter description", descCtrl,
+                      isEnable: false, height: 60.h, minLines: true),
+                  // getVerSpace(20.h),
+                  // getCustomFont("Event Type", 16.sp, Colors.black, 1,
+                  //     fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  // getVerSpace(4.h),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //         child: GestureDetector(
+                  //       onTap: () {
+                  //         controller.onChange(0.obs);
+                  //       },
+                  //       child: Container(
+                  //         height: 60.h,
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             border: Border.all(color: borderColor, width: 1.h),
+                  //             borderRadius: BorderRadius.circular(22.h)),
+                  //         padding: EdgeInsets.only(left: 18.h),
+                  //         child: Row(
+                  //           children: [
+                  //             GetX<CreateEventController>(
+                  //               builder: (controller) => getSvgImage(
+                  //                   controller.select.value == 0
+                  //                       ? "checkRadio.svg"
+                  //                       : "uncheckRadio.svg",
+                  //                   width: 24.h,
+                  //                   height: 24.h),
+                  //               init: CreateEventController(),
+                  //             ),
+                  //             getHorSpace(10.h),
+                  //             getCustomFont(
+                  //                 "Private event", 16.sp, Colors.black, 1,
+                  //                 fontWeight: FontWeight.w500)
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     )),
+                  //     getHorSpace(20.h),
+                  //     Expanded(
+                  //         child: GestureDetector(
+                  //       onTap: () {
+                  //         controller.onChange(1.obs);
+                  //       },
+                  //       child: Container(
+                  //         height: 60.h,
+                  //         decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             border: Border.all(color: borderColor, width: 1.h),
+                  //             borderRadius: BorderRadius.circular(22.h)),
+                  //         padding: EdgeInsets.only(left: 18.h),
+                  //         child: Row(
+                  //           children: [
+                  //             GetX<CreateEventController>(
+                  //               builder: (controller) => getSvgImage(
+                  //                   controller.select.value == 1
+                  //                       ? "checkRadio.svg"
+                  //                       : "uncheckRadio.svg",
+                  //                   width: 24.h,
+                  //                   height: 24.h),
+                  //               init: CreateEventController(),
+                  //             ),
+                  //             getHorSpace(10.h),
+                  //             getCustomFont(
+                  //                 "Public event", 16.sp, Colors.black, 1,
+                  //                 fontWeight: FontWeight.w500)
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ))
+                  //   ],
+                  // ),
+                
+                  getVerSpace(20.h),
+                  getCustomFont("Price", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                   TextFormField(
+                     style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 16.sp,
+            fontFamily: Constant.fontsFamily),
+        decoration: InputDecoration(
+             hintText: 'Enter Price',
+                      labelText: 'Price',
+            counter: Container(),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: 20, horizontal: 20),
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: accentColor, width: 1.h)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: errorColor, width: 1.h)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: errorColor, width: 1.h)),
+            errorStyle: TextStyle(
+                color: Colors.red,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                height: 1.5.h,
+                fontFamily: Constant.fontsFamily),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            suffixIconConstraints: BoxConstraints(
+              maxHeight: 24.h,
+            ),
+          
+            hintStyle: TextStyle(
+                color: greyColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 16.sp,
+                fontFamily: Constant.fontsFamily)),
+                    controller: priceCtrl,
+                    keyboardType: TextInputType.number,
+                    validator: (String? value){
+                      if (value!.isEmpty) return "price can't be empty";
+                      return null;
+                    },
+                    // onChanged: (String value){
+                    //   setState(() {
+                    //     email = value;
+                    //   });
+                    // },
+                  ),
+                  // getDefaultTextFiledWithLabel(
+                  //     context, "Enter price", priceCtrl,
+                  //     isEnable: false, height: 60.h),
+                  getVerSpace(20.h),
+                  getCustomFont("Date", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  getDefaultTextFiledWithLabel(
+                      context, "Select date", dateCtrl,
+                      isEnable: true,
+                      height: 60.h,
+                      withSufix: true,
+                      suffiximage: 'calender_black.svg', onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1950),
+                      lastDate: DateTime(2100),
+                      builder: (context, child) {
+                        return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: accentColor,
+                              ),
+                              textButtonTheme: TextButtonThemeData(
+                                style: TextButton.styleFrom(
+                                  primary: accentColor, // button text color
+                                ),
+                              ),
+                            ),
+                            child: child!);
+                      },
+                    );
+    
+                    if (pickedDate != null) {
+                      String formattedDate =
+                          DateFormat('d MMMM, yyyy').format(pickedDate);
+                                setState(() {
+                                  dateCtrl.text = formattedDate;
+                                });
+                      // controller.onDateChange(formattedDate.obs);
+                    } else {}
+                  }, isReadonly: true),
+                  getVerSpace(20.h),
+                  getCustomFont("Time", 16.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                  getVerSpace(4.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: getDefaultTextFiledWithLabel(
+                            context, "Start time", timeCtrl,
+                            isEnable: false,
+                            height: 60.h,
+                            isReadonly: true, onTap: () async {
+                          TimeOfDay? timeOfDay = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                            initialEntryMode: TimePickerEntryMode.dial,
+                          );
+                          if (timeOfDay != null) {
+    
+                            final now = DateTime.now();
+                            var startTime = DateTime(now.year, now.month, now.day,
+                                timeOfDay.hour, timeOfDay.minute);
+                            final format = DateFormat.jm();
+                             setState(() {
+                                  timeCtrl.text = format.format(startTime);
+                                });
+                            // controller
+                            //     .onStartTimeChange(format.format(startTime).obs);
+                          }
+                        }),
+                      ),
+                      // getHorSpace(20.h),
+                      // Expanded(
+                      //   child: getDefaultTextFiledWithLabel(
+                      //       context, "End time", controller.endTimeController,
+                      //       isEnable: false,
+                      //       height: 60.h,
+                      //       isReadonly: true, onTap: () async {
+                      //     TimeOfDay? timeOfDay = await showTimePicker(
+                      //       context: context,
+                      //       initialTime: TimeOfDay.now(),
+                      //       initialEntryMode: TimePickerEntryMode.dial,
+                      //     );
+                      //     if (timeOfDay != null) {
+                      //       final now = DateTime.now();
+                      //       var startTime = DateTime(now.year, now.month, now.day,
+                      //           timeOfDay.hour, timeOfDay.minute);
+                      //       final format = DateFormat.jm();
+                      //       controller
+                      //           .onEndTimeChange(format.format(startTime).obs);
+                      //     }
+                      //   }),
+                      // ),
+                    ],
+                  ),
+                  
+            Container(
+              height: 50,
+              width: double.infinity,
+              margin: EdgeInsets.only(
+                top: 25,
+              ),
+              child: TextFormField(
+                controller: _controllerNamaLokasi,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Nama lokasi',
+                  hintStyle: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  fillColor: const Color(0xFFE8EAF3),
+                  filled: true,
+                  prefixIcon: const Icon(Icons.place),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: 50,
+              width: double.infinity,
+              margin: const EdgeInsets.only(
+                top: 24,
+              ),
+              child: TextFormField(
+                readOnly: true,
+                controller: _controllerLatitude,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Latitude',
+                  hintStyle: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  fillColor: const Color(0xFFE8EAF3),
+                  filled: true,
+                  prefixIcon: const Icon(Icons.multiple_stop),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                ),
+              ),
+            ),
+             SizedBox(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height * .4,
+      child: GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: CameraPosition(
+          target:  currentPosition == null? const LatLng(-6.1753924, 106.8249641): LatLng(currentPosition!.latitude, currentPosition!.longitude),
+          zoom: 15,
+        ),
+        markers: Set<Marker>.of(markers.values),
+        onMapCreated: onMapCreated,
+        onCameraMove: (position) {
+          if (markers.values.isNotEmpty) {
+            MarkerId markerId = MarkerId(markerIdVal());
+            Marker? marker = markers[markerId];
+            Marker updatedMarker = marker!.copyWith(
+              positionParam: position.target,
+            );
+            setState(() {
+              markersgm(markerId, updatedMarker);
+            });
+          }
+        },
+        zoomControlsEnabled: false,
+        zoomGesturesEnabled: true,
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
+      ),
+    ),
+            Container(
+              height: 50,
+              width: double.infinity,
+              margin: const EdgeInsets.only(
+                top: 24,
+              ),
+              child: TextFormField(
+                readOnly: false,
+                controller: _controllerLongitude,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Longitude',
+                  hintStyle: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                    borderSide: const BorderSide(color: Colors.transparent),
+                  ),
+                  fillColor: const Color(0xFFE8EAF3),
+                  filled: true,
+                  prefixIcon: const Icon(Icons.multiple_stop),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 0,
+                  ),
+                ),
+              ),
+            ),
+  
+                  getVerSpace(30.h),
+
+                  loading == true 
+                  ? Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                 :  getButton(context, accentColor, "Publish", Colors.white, () {
+                  handleUpdateData();
+                  
+                  }, 18.sp,
+                      weight: FontWeight.w700,
+                      borderRadius: BorderRadius.circular(22.h),
+                      buttonHeight: 60.h),
+                  getVerSpace(50.h),
+                ],
+              ))
+        ],
+      ),
+    );
+  }
+
+  Column buildImageWidget() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (controller.image1 == null) {
+              _onPictureSelection1();
+            }
+          },
+          child: GetBuilder<CreateEventController>(
+            init: CreateEventController(),
+            builder: (controller) => controller.image1 == null
+                ? Container(
+                    height: 155.h,
+                    decoration: BoxDecoration(
+                        color: lightColor,
+                        borderRadius: BorderRadius.circular(22.h)),
+                    child: DottedBorder(
+                        dashPattern: const [6, 6],
+                        color: accentColor,
+                        strokeWidth: 1.h,
+                        radius: Radius.circular(22.h),
+                        borderType: BorderType.RRect,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                height: 48.h,
+                                width: 48.h,
+                                padding: EdgeInsets.all(14.h),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: accentColor, width: 1.h),
+                                    borderRadius: BorderRadius.circular(13.h)),
+                                child: getSvgImage("add.svg",
+                                    color: accentColor,
+                                    width: 20.h,
+                                    height: 20.h),
+                              ),
+                            ),
+                            getVerSpace(10.h),
+                            getCustomFont(
+                                "Add Cover Image", 15.sp, greyColor, 1,
+                                fontWeight: FontWeight.w500, txtHeight: 1.46.h),
+                          ],
+                        )),
+                  )
+                : Container(
+                    height: 155.h,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22.h),
+                        image: DecorationImage(
+                            image: FileImage(controller.image1!),
+                            fit: BoxFit.fill)),
+                  ),
+          ),
+        ),
+        getVerSpace(20.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (controller.image2 == null) {
+                  _onPictureSelection2();
+                }
+              },
+              child: GetBuilder<CreateEventController>(
+                init: CreateEventController(),
+                builder: (controller) => controller.image2 == null
+                    ? Container(
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            color: lightColor,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        child: DottedBorder(
+                          dashPattern: const [6, 6],
+                          color: accentColor,
+                          strokeWidth: 1.h,
+                          padding: EdgeInsets.all(27.h),
+                          radius: Radius.circular(22.h),
+                          borderType: BorderType.RRect,
+                          child: getSvgImage("add.svg",
+                              color: accentColor, height: 24.h, width: 24.h),
+                        ),
+                      )
+                    : Container(
+                        width: 78.w,
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(22.h),
+                            image: DecorationImage(
+                                image: FileImage(controller.image2!),
+                                fit: BoxFit.fill)),
+                        padding: EdgeInsets.only(
+                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.onImage2Null();
+                          },
+                          child: getSvgImage("close.svg",
+                              width: 18.h, height: 18.h),
+                        ),
+                      ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (controller.image3 == null) {
+                  controller.getImage3();
+                }
+              },
+              child: GetBuilder<CreateEventController>(
+                init: CreateEventController(),
+                builder: (controller) => controller.image3 == null
+                    ? Container(
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            color: lightColor,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        child: DottedBorder(
+                          dashPattern: const [6, 6],
+                          color: accentColor,
+                          strokeWidth: 1.h,
+                          padding: EdgeInsets.all(27.h),
+                          radius: Radius.circular(22.h),
+                          borderType: BorderType.RRect,
+                          child: getSvgImage("add.svg",
+                              color: accentColor, height: 24.h, width: 24.h),
+                        ),
+                      )
+                    : Container(
+                        width: 78.w,
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(22.h),
+                            image: DecorationImage(
+                                image: FileImage(controller.image3!),
+                                fit: BoxFit.fill)),
+                        padding: EdgeInsets.only(
+                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.onImage3Null();
+                          },
+                          child: getSvgImage("close.svg",
+                              width: 18.h, height: 18.h),
+                        ),
+                      ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (controller.image4 == null) {
+                  controller.getImage4();
+                }
+              },
+              child: GetBuilder<CreateEventController>(
+                init: CreateEventController(),
+                builder: (controller) => controller.image4 == null
+                    ? Container(
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            color: lightColor,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        child: DottedBorder(
+                          dashPattern: const [6, 6],
+                          color: accentColor,
+                          strokeWidth: 1.h,
+                          padding: EdgeInsets.all(27.h),
+                          radius: Radius.circular(22.h),
+                          borderType: BorderType.RRect,
+                          child: getSvgImage("add.svg",
+                              color: accentColor, height: 24.h, width: 24.h),
+                        ),
+                      )
+                    : Container(
+                        width: 78.w,
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(22.h),
+                            image: DecorationImage(
+                                image: FileImage(controller.image4!),
+                                fit: BoxFit.fill)),
+                        padding: EdgeInsets.only(
+                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.onImage4Null();
+                          },
+                          child: getSvgImage("close.svg",
+                              width: 18.h, height: 18.h),
+                        ),
+                      ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (controller.image5 == null) {
+                  controller.getImage5();
+                }
+              },
+              child: GetBuilder<CreateEventController>(
+                init: CreateEventController(),
+                builder: (controller) => controller.image5 == null
+                    ? Container(
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            color: lightColor,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        child: DottedBorder(
+                          dashPattern: const [6, 6],
+                          color: accentColor,
+                          strokeWidth: 1.h,
+                          padding: EdgeInsets.all(27.h),
+                          radius: Radius.circular(22.h),
+                          borderType: BorderType.RRect,
+                          child: getSvgImage("add.svg",
+                              color: accentColor, height: 24.h, width: 24.h),
+                        ),
+                      )
+                    : Container(
+                        width: 78.w,
+                        height: 78.h,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(22.h),
+                            image: DecorationImage(
+                                image: FileImage(controller.image5!),
+                                fit: BoxFit.fill)),
+                        padding: EdgeInsets.only(
+                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+                        child: GestureDetector(
+                          onTap: () {
+                            controller.onImage5Null();
+                          },
+                          child: getSvgImage("close.svg",
+                              width: 18.h, height: 18.h),
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  AppBar buildAppBar() {
+    return getToolBar(() {},
+        title: getCustomFont("Create Event", 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+        leading: false);
+  }
+}
