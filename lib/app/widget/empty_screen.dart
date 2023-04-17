@@ -16,25 +16,23 @@ class EmptyScreen extends StatelessWidget {
               children: [
                  
                      Container(
-                              height: 208.h,
-                              width: 208.h,
                               decoration: BoxDecoration(
                                   color: lightColor,
                                   borderRadius: BorderRadius.circular(187.h)),
                               padding: EdgeInsets.all(27.h),
-                              child: getAssetImage("bell.png",
-                                  height: 114.h, width: 114.h),
+                              child: getAssetImage("onBoarding3.png",
+                                   width: 214.h,boxFit: BoxFit.cover),
                             ),
-                            getVerSpace(28.h),
                             getCustomFont(
-                                "No Item Yet!", 20.sp, Colors.black, 1,
+                                "Item Empty", 20.sp, Colors.black, 1,
                                 fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                             getVerSpace(8.h),
                             getMultilineCustomFont(
-                                "Not have item data",
+                                "Sorry, we couldn't find any results for your item.",
                                 16.sp,
                                 Colors.black,
                                 fontWeight: FontWeight.w500,
+                                textAlign: TextAlign.center,
                                 txtHeight: 1.5.h)
               ],
             ),

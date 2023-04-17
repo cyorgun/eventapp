@@ -159,6 +159,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
      handleUpdateData () async {
     final sb = context.read<SignInBloc>();
+    
+  
+  DateTime chosenDate = DateFormat('dd/MM/yyyy').parse(dateCtrl.text);
+  Timestamp timestamp = Timestamp.fromDate(chosenDate);
     await AppService().checkInternet().then((hasInternet) async {
       if(hasInternet == false){       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -185,15 +189,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         FirebaseFirestore.instance
             .collection("event") .add({
              "category": dropdownvalue.toString(),
-              "date":timeCtrl.text+", "+dateCtrl.text,
+              "date":timestamp,
+              "time":timeCtrl.text,
               "description":descCtrl.text,
               "id":sb.name ??''+titleCtrl.text,
               "image":imageUrl,
               "location":locCtrl.text,
+              'createdAt':FieldValue.serverTimestamp(),
               "loves":"",
               "mapsLangLink":43.8877866,
+              'count':0,
               "mapsLatLink":-108.9674244,
-              "price": int.tryParse(priceCtrl.text)??0 ,
+              "price": int.tryParse(priceCtrl.text)??0,
               "title":titleCtrl.text,
               "type":dropdownvalue2.toString(),
               "userDesc":"Organizer",
@@ -223,12 +230,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         FirebaseFirestore.instance
             .collection("event") .add({
               "category": dropdownvalue.toString(),
-              "date":dateCtrl.text +", " +timeCtrl.text,
+              "date":timestamp,
+              "time":timeCtrl.text,
+              'createdAt':FieldValue.serverTimestamp(),
               "description":descCtrl.text,
               "id":sb.name ??''+DateTime.now().toString(),
               "image":imageUrl,
               "location":locCtrl.text,
               "loves":"",
+              'count':0,
               "mapsLangLink":43.8877866,
               "mapsLatLink":-108.9674244,
               "price":int.tryParse(priceCtrl.text)??0 ,
@@ -628,10 +638,13 @@ permission();
     
                     if (pickedDate != null) {
                       String formattedDate =
-                          DateFormat('d MMMM, yyyy').format(pickedDate);
+                          DateFormat('dd/MM/yyyy').format(pickedDate);
                                 setState(() {
                                   dateCtrl.text = formattedDate;
                                 });
+
+                                
+   
                       // controller.onDateChange(formattedDate.obs);
                     } else {}
                   }, isReadonly: true),
@@ -691,145 +704,145 @@ permission();
                     ],
                   ),
                   
-            Container(
-              height: 50,
-              width: double.infinity,
-              margin: EdgeInsets.only(
-                top: 25,
-              ),
-              child: TextFormField(
-                controller: _controllerNamaLokasi,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Nama lokasi',
-                  hintStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  fillColor: const Color(0xFFE8EAF3),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.place),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 0,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              height: 50,
-              width: double.infinity,
-              margin: const EdgeInsets.only(
-                top: 24,
-              ),
-              child: TextFormField(
-                readOnly: true,
-                controller: _controllerLatitude,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Latitude',
-                  hintStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  fillColor: const Color(0xFFE8EAF3),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.multiple_stop),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 0,
-                  ),
-                ),
-              ),
-            ),
-             SizedBox(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * .4,
-      child: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: CameraPosition(
-          target:  currentPosition == null? const LatLng(-6.1753924, 106.8249641): LatLng(currentPosition!.latitude, currentPosition!.longitude),
-          zoom: 15,
-        ),
-        markers: Set<Marker>.of(markers.values),
-        onMapCreated: onMapCreated,
-        onCameraMove: (position) {
-          if (markers.values.isNotEmpty) {
-            MarkerId markerId = MarkerId(markerIdVal());
-            Marker? marker = markers[markerId];
-            Marker updatedMarker = marker!.copyWith(
-              positionParam: position.target,
-            );
-            setState(() {
-              markersgm(markerId, updatedMarker);
-            });
-          }
-        },
-        zoomControlsEnabled: false,
-        zoomGesturesEnabled: true,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false,
-      ),
-    ),
-            Container(
-              height: 50,
-              width: double.infinity,
-              margin: const EdgeInsets.only(
-                top: 24,
-              ),
-              child: TextFormField(
-                readOnly: false,
-                controller: _controllerLongitude,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Longitude',
-                  hintStyle: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    borderSide: const BorderSide(color: Colors.transparent),
-                  ),
-                  fillColor: const Color(0xFFE8EAF3),
-                  filled: true,
-                  prefixIcon: const Icon(Icons.multiple_stop),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 0,
-                  ),
-                ),
-              ),
-            ),
+    //         Container(
+    //           height: 50,
+    //           width: double.infinity,
+    //           margin: EdgeInsets.only(
+    //             top: 25,
+    //           ),
+    //           child: TextFormField(
+    //             controller: _controllerNamaLokasi,
+    //             style: const TextStyle(
+    //               fontWeight: FontWeight.w500,
+    //               fontSize: 14,
+    //             ),
+    //             decoration: InputDecoration(
+    //               hintText: 'Nama lokasi',
+    //               hintStyle: const TextStyle(
+    //                 fontWeight: FontWeight.w500,
+    //                 fontSize: 14,
+    //               ),
+    //               enabledBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               focusedBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               fillColor: const Color(0xFFE8EAF3),
+    //               filled: true,
+    //               prefixIcon: const Icon(Icons.place),
+    //               contentPadding: const EdgeInsets.symmetric(
+    //                 horizontal: 16,
+    //                 vertical: 0,
+    //               ),
+    //             ),
+    //           ),
+    //         ),
+    //         Container(
+    //           height: 50,
+    //           width: double.infinity,
+    //           margin: const EdgeInsets.only(
+    //             top: 24,
+    //           ),
+    //           child: TextFormField(
+    //             readOnly: true,
+    //             controller: _controllerLatitude,
+    //             style: const TextStyle(
+    //               fontWeight: FontWeight.w500,
+    //               fontSize: 14,
+    //             ),
+    //             decoration: InputDecoration(
+    //               hintText: 'Latitude',
+    //               hintStyle: const TextStyle(
+    //                 fontWeight: FontWeight.w500,
+    //                 fontSize: 14,
+    //               ),
+    //               enabledBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               focusedBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               fillColor: const Color(0xFFE8EAF3),
+    //               filled: true,
+    //               prefixIcon: const Icon(Icons.multiple_stop),
+    //               contentPadding: const EdgeInsets.symmetric(
+    //                 horizontal: 16,
+    //                 vertical: 0,
+    //               ),
+    //             ),
+    //           ),
+    //         ),
+    //          SizedBox(
+    //   width: double.infinity,
+    //   height: MediaQuery.of(context).size.height * .4,
+    //   child: GoogleMap(
+    //     mapType: MapType.normal,
+    //     initialCameraPosition: CameraPosition(
+    //       target:  currentPosition == null? const LatLng(-6.1753924, 106.8249641): LatLng(currentPosition!.latitude, currentPosition!.longitude),
+    //       zoom: 15,
+    //     ),
+    //     markers: Set<Marker>.of(markers.values),
+    //     onMapCreated: onMapCreated,
+    //     onCameraMove: (position) {
+    //       if (markers.values.isNotEmpty) {
+    //         MarkerId markerId = MarkerId(markerIdVal());
+    //         Marker? marker = markers[markerId];
+    //         Marker updatedMarker = marker!.copyWith(
+    //           positionParam: position.target,
+    //         );
+    //         setState(() {
+    //           markersgm(markerId, updatedMarker);
+    //         });
+    //       }
+    //     },
+    //     zoomControlsEnabled: false,
+    //     zoomGesturesEnabled: true,
+    //     myLocationEnabled: true,
+    //     myLocationButtonEnabled: false,
+    //   ),
+    // ),
+    //         Container(
+    //           height: 50,
+    //           width: double.infinity,
+    //           margin: const EdgeInsets.only(
+    //             top: 24,
+    //           ),
+    //           child: TextFormField(
+    //             readOnly: false,
+    //             controller: _controllerLongitude,
+    //             style: const TextStyle(
+    //               fontWeight: FontWeight.w500,
+    //               fontSize: 14,
+    //             ),
+    //             decoration: InputDecoration(
+    //               hintText: 'Longitude',
+    //               hintStyle: const TextStyle(
+    //                 fontWeight: FontWeight.w500,
+    //                 fontSize: 14,
+    //               ),
+    //               enabledBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               focusedBorder: OutlineInputBorder(
+    //                 borderRadius: BorderRadius.circular(6),
+    //                 borderSide: const BorderSide(color: Colors.transparent),
+    //               ),
+    //               fillColor: const Color(0xFFE8EAF3),
+    //               filled: true,
+    //               prefixIcon: const Icon(Icons.multiple_stop),
+    //               contentPadding: const EdgeInsets.symmetric(
+    //                 horizontal: 16,
+    //                 vertical: 0,
+    //               ),
+    //             ),
+    //           ),
+    //         ),
   
                   getVerSpace(30.h),
 

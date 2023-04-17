@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_app/app/view/home/tab/tab_home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
 
 import '../../../../base/color_data.dart';
+import '../../../../base/widget_utils.dart';
 import '../../../modal/modal_event.dart';
 import '../../featured_event/featured_event_detail2.dart';
 import '../cardSlider/cardSlider.dart';
@@ -23,18 +27,16 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   bool isMapCreated = false;
   // List<Marker> allMarkers = [];
 
-  List<Marker> allMarkers  = [];
+  List<Marker> allMarkers = [];
   PageController? _pageController;
-   List<DocumentSnapshot> dataList = [];
+  List<DocumentSnapshot> dataList = [];
 
-   
   List<Map<dynamic, dynamic>> dataList2 = [];
-  
+
   final firestoreInstance = FirebaseFirestore.instance;
   // List<DocumentSnapshot> dataList = [];
 
   int? prevPage;
-
 
   @override
   void initState() {
@@ -60,11 +62,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
     //     ));
     //   });
     // });
-FirebaseFirestore.instance
-        .collection('event')
-        .get()
-        .then(( querySnapshot) {
-          
+    FirebaseFirestore.instance.collection('event').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         Map<String, dynamic> data = doc.data();
         LatLng latLng = LatLng(data['mapsLatLink'], data['mapsLangLink']);
@@ -79,17 +77,15 @@ FirebaseFirestore.instance
           icon:
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
         );
-          
-        markers.add(marker);
-         });
 
-      
+        markers.add(marker);
+      });
     });
     // getMarker();
     getDataFromFirestore();
     _pageController = PageController(initialPage: 1, viewportFraction: 0.8)
       ..addListener(_onScroll);
-      
+
     super.initState();
   }
 
@@ -108,7 +104,6 @@ FirebaseFirestore.instance
       });
     });
   }
- 
 
   void _onScroll() {
     if (_pageController!.page!.toInt() != prevPage) {
@@ -125,7 +120,7 @@ FirebaseFirestore.instance
     _controller.setMapStyle(mapStyle);
   }
 
-   void getDataFromFirestore() {
+  void getDataFromFirestore() {
     FirebaseFirestore.instance.collection("event").get().then((querySnapshot) {
       setState(() {
         dataList.clear();
@@ -133,113 +128,113 @@ FirebaseFirestore.instance
       });
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // if (isMapCreated) {
     //   getJsonFile("assets/nightmode.json").then(setMapStyle);
     // }
+
     return Scaffold(
         body: Stack(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                mapType: MapType.normal,
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(40.7078523, -74.008981), zoom: 13.0),
+      children: <Widget>[
+        Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: GoogleMap(
+            mapType: MapType.normal,
+            initialCameraPosition: CameraPosition(
+                target: LatLng(40.7078523, -74.008981), zoom: 13.0),
 
-                // markers: markers,
-                onTap: (pos) {
-                  print(pos);
-                  Marker m = Marker(
-                      markerId: MarkerId('1'),
-                      icon: customIcon!,
-                      position: pos);
-                  setState(() {
-                    markers.add(m);
-                  });
-                },
-                markers:
-                    Set.from(markers),
-                    //                {
-                    // Marker(
-                    //   markerId: const MarkerId("marker1"),
-                    //   position:  LatLng(40.7078523, -74.008981),
-                    //   draggable: true,
-                    //   onDragEnd: (value) {
-                    //     // value is the new position
-                    //   },
-                    //   // To do: custom marker icon
-                    // ),},
+            // markers: markers,
+            onTap: (pos) {
+              print(pos);
+              Marker m = Marker(
+                  markerId: MarkerId('1'), icon: customIcon!, position: pos);
+              setState(() {
+                markers.add(m);
+              });
+            },
+            markers: Set.from(markers),
+            //                {
+            // Marker(
+            //   markerId: const MarkerId("marker1"),
+            //   position:  LatLng(40.7078523, -74.008981),
+            //   draggable: true,
+            //   onDragEnd: (value) {
+            //     // value is the new position
+            //   },
+            //   // To do: custom marker icon
+            // ),},
 
-                onMapCreated: (GoogleMapController controller) {
-                  _controller = controller;
-                },
-              ),
-            ),
-          dataList.length == 0
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          :  Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 200.0,
-                width: MediaQuery.of(context).size.width,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: dataList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return cardMaps(index);
-                  },
+            onMapCreated: (GoogleMapController controller) {
+              _controller = controller;
+            },
+          ),
+        ),
+        dataList.length == 0
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 200.0,
+                  width: MediaQuery.of(context).size.width,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: dataList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return cardMaps(index);
+                    },
+                  ),
                 ),
               ),
-            ),
-            Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 0.0),
-                  child: Container(
-                    height: 55.0,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20.0, right: 20.0, top: 0.0),
-                      child: Center(
-                        child: Text(
-                          "Locations",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22.0,),
-                        ),
+        Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0),
+              child: Container(
+                height: 55.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0),
+                  child: Center(
+                    child: Text(
+                      "Locations",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "Gilroy",
+                        fontWeight: FontWeight.w700,
+                        fontSize: 22.0,
                       ),
                     ),
                   ),
                 ),
-                Container(
-                  height: 40.0,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: <Color>[
-                        Colors.white.withOpacity(0.1),
-                        Colors.white.withOpacity(0.6),
-                        Colors.white,
-                      ],
-                    ),
-                  ),
+              ),
+            ),
+            Container(
+              height: 40.0,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: <Color>[
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.6),
+                    Colors.white,
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
-        ));
+        ),
+      ],
+    ));
   }
 
   moveCamera() {
@@ -257,24 +252,25 @@ FirebaseFirestore.instance
           if (!snapshot.hasData) return CircularProgressIndicator();
           final List<Event> lokasiList = snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
-          final events = snapshot.data?.docs.map((e) {
-            return Event.fromFirestore(e);
-          }).toList();
+            final events = snapshot.data?.docs.map((e) {
+              return Event.fromFirestore(e);
+            }).toList();
+
             return Event(
-           category : data['category'],
-    date  : data['date'],
-    image: data['image'],
-    description  : data['description'],
-    id  : data['id'],
-    location  : data['location'],
-    mapsLangLink  : data['mapsLangLink'],
-    mapsLatLink  : data['mapsLatLink'],
-    price  : data['price'],
-    title  : data['title'],
-    type  : data['type'],
-    userDesc  : data['userDesc'],
-    userName  : data['userName'],
-    userProfile  : data['userProfile'],
+              category: data['category'],
+              date: data['date'],
+              image: data['image'],
+              description: data['description'],
+              id: data['id'],
+              location: data['location'],
+              mapsLangLink: data['mapsLangLink'],
+              mapsLatLink: data['mapsLatLink'],
+              price: data['price'],
+              title: data['title'],
+              type: data['type'],
+              userDesc: data['userDesc'],
+              userName: data['userName'],
+              userProfile: data['userProfile'],
             );
             // return Event.fromFirestore(events);
           }).toList();
@@ -305,29 +301,32 @@ FirebaseFirestore.instance
   }
 
   Widget card(lokasiList, i) {
+    DateTime? dateTime = lokasiList![i].date?.toDate();
+    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+
     return Padding(
       padding:
           const EdgeInsets.only(left: 0.0, right: 8.0, top: 5.0, bottom: 5.0),
       child: InkWell(
         onTap: () {
-           Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                    event:lokasiList[i],
-                        // category: category,
-                        // date: date,
-                        // description: description,
-                        // id: id,
-                        // image: image,
-                        // location: location,
-                        // mapsLangLink: mapsLangLink,
-                        // mapsLatLink: mapsLatLink,
-                        // price: price,
-                        // title: title,
-                        // type: type,
-                        // userDesc: userDesc,
-                        // userName: userName,
-                        // userProfile: userProfile,
-                      )));
+          Navigator.of(context).push(PageRouteBuilder(
+              pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
+                    event: lokasiList[i],
+                    // category: category,
+                    // date: date,
+                    // description: description,
+                    // id: id,
+                    // image: image,
+                    // location: location,
+                    // mapsLangLink: mapsLangLink,
+                    // mapsLatLink: mapsLatLink,
+                    // price: price,
+                    // title: title,
+                    // type: type,
+                    // userDesc: userDesc,
+                    // userName: userName,
+                    // userProfile: userProfile,
+                  )));
         },
         child: Container(
           height: 140.0,
@@ -364,7 +363,9 @@ FirebaseFirestore.instance
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(height: 5.0,),
+                    SizedBox(
+                      height: 5.0,
+                    ),
                     Container(
                         width: 150.0,
                         child: Text(
@@ -382,18 +383,17 @@ FirebaseFirestore.instance
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Icon(
-                            Icons.location_on,
-                            size: 13.0,
-                            color: Colors.black,
+                          getSvg("Location.svg",
+                              color: accentColor, width: 13.h, height: 13.h),
+                          SizedBox(
+                            width: 5.0,
                           ),
-                          SizedBox(width: 5.0,),
                           Container(
                             width: 140.0,
                             child: Text(
                               lokasiList[i].location ?? '',
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: greyColor,
                                   fontSize: 14.5,
                                   fontFamily: "Gilroy",
                                   fontWeight: FontWeight.w500),
@@ -404,19 +404,79 @@ FirebaseFirestore.instance
                         ],
                       ),
                     ),
-                    SizedBox(height: 5.0,),
-                    Container(
-                      height: 35.0,
-                      width: 80.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                          color: accentColor),
-                      child: Center(
-                          child: Text(
-                        lokasiList[i].category ?? '',
-                        style: TextStyle(color: Colors.white),
-                      )),
-                    )
+                    SizedBox(
+                      height: 1.0,
+                    ),
+                    Row(
+                      children: [
+                        getSvg("calender.svg",
+                            color: accentColor, width: 16.h, height: 16.h),
+                        getHorSpace(5.h),
+                        getCustomFont(
+                            date.toString() ?? "", 15.sp, greyColor, 1,
+                            fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                      ],
+                    ),
+
+                    Expanded(
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("JoinEvent")
+                            .doc("user")
+                            .collection(lokasiList[i].title ?? '')
+                            .snapshots(),
+                        builder: (BuildContext ctx,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+
+                          if (snapshot.data!.docs.isEmpty) {
+                            return Center(child:  Text(
+                                      "No one has joined yet",
+                                      style: TextStyle(
+                                          color: greyColor,
+                                          fontSize: 12.5,
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w500),
+                                    ));
+                          }
+                          if (snapshot.hasError) {
+                            return Center(child: Text('Error'));
+                          }
+                          return snapshot.hasData
+                              ? Row(
+                                  children: [
+                                    Text(
+                                      "People Join :",
+                                      style: TextStyle(
+                                          color: greyColor,
+                                          fontSize: 12.5,
+                                          fontFamily: "Gilroy",
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    new joinEvents(
+                                      list: snapshot.data?.docs,
+                                    ),
+                                  ],
+                                )
+                              : Container();
+                        },
+                      ),
+                    ),
+                    // Container(
+                    //   height: 35.0,
+                    //   width: 80.0,
+                    //   decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    //       color: accentColor),
+                    //   child: Center(
+                    //       child: Text(
+                    //     lokasiList[i].category ?? '',
+                    //     style: TextStyle(color: Colors.white),
+                    //   )),
+                    // )
                   ],
                 ),
               ),

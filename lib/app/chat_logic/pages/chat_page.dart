@@ -6,6 +6,7 @@ import 'package:event_app/app/chat_logic/models/message_chat.dart';
 import 'package:event_app/app/chat_logic/pages/full_photo_page.dart';
 import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:event_app/base/color_data.dart';
+import 'package:event_app/base/widget_utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -822,6 +823,7 @@ class ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.0,
@@ -1023,7 +1025,7 @@ class ChatPageState extends State<ChatPage> {
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type your message...',
-                  hintStyle: TextStyle(color: ColorConstants.greyColor),
+                  hintStyle: TextStyle(color: ColorConstants.greyColor,fontFamily: "Gilroy",fontWeight: FontWeight.w600,fontSize: 16.0),
                 ),
                 focusNode: focusNode,
                 autofocus: true,
@@ -1074,7 +1076,15 @@ class ChatPageState extends State<ChatPage> {
                       controller: listScrollController,
                     );
                   } else {
-                    return Center(child: Text("No message here yet..."));
+                    return Center(child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        getSvg("noMessage.svg", height: 250, width: 250,),
+                        SizedBox(height: 10.0,),
+                        Text("No message here yet...",style: TextStyle(fontFamily: "Gilroy",fontWeight: FontWeight.w600,fontSize: 16.0),),
+                      ],
+                    ));
                   }
                 } else {
                   return Center(

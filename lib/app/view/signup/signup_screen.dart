@@ -109,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    setStatusBarColor(Colors.white);
+    setStatusBarColor(accentColor);
     return WillPopScope(
       onWillPop: () async {
         backClick();

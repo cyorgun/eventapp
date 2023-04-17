@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -179,8 +180,17 @@ class AfterSearchUI extends StatelessWidget {
                   height: 15,
                 ),
                 itemBuilder: (BuildContext context, int index) {
-                  return Card4(
-                      d: snapshot.data[index], heroTag: 'search$index');
+                  return InkWell(
+                    onTap: (){
+                        FirebaseFirestore.instance
+                  .collection('event')
+                  .doc( snapshot.data?.id)
+                  .update({'count': FieldValue.increment(1)});
+             
+                    },
+                    child: Card4(
+                        events: snapshot.data[index], heroTag: 'search$index'),
+                  );
                 },
               );
           }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 class Constant {
   static String assetImagePath = "assets/images/";
+  static String assetSvgPath = "assets/svg/";
   static bool isDriverApp = false;
   static const String fontsFamily = "Gilroy";
   static const String fromLogin = "getFromLoginClick";

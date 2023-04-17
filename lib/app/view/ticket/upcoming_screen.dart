@@ -7,6 +7,7 @@ import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:math' as math;
@@ -51,7 +52,8 @@ class _UpComingScreenState extends State<UpComingScreen> {
                     if (snapshot.data?.docs.length == 0) {
                       return noItem();
                     } else {
-                      return itemData(list: snapshot.data?.docs);
+                      return 
+                      itemData(list: snapshot.data?.docs);
                       // return new dataFirestore(list: snapshot.data.docs);
                     }
                     //  return  new noItem();
@@ -282,24 +284,11 @@ class itemData extends StatelessWidget {
             final events = list?.map((e) {
             return Event.fromFirestore(e);
           }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? ticket = list?[i]['ticket'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
           
-          String? code = events?[i].title;
-          String? codes = sb.name;
+          
+    DateTime? dateTime = events![i].date?.toDate();
+    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+
           return Padding(
             padding: const EdgeInsets.only(top: 15.0),
             child: Transform.rotate(
@@ -309,21 +298,6 @@ class itemData extends StatelessWidget {
                   Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => TicketDetail(
                            event: events?[i],
-                            // category: category,
-                            // date: date,
-                            // image: image,
-                            // description: description,
-                            // id: id,
-                            // location: location,
-                            // mapsLangLink: mapsLangLink,
-                            // mapsLatLink: mapsLatLink,
-                            // price: price,
-                            // title: title,
-                            // type: type,
-                            // userDesc: userDesc,
-                            // userName: userName,
-                            // ticket: ticket,
-                            // userProfile: userProfile
                           )));
                 },
                 child: CustomPaint(
@@ -346,9 +320,7 @@ class itemData extends StatelessWidget {
                                   version: QrVersions.auto,
                                   size: 90.0,
                                 ),
-                                // getAssetImage("code.png",
-                                //     width: 100.h, height: 100.h),
-                                CustomPaint(
+                              CustomPaint(
                                     size: Size(2.h, 105.h),
                                     painter: DashedLineVerticalPainter())
                               ],
@@ -366,7 +338,7 @@ class itemData extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     txtHeight: 1.5.h),
                                 getVerSpace(6.h),
-                                getCustomFont(events?[i].date ?? "", 15.sp, greyColor, 1,
+                                getCustomFont(date.toString() ?? "", 15.sp, greyColor, 1,
                                     fontWeight: FontWeight.w500,
                                     txtHeight: 1.46.h),
                                 getVerSpace(9.h),
@@ -376,7 +348,8 @@ class itemData extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     getCustomFont(
-                                        "Ticket : ${events?[i].ticket}" ?? '',
+                                        "Ticket : ${events?[i].ticket.toString()}" ?? '',
+                                      
                                         15.sp,
                                         Colors.black,
                                         1,
@@ -391,7 +364,8 @@ class itemData extends StatelessWidget {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 12.h, vertical: 6.h),
                                       child: getCustomFont(
-                                          "\$ ${events?[i].price}" ?? '',
+                                          "\$ ${events?[i].price.toString()}" ?? '',
+                                       
                                           15.sp,
                                           accentColor,
                                           1,
@@ -411,6 +385,9 @@ class itemData extends StatelessWidget {
               ),
             ),
           );
+    
+    
+    
         });
   }
 }

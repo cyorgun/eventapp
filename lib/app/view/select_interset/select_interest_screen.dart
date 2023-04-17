@@ -51,7 +51,7 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
   Widget build(BuildContext context) { 
     final BookmarkBloc sb = Provider.of<BookmarkBloc>(context, listen: false);
    
-    setStatusBarColor(Colors.white);
+    setStatusBarColor(accentColor);
     return WillPopScope(
       onWillPop: () async {
         backClick();
@@ -60,13 +60,7 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getCustomFont("Select Interests", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        ),
+       
         body: SafeArea(
           child: Stack(
             children: [
@@ -80,20 +74,20 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
               
               Column(
                 children: [
-                  getDivider(
-                    dividerColor,
-                    1.h,
-                  ),
+                 
                   getVerSpace(30.h),
                   getPaddingWidget(
                     EdgeInsets.symmetric(horizontal: 20.h),
-                    getMultilineCustomFont(
-                        "Select the event you are interested in",
-                        16.sp,
-                        Colors.black,
-                        fontWeight: FontWeight.w500,
-                        textAlign: TextAlign.center,
-                        txtHeight: 1.5.h),
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: getMultilineCustomFont(
+                          "Please Select the event you are interested in",
+                          21.sp,
+                          Colors.black,
+                          fontWeight: FontWeight.w800,
+                          textAlign: TextAlign.center,
+                          txtHeight: 1.5.h),
+                    ),
                   ),
                   getVerSpace(30.h),
                   Expanded(

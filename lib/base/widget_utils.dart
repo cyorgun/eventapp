@@ -54,6 +54,19 @@ Widget getSvgImage(String image,
     fit: boxFit,
   );
 }
+Widget getSvg(String image,
+    {double? width,
+    double? height,
+    Color? color,
+    BoxFit boxFit = BoxFit.contain}) {
+  return SvgPicture.asset(
+    Constant.assetSvgPath + image,
+    color: color,
+    width: width,
+    height: height,
+    fit: boxFit,
+  );
+}
 
 Widget getPaddingWidget(EdgeInsets edgeInsets, Widget widget) {
   return Padding(

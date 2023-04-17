@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "288393393189",
-    "project_id": "sport-event-a637a",
-    "storage_bucket": "sport-event-a637a.appspot.com"
+    "project_number": "531047962965",
+    "project_id": "evente-pro",
+    "storage_bucket": "evente-pro.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:288393393189:android:3db21a28d97d67e9843bcc",
+        "mobilesdk_app_id": "1:531047962965:android:3db54903a7796a3b70b7dc",
         "android_client_info": {
-          "package_name": "com.event.eventsport"
+          "package_name": "com.evente.proevent"
         }
       },
       "oauth_client": [
         {
-          "client_id": "288393393189-cb16bjd3suu7k8a8goapvuu3k8fjcmmt.apps.googleusercontent.com",
+          "client_id": "531047962965-6ibg2hu6br9ncnsgrso7s6l67uh1cjhb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBwxIagzTzSjVuefsXcfjkeveYJithlHVk"
+          "current_key": "AIzaSyAMYgrPjke0te2s402LdhuKz9FFXedHqQ8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "288393393189-cb16bjd3suu7k8a8goapvuu3k8fjcmmt.apps.googleusercontent.com",
+              "client_id": "531047962965-6ibg2hu6br9ncnsgrso7s6l67uh1cjhb.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

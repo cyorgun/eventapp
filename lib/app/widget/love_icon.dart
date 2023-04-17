@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/widget/icons.dart';
+import 'package:event_app/base/color_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -35,8 +36,8 @@ import '../view/bloc/sign_in_bloc.dart';
         List d = snap.data[_type];
 
         if (d.contains(timestamp)) {
-          return    getAssetImage("favourite_select.png",
-                            width: 35.h, height: 35.h);
+          return    getSvg("hearth.svg",
+                            width: 27.h, height: 27.h,color: accentColor);
         } else {
           return LoveIcon().normal;
         }

@@ -162,20 +162,26 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   color: lightColor,
                                   borderRadius: BorderRadius.circular(187.h)),
                               padding: EdgeInsets.all(27.h),
-                              child: getAssetImage("bell.png",
-                                  height: 114.h, width: 114.h),
+                              child: getSvg("notification2.svg",
+                                  height: 414.h, width: 414.h,boxFit: BoxFit.cover),
                             ),
                             getVerSpace(28.h),
                             getCustomFont(
-                                "No Notifications Yet!", 20.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                                "Not Have Notification", 23.sp, Colors.black, 1,
+                                fontWeight: FontWeight.w800, txtHeight: 1.5.h),
                             getVerSpace(8.h),
-                            getMultilineCustomFont(
-                                "We’ll notify you when something arrives.",
-                                16.sp,
-                                Colors.black,
-                                fontWeight: FontWeight.w500,
-                                txtHeight: 1.5.h)
+                            Padding(
+                              padding: const EdgeInsets.only(left:20.0,right: 20.0),
+                              child: Center(
+                                child: getMultilineCustomFont(
+                                    "You will get notification when you have new information",
+                                    17.sp,
+                                    greyColor,
+                                    textAlign: TextAlign.center,
+                                    fontWeight: FontWeight.w500,
+                                    txtHeight: 1.5.h),
+                              ),
+                            )
               ],
             ),
                 );

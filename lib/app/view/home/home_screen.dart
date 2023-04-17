@@ -56,9 +56,9 @@ void getFromSharedPreferences() async {
      final List<Widget> _widgetOptions = <Widget>[
     const TabHome(),
     const TabFavourite(),
-       const CreateEventScreen(),
-    // const TabTicket(),
      MapsScreenT1(),
+      //  const CreateEventScreen(),
+    const TabTicket(),
     const TabProfile()
   ];
 
@@ -83,11 +83,11 @@ void getFromSharedPreferences() async {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
-        bottomNavigationBar:  role == "user"? _buildBottomBar() : _buildBottomBar2(),
+        bottomNavigationBar:  _buildBottomBar() ,
         body: SafeArea(
           child: GetX<HomeController>(
             init: HomeController(),
-            builder: (controller) => role == "user"? _widgetOptions[controller.index.value]:_widgetOptions2[controller.index.value],
+            builder: (controller) => _widgetOptions[controller.index.value]
           ),
         ),
       ),
@@ -145,24 +145,24 @@ return
       builder: (controller) => ConvexAppBar(
         items: [
           TabItem(
-              icon: getSvgImage("home.svg", height: 24.h, width: 24.h),
+              icon: getSvg("home.svg", height: 24.h, width: 24.h),
               activeIcon:
-                  getSvgImage("home_bold.svg", height: 24.h, width: 24.h)),
+                  getSvg("home2.svg", height: 24.h, width: 24.h,color: accentColor)),
           TabItem(
-              icon: getSvgImage("favourite.svg", height: 24.h, width: 24.h),
+              icon: getSvg("bookmark.svg", height: 24.h, width: 24.h,),
               activeIcon:
-                  getSvgImage("favourite_bold.svg", height: 24.h, width: 24.h)),
+                  getSvg("bookmark2.svg", height: 24.h, width: 24.h,color: accentColor)),
            TabItem(
-              icon: getSvgImage("add.svg", height: 24.h, width: 24.h),
-              activeIcon: getSvgImage("add.svg", height: 24.h, width: 24.h)),
+              icon: getSvg("map.svg", height: 24.h, width: 24.h,color: Colors.white),
+              activeIcon: getSvg("map2.svg", height: 24.h, width: 24.h,color: Colors.white)),
           TabItem(
-              icon: getSvgImage("ticket.svg", height: 24.h, width: 24.h),
+              icon: getSvg("ticket.svg", height: 24.h, width: 24.h),
               activeIcon:
-                  getSvgImage("ticket_bold.svg", height: 24.h, width: 24.h)),
+                  getSvg("ticket2.svg", height: 24.h, width: 24.h,color: accentColor)),
           TabItem(
-              icon: getSvgImage("profile.svg", height: 24.h, width: 24.h),
+              icon: getSvg("profile.svg", height: 24.h, width: 24.h),
               activeIcon:
-                  getSvgImage("profile_bold.svg", height: 24.h, width: 24.h))
+                  getSvg("profile2.svg", height: 24.h, width: 24.h,color: accentColor))
         ],
         height: 88.h,
         elevation: 5,
@@ -182,47 +182,4 @@ return
 
 
   
-  Widget _buildBottomBar2() {
-    return GetX<HomeController>(
-      init: HomeController(),
-      builder: (controller) => ConvexAppBar(
-        items: [
-          TabItem(
-              icon: getSvgImage("home.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvgImage("home_bold.svg", height: 24.h, width: 24.h)),
-          TabItem(
-              icon: getSvgImage("favourite.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvgImage("favourite_bold.svg", height: 24.h, width: 24.h)),
-            TabItem(
-              icon: getSvgImage("add.svg", height: 24.h, width: 24.h),
-              activeIcon: getSvgImage("add.svg", height: 24.h, width: 24.h)),
-       
-         
-          TabItem(
-              icon: getSvgImage("ticket.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvgImage("ticket_bold.svg", height: 24.h, width: 24.h)),
-          TabItem(
-              icon: getSvgImage("profile.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvgImage("profile_bold.svg", height: 24.h, width: 24.h))
-        ],
-        height: 88.h,
-        elevation: 5,
-        color: accentColor,
-        top: -33.h,
-        curveSize: 85.h,
-        initialActiveIndex: controller.index.value,
-        activeColor: accentColor,
-        style: TabStyle.fixedCircle,
-        backgroundColor: Colors.white,
-        onTap: (count) {
-          controller.onChange(count.obs);
-        },
-      ),
-    );
-  }
-
 }

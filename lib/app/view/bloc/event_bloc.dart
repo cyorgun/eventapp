@@ -9,8 +9,8 @@ class EventBloc extends ChangeNotifier{
   List<Event> _dataPopular = [];
   List<Event> get data => _dataPopular;
   
-  List<Event2> _dataTrending = [];
-  List<Event2> get data2 => _dataTrending;
+  List<Event> _dataTrending = [];
+  List<Event> get data2 => _dataTrending;
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<DocumentSnapshot> _snap = [];
@@ -115,7 +115,7 @@ class EventBloc extends ChangeNotifier{
       if (mounted2) {
         _isLoading = false;
         _snap.addAll(rawData.docs);
-        _dataTrending = _snap.map((e) => Event2.fromFirestore(e)).toList();
+        _dataTrending = _snap.map((e) => Event.fromFirestore(e)).toList();
         notifyListeners();
       }
     } else {

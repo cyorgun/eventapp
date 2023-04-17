@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    setStatusBarColor(Colors.white);
+    setStatusBarColor(accentColor);
     return WillPopScope(
       onWillPop: () async {
         backClick();

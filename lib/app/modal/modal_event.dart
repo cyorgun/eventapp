@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Event {
   String? category;
-  String? date;
+  Timestamp? date;
   String? description;
   String? id;
   String? location;
@@ -14,9 +14,11 @@ class Event {
   String? type;
   String? userDesc;
   String? userName;
+  String? time;
   String? userProfile;
   String? image;
-  String? ticket;
+  int? ticket;
+
 
   Event(
       {this.category,
@@ -24,6 +26,7 @@ class Event {
       this.description,
       this.id,
       this.location,
+      this.time,
       this.mapsLangLink,
       this.mapsLatLink,
       this.price,
@@ -44,6 +47,7 @@ class Event {
     description  : data['description'],
     id  : data['id'],
     location  : data['location'],
+    time: data['time'],
     mapsLangLink  : data['mapsLangLink'],
     mapsLatLink  : data['mapsLatLink'],
     price  : data['price'],
@@ -58,55 +62,55 @@ class Event {
 }
 
 
-class Event2 {
-  String? category;
-  String? date;
-  String? description;
-  String? id;
-  String? location;
-  double? mapsLangLink;
-  double? mapsLatLink;
-  int? price;
-  String? title;
-  String? type;
-  String? userDesc;
-  String? userName;
-  String? userProfile;
-  String? image;
+// class Event2 {
+//   String? category;
+//   Timestamp? date;
+//   String? description;
+//   String? id;
+//   String? location;
+//   double? mapsLangLink;
+//   double? mapsLatLink;
+//   int? price;
+//   String? title;
+//   String? type;
+//   String? userDesc;
+//   String? userName;
+//   String? userProfile;
+//   String? image;
 
-  Event2(
-      {this.category,
-      this.date,
-      this.description,
-      this.id,
-      this.location,
-      this.mapsLangLink,
-      this.mapsLatLink,
-      this.price,
-      this.title,
-      this.type,
-      this.userDesc,
-      this.userName,
-      this.image,
-      this.userProfile});
+//   Event2(
+//       {this.category,
+//       this.date,
+//       this.description,
+//       this.id,
+//       this.location,
+//       this.mapsLangLink,
+//       this.mapsLatLink,
+//       this.price,
+//       this.title,
+//       this.type,
+//       this.userDesc,
+//       this.userName,
+//       this.image,
+//       this.userProfile});
 
-  factory Event2.fromFirestore(DocumentSnapshot snapshot){
-    Map data = snapshot.data() as Map<dynamic, dynamic>;
-    return Event2(
-       category : data['category'],
-    date  : data['date'],
-    image: data['image'],
-    description  : data['description'],
-    id  : data['id'],
-    location  : data['location'],
-    mapsLangLink  : data['mapsLangLink'],
-    mapsLatLink  : data['mapsLatLink'],
-    price  : data['price'],
-    title  : data['title'],
-    type  : data['type'],
-    userDesc  : data['userDesc'],
-    userName  : data['userName'],
-    userProfile  : data['userProfile'],
-    );
-  }
-}
+//   factory Event2.fromFirestore(DocumentSnapshot snapshot){
+//     Map data = snapshot.data() as Map<dynamic, dynamic>;
+//     return Event2(
+//        category : data['category'],
+//     date  : data['date'],
+//     image: data['image'],
+//     description  : data['description'],
+//     id  : data['id'],
+//     location  : data['location'],
+//     mapsLangLink  : data['mapsLangLink'],
+//     mapsLatLink  : data['mapsLatLink'],
+//     price  : data['price'],
+//     title  : data['title'],
+//     type  : data['type'],
+//     userDesc  : data['userDesc'],
+//     userName  : data['userName'],
+//     userProfile  : data['userProfile'],
+//     );
+//   }
+// }

@@ -19,6 +19,7 @@ import '../../dialog/ticket_confirm_dialog.dart';
 import '../bloc/sign_in_bloc.dart';
 import '../ticket/ticket_detail.dart';
 import 'package:http/http.dart' as http;
+
 class BuyTicket extends StatefulWidget {
  Event? event;
   BuyTicket({
@@ -69,6 +70,8 @@ class _BuyTicketState extends State<BuyTicket> {
         });
       });
     }
+
+
 
      void userSaved() {
       FirebaseFirestore.instance
@@ -222,11 +225,7 @@ class _BuyTicketState extends State<BuyTicket> {
                         ],
                       ),
                       getVerSpace(30.h),
-                      Divider(
-                        color: dividerColor,
-                        thickness: 1.h,
-                        height: 1.h,
-                      ),
+                    
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,13 +264,14 @@ class _BuyTicketState extends State<BuyTicket> {
                                 GestureDetector(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: "#E8F6F6".toColor(),
+                                        color: accentColor,
                                         borderRadius:
                                             BorderRadius.circular(18.h)),
                                     height: 68.h,
                                     width: 68.h,
                                     padding: EdgeInsets.all(22.h),
                                     child: getSvgImage("minus.svg",
+                                    color: Colors.white,
                                         width: 24.h, height: 24.h),
                                   ),
                                   onTap: () {
@@ -303,7 +303,7 @@ class _BuyTicketState extends State<BuyTicket> {
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: "#E8F6F6".toColor(),
+                                        color: accentColor,
                                         borderRadius:
                                             BorderRadius.circular(18.h)),
                                     height: 68.h,
@@ -312,48 +312,35 @@ class _BuyTicketState extends State<BuyTicket> {
                                     child: getSvgImage("add.svg",
                                         width: 24.h,
                                         height: 24.h,
-                                        color: Colors.black),
+                                        color: Colors.white),
                                   ),
                                 )
                               ],
                             ),
                           ),
 
-                          StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("JoinEvent")
-                                .doc("user")
-                                .collection(event.title ?? '')
-                                .snapshots(),
-                            builder: (BuildContext ctx,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              return snapshot.hasData
-                                  ? getPaddingWidget(
-                                      EdgeInsets.symmetric(
-                                          horizontal: 30.h, vertical: 10.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          getCustomFont(
-                                              snapshot.data?.docs.length
-                                                      .toString() ??
-                                                  '',
-                                              16.sp,
-                                              Colors.black,
-                                              1,
-                                              fontWeight: FontWeight.w600,
-                                              txtHeight: 1.5.h),
-                                          getCustomFont(" People joined", 15.sp,
-                                              greyColor, 1,
-                                              fontWeight: FontWeight.w500,
-                                              txtHeight: 1.5.h)
-                                        ],
-                                      ),
-                                    )
-                                  : Container();
-                            },
+
+ Padding(
+                            padding: const EdgeInsets.only(left: 20.0,top: 40.0),
+                            child: getCustomFont(
+                                "Who Joins event " + (event.title ??"") , 16.sp, Colors.black, 1,
+                                fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                           ),
+                             StreamBuilder(
+                               stream: FirebaseFirestore.instance
+                                   .collection("JoinEvent")
+                                   .doc("user")
+                                   .collection(event.title ?? '')
+                                   .snapshots(),
+                               builder: (BuildContext ctx,
+                                   AsyncSnapshot<QuerySnapshot> snapshot) {
+                                 return snapshot.hasData
+                                     ? new joinEvent(
+                                         list: snapshot.data?.docs,
+                                       )
+                                     : Container();
+                               },
+                             ),
                         ],
                       ),
                     ],
@@ -386,7 +373,6 @@ class _BuyTicketState extends State<BuyTicket> {
                           context: context);
                         userSaved();
                         addData();
-
                         Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => TicketDetail(
                                event: event,
@@ -400,8 +386,21 @@ class _BuyTicketState extends State<BuyTicket> {
                    if(event.price!>0)  getButton(context, accentColor, "Checkout", Colors.white,
                         () async {
                           
-                          
-                await makePayment();
+                               
+                      Constant.sendToNext(context, Routes.paymentRoute);
+                      // showDialog(
+                      //     builder: (context) {
+                      //       return const TicketConfirmDialog();
+                      //     },
+                      //     context: context);
+                       
+                        userSaved();
+                        addData();
+                        Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (_, __, ___) => TicketDetail(
+                               event: event,
+                              )));     
+                // await makePayment();
                       // Constant.sendToNext(context, Routes.paymentRoute);
                       // showDialog(
                       //     builder: (context) {
@@ -700,3 +699,95 @@ class _BuyTicketState extends State<BuyTicket> {
   // }
 
 
+
+
+class joinEvent extends StatelessWidget {
+  joinEvent({this.list});
+  final List<DocumentSnapshot>? list;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 15.0,top: 10.0),
+          child: Container(
+              height: 100.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
+                itemCount: list!.length > 3 ? 3 : list?.length,
+                itemBuilder: (context, i) {
+                  String? _title = list?[i]['name'].toString();
+                  String? _uid = list?[i]['uid'].toString();
+                  String? _img = list?[i]['photoProfile'].toString();
+
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 0.0,bottom: 5.0),
+                        child: Container(
+                          height: 35.0,
+                          width: 35.0,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(70.0)),
+                              image: DecorationImage(
+                                  image: NetworkImage(_img ?? ''),
+                                  fit: BoxFit.cover)),
+                        ),
+                      ),
+                      Text((list?.length.toString()??'')+ " people joined",style: TextStyle(fontFamily: "Gilroy"),),
+                    ],
+                  );
+                },
+              )),
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(
+        //     top: 0.0,
+        //     left: 130.0,
+        //   ),
+        //   child: Row(
+        //     children: [
+        //       Positioned(
+        //           left: 22.h,
+        //           child: Container(
+        //             height: 36.h,
+        //             width: 36.h,
+        //             decoration: BoxDecoration(
+        //                 color: accentColor,
+        //                 borderRadius: BorderRadius.circular(30.h),
+        //                 border: Border.all(color: Colors.white, width: 1.5.h)),
+        //             alignment: Alignment.center,
+        //             child: Row(
+        //               mainAxisAlignment: MainAxisAlignment.center,
+        //               crossAxisAlignment: CrossAxisAlignment.center,
+        //               children: [
+        //                 getCustomFont(list?.length.toString() ?? '', 12.sp,
+        //                     Colors.white, 1,
+        //                     fontWeight: FontWeight.w600),
+        //                 getCustomFont(" +", 12.sp, Colors.white, 1,
+        //                     fontWeight: FontWeight.w600),
+        //               ],
+        //             ),
+        //           )),
+
+        //       // Text(
+        //       //   list?.length.toString()??'',
+        //       //   style: TextStyle(fontFamily: "Popins"),
+        //       // ),
+        //       //  Text(
+        //       //   " People Join",
+        //       //   style: TextStyle(fontFamily: "Popins"),
+        //       // ),
+        //     ],
+        //   ),
+        // )
+    
+      ],
+    );
+  }
+}
