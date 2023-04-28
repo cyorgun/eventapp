@@ -88,17 +88,7 @@ class _ChangePasswordState extends State<ChangePassword> {
           child: SafeArea(
             child: Column(
               children: [
-                getDivider(
-                  dividerColor,
-                  1.h,
-                ),
-                getVerSpace(8.h),
-                getMultilineCustomFont(
-                    "Enter your new password", 16.sp, Colors.black,
-                    txtHeight: 1.5.h,
-                    textAlign: TextAlign.center,
-                    fontWeight: FontWeight.w500),
-                getVerSpace(38.h),
+              
                 Expanded(
                     flex: 1,
                     child: Container(

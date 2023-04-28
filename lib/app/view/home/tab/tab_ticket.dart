@@ -35,19 +35,7 @@ class _TabTicketState extends State<TabTicket>
       children: [
         buildAppBar(),
         Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-        getVerSpace(20.h),
-        buildTabBar(),
-        Expanded(
-          flex: 1,
-          child: PageView(
-            controller: pageController,
-            scrollDirection: Axis.horizontal,
-            children: const [UpComingScreen(), PastScreen()],
-            onPageChanged: (value) {
-              controller.animateTo(value);
-            },
-          ),
-        )
+       Expanded(child: UpComingScreen())
       ],
     );
   }

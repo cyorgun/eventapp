@@ -50,11 +50,27 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                   child: ListView(
                     padding: EdgeInsets.symmetric(horizontal: 20.h),
                     children: [
-                      getVerSpace(20.h),
+                      getVerSpace(10.h),
                       getMultilineCustomFont(
-                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.\nIt is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
-                          15.sp,
-                          greyColor,
+                          "   At our company, we take user privacy very seriously, especially in the context of our event mobile app. We understand that our users trust us with their personal information, and we strive to uphold that trust by implementing strict privacy policies and security measures. Our event mobile app is designed to collect only the data necessary to provide our users with a seamless event experience, such as event registration information, schedule preferences, and contact details for event organizers. We use industry-standard security protocols to protect this information, including encryption and multi-factor authentication, to ensure that our users' data is kept safe and confidential.",
+                          16.sp,
+                          Colors.black,
+                          fontWeight: FontWeight.w500,
+                          txtHeight: 1.46.h,
+                          textAlign: TextAlign.start),
+                            getVerSpace(10.h),
+                      getMultilineCustomFont(
+                          "   Furthermore, we believe in giving our users control over their own privacy settings. Our event mobile app includes granular privacy settings that allow users to choose which information they want to share with other attendees, event organizers, and sponsors. We also make it easy for users to opt-out of any marketing communications they do not wish to receive.",
+                          16.sp,
+                          Colors.black,
+                          fontWeight: FontWeight.w500,
+                          txtHeight: 1.46.h,
+                          textAlign: TextAlign.start),
+                                 getVerSpace(10.h),
+                      getMultilineCustomFont(
+                          "   Finally, we never share our users' personal information with third parties, except where required by law. We believe in being transparent about our data collection and sharing practices, and we provide detailed privacy policies that explain how we collect, use, and share our users' data. We are committed to maintaining the highest standards of data security and privacy for our users, and we will continue to innovate and improve our event mobile app to ensure that it meets the evolving needs of our users in a privacy-respecting way.",
+                          16.sp,
+                          Colors.black,
                           fontWeight: FontWeight.w500,
                           txtHeight: 1.46.h,
                           textAlign: TextAlign.start)

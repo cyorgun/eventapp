@@ -487,7 +487,7 @@ Widget settingContainer(Function function, String title, String image) {
                     color: dividerColor,
                     borderRadius: BorderRadius.circular(22.h)),
                 padding: EdgeInsets.all(15.h),
-                child: getSvgImage(image, width: 24.h, height: 24.h),
+                child: getSvgImage(image, width: 24.h, height: 24.h,color: accentColor),
               ),
               getHorSpace(16.h),
               getCustomFont(title, 16.sp, Colors.black, 1,
