@@ -1,3 +1,4 @@
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:event_app/app/view/create_event/create_event_screen.dart';
 import 'package:event_app/app/view/home/tab/tab_maps.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../base/appBar/bar.dart';
-import '../../../base/appBar/item.dart';
+// import '../../../base/appBar/bar.dart';
+// import '../../../base/appBar/item.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
@@ -36,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
     getFromSharedPreferences();
     super.initState();
   }
-void getFromSharedPreferences() async {
+
+  void getFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
@@ -45,141 +47,79 @@ void getFromSharedPreferences() async {
   }
 
   String? role;
-  
-  CreateEventController createEventController =
-      Get.put(CreateEventController());
-  HomeController controller = Get.put(HomeController());
-  
+
+  int _currentIndex = 1;
+
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  final List<Widget> _widgetOptions = [
+    const TabHome(),
+    const TabFavourite(),
+    MapsScreenT1(),
+    //  const CreateEventScreen(),
+    const TabTicket(),
+    const TabProfile()
+  ];
 
   @override
   Widget build(BuildContext context) {
-     final List<Widget> _widgetOptions = <Widget>[
-    const TabHome(),
-    const TabFavourite(),
-     MapsScreenT1(),
-      //  const CreateEventScreen(),
-    const TabTicket(),
-    const TabProfile()
-  ];
-
-       final List<Widget> _widgetOptions2 = <Widget>[
-    const TabHome(),
-    const TabFavourite(),
-     users(),
-    const TabTicket(),
-    const TabProfile()
-  ];
     setStatusBarColor(Colors.white);
-    return WillPopScope(
-      onWillPop: () async {
-        if (controller.index.value != 0) {
-          controller.onChange(0.obs);
-        } else {
-          backClick();
-        }
-
-        return false;
-      },
-      child: Scaffold(
+    return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
-        bottomNavigationBar:  _buildBottomBar() ,
-        body: SafeArea(
-          child: GetX<HomeController>(
-            init: HomeController(),
-            builder: (controller) => _widgetOptions[controller.index.value]
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget users(){
-return  
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-                 Padding(
-                   padding: const EdgeInsets.only(top:15.0),
-                   child: getCustomFont("Add Event", 20.sp, Colors.black, 1,
-                    fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                 ),
-             
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 208.h,
-                        width: 208.h,
-                        padding: EdgeInsets.symmetric(horizontal: 52.h, vertical: 47.h),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(187.h),
-                            color: lightColor),
-                        child:
-                            getAssetImage("valentine.png", height: 114.h, width: 114.h),
-                      ),
-                      getVerSpace(28.h),
-                      getCustomFont("Role Admin", 20.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                      getVerSpace(8.h),
-                      getMultilineCustomFont(
-                          "This screen for admin", 16.sp, Colors.black,
-                          fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-                    ],
-                  ),
-                ),
-              ),
-              
-              Text(""),
-            ],
-          );
+        bottomNavigationBar: _buildBottomBar(),
+        body: _widgetOptions[_currentIndex]);
   }
 
   Widget _buildBottomBar() {
-    return GetX<HomeController>(
-      init: HomeController(),
-      builder: (controller) => ConvexAppBar(
-        items: [
-          TabItem(
-              icon: getSvg("home.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvg("home2.svg", height: 24.h, width: 24.h,color: accentColor)),
-          TabItem(
-              icon: getSvg("bookmark.svg", height: 24.h, width: 24.h,),
-              activeIcon:
-                  getSvg("bookmark2.svg", height: 24.h, width: 24.h,color: accentColor)),
-           TabItem(
-              icon: getSvg("map.svg", height: 24.h, width: 24.h,color: Colors.white),
-              activeIcon: getSvg("map2.svg", height: 24.h, width: 24.h,color: Colors.white)),
-          TabItem(
-              icon: getSvg("ticket.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvg("ticket2.svg", height: 24.h, width: 24.h,color: accentColor)),
-          TabItem(
-              icon: getSvg("profile.svg", height: 24.h, width: 24.h),
-              activeIcon:
-                  getSvg("profile2.svg", height: 24.h, width: 24.h,color: accentColor))
-        ],
-        height: 88.h,
-        elevation: 5,
-        color: accentColor,
-        top: -33.h,
-        curveSize: 85.h,
-        initialActiveIndex: controller.index.value,
-        activeColor: accentColor,
-        style: TabStyle.fixedCircle,
-        backgroundColor: Colors.white,
-        onTap: (count) {
-          controller.onChange(count.obs);
-        },
-      ),
+    return ConvexAppBar(
+      items: [
+        TabItem(
+            icon: getSvg("home.svg", height: 24.h, width: 24.h),
+            activeIcon: getSvg("home2.svg",
+                height: 24.h, width: 24.h, color: accentColor)),
+        TabItem(
+            icon: getSvg(
+              "bookmark.svg",
+              height: 24.h,
+              width: 24.h,
+            ),
+            activeIcon: getSvg("bookmark2.svg",
+                height: 24.h, width: 24.h, color: accentColor)),
+        TabItem(
+            icon: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: getSvg("map.svg",
+                  height: 24.h, width: 24.h, color: Colors.white),
+            ),
+            activeIcon: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: getSvg("map2.svg",
+                  height: 24.h, width: 24.h, color: Colors.white),
+            )),
+        TabItem(
+            icon: getSvg("ticket.svg", height: 24.h, width: 24.h),
+            activeIcon: getSvg("ticket2.svg",
+                height: 24.h, width: 24.h, color: accentColor)),
+        TabItem(
+            icon: getSvg("profile.svg", height: 24.h, width: 24.h),
+            activeIcon: getSvg("profile2.svg",
+                height: 24.h, width: 24.h, color: accentColor))
+      ],
+      height: 75.h,
+      elevation: 5,
+      color: accentColor,
+      top: -78.h,
+      curveSize: 70.h,
+      activeColor: accentColor,
+      style: TabStyle.fixedCircle,
+      backgroundColor: Colors.white,
+      initialActiveIndex: _currentIndex,
+      onTap: onTabTapped,
     );
   }
-
-
-  
 }

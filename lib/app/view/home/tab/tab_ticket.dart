@@ -35,58 +35,8 @@ class _TabTicketState extends State<TabTicket>
       children: [
         buildAppBar(),
         Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-       Expanded(child: UpComingScreen())
+        Expanded(child: UpComingScreen())
       ],
-    );
-  }
-
-  Container buildTabBar() {
-    return Container(
-      padding: EdgeInsets.all(5.h),
-      margin: EdgeInsets.symmetric(horizontal: 20.h),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(41.h),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor, offset: const Offset(0, 8), blurRadius: 27)
-          ]),
-      child: TabBar(
-          controller: controller,
-          unselectedLabelColor: greyColor,
-          labelColor: Colors.white,
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicator: BoxDecoration(
-              borderRadius: BorderRadius.circular(44.h), color: accentColor),
-          onTap: (index) {
-            pageController.animateToPage(
-              index,
-              duration: const Duration(milliseconds: 400),
-              curve: Curves.easeInOut,
-            );
-          },
-          tabs: [
-            Tab(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("Upcoming",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontFamily: Constant.fontsFamily,
-                        fontSize: 18.sp)),
-              ),
-            ),
-            Tab(
-              child: Align(
-                alignment: Alignment.center,
-                child: Text("Past",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontFamily: Constant.fontsFamily,
-                        fontSize: 18.sp)),
-              ),
-            ),
-          ]),
     );
   }
 

@@ -65,14 +65,14 @@ class _TabProfileState extends State<TabProfile>
                         Constant.sendToNext(context, Routes.editProfileRoute);
                       }, "Edit Profile", "edit_profile.svg"),
                       getVerSpace(20.h),
-                      settingContainer(
-                          () {
-                            Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=> ChangePassword()));
-                          }, "Change Password", "change_password.svg"),
-                      getVerSpace(30.h),
-                      getCustomFont("Preferences", 16.sp, greyColor, 1,
-                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                      getVerSpace(12.h),
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => ChangePassword()));
+                      }, "Change Password", "change_password.svg"),
+                      // getVerSpace(30.h),
+                      // getCustomFont("Preferences", 16.sp, greyColor, 1,
+                      //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                      getVerSpace(20.h),
                       settingContainer(() {
                         Constant.sendToNext(
                             context, Routes.notificationScreenRoute);
@@ -86,52 +86,60 @@ class _TabProfileState extends State<TabProfile>
                         Constant.sendToNext(context, Routes.privacyScreenRoute);
                       }, "Privacy", "privacy.svg"),
                       getVerSpace(20.h),
-                   
+
                       GestureDetector(
-    onTap: ()       async{
-                await context.read<SignInBloc>().userSignout()
-                .then((value) => context.read<SignInBloc>().afterUserSignOut())
-                .then((value){
-                  Constant.sendToNext(
-                      context, Routes.loginRoute);
-                }
-                );
-                
-                
-              },
-    child: Container(
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22.h),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor, offset: const Offset(0, 8), blurRadius: 27)
-          ]),
-      padding: EdgeInsets.only(bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 54.h,
-                width: 54.h,
-                decoration: BoxDecoration(
-                    color: dividerColor,
-                    borderRadius: BorderRadius.circular(22.h)),
-                padding: EdgeInsets.all(15.h),
-                child: getSvg("Logout.svg", width: 24.h, height: 24.h,color: accentColor),
-              ),
-              getHorSpace(16.h),
-              getCustomFont("Logout", 16.sp, Colors.black, 1,
-                  fontWeight: FontWeight.w500)
-            ],
-          ),
-          getSvgImage("arrow_right.svg", height: 24.h, width: 24.h)
-        ],
-      ),
-    ),
-  ),
+                        onTap: () async {
+                          await context
+                              .read<SignInBloc>()
+                              .userSignout()
+                              .then((value) =>
+                                  context.read<SignInBloc>().afterUserSignOut())
+                              .then((value) {
+                            Constant.sendToNext(context, Routes.loginRoute);
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(22.h),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: shadowColor,
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 27)
+                              ]),
+                          padding: EdgeInsets.only(
+                              bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 54.h,
+                                    width: 54.h,
+                                    decoration: BoxDecoration(
+                                        color: dividerColor,
+                                        borderRadius:
+                                            BorderRadius.circular(22.h)),
+                                    padding: EdgeInsets.all(15.h),
+                                    child: getSvg("Logout.svg",
+                                        width: 24.h,
+                                        height: 24.h,
+                                        color: accentColor),
+                                  ),
+                                  getHorSpace(16.h),
+                                  getCustomFont(
+                                      "Logout", 16.sp, Colors.black, 1,
+                                      fontWeight: FontWeight.w500)
+                                ],
+                              ),
+                              getSvgImage("arrow_right.svg",
+                                  height: 24.h, width: 24.h)
+                            ],
+                          ),
+                        ),
+                      ),
                       getVerSpace(50.h),
                     ],
                   ),
@@ -153,7 +161,7 @@ class _TabProfileState extends State<TabProfile>
           Row(
             children: [
               getCustomFont("Interests", 16.sp, greyColor, 1,
-                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                  fontWeight: FontWeight.w500, txtHeight: 1.5.h),
               getHorSpace(3.h),
               // getSvgImage('edit.svg',
               //     color: Colors.black,
@@ -162,7 +170,7 @@ class _TabProfileState extends State<TabProfile>
             ],
           ),
           getVerSpace(10.h),
-      if (b.list != null && b.list!.isNotEmpty)
+          if (b.list != null && b.list!.isNotEmpty)
             Wrap(
               alignment: WrapAlignment.start,
               spacing: 10.h,
@@ -181,9 +189,9 @@ class _TabProfileState extends State<TabProfile>
                   .toList(),
             ),
           if (b.list!.isEmpty) Text("Not Have Interest Item"),
-            SizedBox(
-                width: 15.0,
-              ),
+          SizedBox(
+            width: 15.0,
+          ),
         ],
       ),
     );
@@ -192,12 +200,12 @@ class _TabProfileState extends State<TabProfile>
   Widget buildAboutWidget() {
     final sb = context.watch<SignInBloc>();
     return Padding(
-      padding:  EdgeInsets.only(left:15.0,right: 15.0,bottom: 15.0),
+      padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 15.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           getCustomFont("About", 16.sp, greyColor, 1,
-                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
           getVerSpace(10.h),
           Row(
             children: [
@@ -209,7 +217,8 @@ class _TabProfileState extends State<TabProfile>
               SizedBox(
                 width: 15.0,
               ),
-              getCustomFont(sb.email!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+              getCustomFont(
+                  sb.email!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -224,7 +233,8 @@ class _TabProfileState extends State<TabProfile>
               SizedBox(
                 width: 15.0,
               ),
-              getCustomFont(sb.phone!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+              getCustomFont(
+                  sb.phone!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -379,8 +389,8 @@ class _TabProfileState extends State<TabProfile>
             //   ),
 
             // ),
-             
-             buildAboutWidget(),
+
+            buildAboutWidget(),
             buildInterestWidget(),
             getVerSpace(30.h),
           ],

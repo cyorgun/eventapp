@@ -2,7 +2,6 @@ import 'package:event_app/app/dialog/account_create_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pinput/pinput.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
@@ -22,20 +21,21 @@ class _VerifyScreenState extends State<VerifyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultPinTheme = PinTheme(
-      width: 60.h,
-      height: 60.h,
-      margin: EdgeInsets.symmetric(horizontal: 14.h),
-      textStyle: TextStyle(
-          fontSize: 24.h,
-          color: Colors.black,
-          fontWeight: FontWeight.w700,
-          fontFamily: Constant.fontsFamily),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: borderColor, width: 1.h),
-          borderRadius: BorderRadius.circular(22.h)),
-    );
+    // final defaultPinTheme = PinTheme(
+    //   width: 60.h,
+    //   height: 60.h,
+    //   margin: EdgeInsets.symmetric(horizontal: 14.h),
+    //   textStyle: TextStyle(
+    //       fontSize: 24.h,
+    //       color: Colors.black,
+    //       fontWeight: FontWeight.w700,
+    //       fontFamily: Constant.fontsFamily),
+    //   decoration: BoxDecoration(
+    //       color: Colors.white,
+    //       border: Border.all(color: borderColor, width: 1.h),
+    //       borderRadius: BorderRadius.circular(22.h)),
+    // );
+
     setStatusBarColor(Colors.white);
     return WillPopScope(
       onWillPop: () async {
@@ -88,18 +88,18 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         getVerSpace(50.h),
-                        Pinput(
-                          defaultPinTheme: defaultPinTheme,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          pinputAutovalidateMode:
-                              PinputAutovalidateMode.onSubmit,
-                          showCursor: true,
-                          onCompleted: (pin) {},
-                          length: 4,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                        ),
+                        // Pinput(
+                        //   defaultPinTheme: defaultPinTheme,
+                        //   inputFormatters: [
+                        //     FilteringTextInputFormatter.digitsOnly,
+                        //   ],
+                        //   pinputAutovalidateMode:
+                        //       PinputAutovalidateMode.onSubmit,
+                        //   showCursor: true,
+                        //   onCompleted: (pin) {},
+                        //   length: 4,
+                        //   mainAxisAlignment: MainAxisAlignment.center,
+                        // ),
                         getVerSpace(50.h),
                         getButton(context, accentColor, "Verify", Colors.white,
                             () {

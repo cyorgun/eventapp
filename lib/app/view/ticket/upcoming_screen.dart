@@ -52,8 +52,7 @@ class _UpComingScreenState extends State<UpComingScreen> {
                     if (snapshot.data?.docs.length == 0) {
                       return noItem();
                     } else {
-                      return 
-                      itemData(list: snapshot.data?.docs);
+                      return itemData(list: snapshot.data?.docs);
                       // return new dataFirestore(list: snapshot.data.docs);
                     }
                     //  return  new noItem();
@@ -175,27 +174,18 @@ class _UpComingScreenState extends State<UpComingScreen> {
           SizedBox(
             height: 100.h,
           ),
-          Container(
-            height: 208.h,
-            width: 208.h,
-            padding: EdgeInsets.all(47.h),
-            decoration: BoxDecoration(
-                color: lightColor, borderRadius: BorderRadius.circular(187.h)),
-            child: getAssetImage("ticket.png", height: 114.h, width: 114.h),
-            // padding: ,
-          ),
+          getAssetImage("ticket.png", height: 300.0, width: 400.0),
           getVerSpace(28.h),
-          getCustomFont("No Upcoming Ticket Yet!", 20.sp, Colors.black, 1,
+          getCustomFont("No have Ticket", 20.sp, Colors.black, 1,
               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
           getVerSpace(8.h),
           getMultilineCustomFont(
-              "Explore more and shortlist events.", 16.sp, Colors.black,
+              "Explore more event and join get the ticket", 16.sp, Colors.black,
               fontWeight: FontWeight.w500, txtHeight: 1.5.h)
         ],
       ),
     );
   }
-
 }
 
 class RPSCustomPainter extends CustomPainter {
@@ -281,13 +271,12 @@ class itemData extends StatelessWidget {
         primary: false,
         itemCount: list?.length,
         itemBuilder: (context, i) {
-            final events = list?.map((e) {
+          final events = list?.map((e) {
             return Event.fromFirestore(e);
           }).toList();
-          
-          
-    DateTime? dateTime = events![i].date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+
+          DateTime? dateTime = events![i].date?.toDate();
+          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
 
           return Padding(
             padding: const EdgeInsets.only(top: 15.0),
@@ -297,7 +286,7 @@ class itemData extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => TicketDetail(
-                           event: events?[i],
+                            event: events?[i],
                           )));
                 },
                 child: CustomPaint(
@@ -316,11 +305,11 @@ class itemData extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 QrImage(
-                                  data: sb.name??'${events?[i].title!}',
+                                  data: sb.name ?? '${events?[i].title!}',
                                   version: QrVersions.auto,
                                   size: 90.0,
                                 ),
-                              CustomPaint(
+                                CustomPaint(
                                     size: Size(2.h, 105.h),
                                     painter: DashedLineVerticalPainter())
                               ],
@@ -333,12 +322,13 @@ class itemData extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                getCustomFont(
-                                    events?[i].title ?? "", 18.sp, Colors.black, 1,
+                                getCustomFont(events?[i].title ?? "", 18.sp,
+                                    Colors.black, 1,
                                     fontWeight: FontWeight.w600,
                                     txtHeight: 1.5.h),
                                 getVerSpace(6.h),
-                                getCustomFont(date.toString() ?? "", 15.sp, greyColor, 1,
+                                getCustomFont(
+                                    date.toString() ?? "", 15.sp, greyColor, 1,
                                     fontWeight: FontWeight.w500,
                                     txtHeight: 1.46.h),
                                 getVerSpace(9.h),
@@ -348,8 +338,8 @@ class itemData extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     getCustomFont(
-                                        "Ticket : ${events?[i].ticket.toString()}" ?? '',
-                                      
+                                        "Ticket : ${events?[i].ticket.toString()}" ??
+                                            '',
                                         15.sp,
                                         Colors.black,
                                         1,
@@ -364,8 +354,8 @@ class itemData extends StatelessWidget {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 12.h, vertical: 6.h),
                                       child: getCustomFont(
-                                          "\$ ${events?[i].price.toString()}" ?? '',
-                                       
+                                          "\$ ${events?[i].price.toString()}" ??
+                                              '',
                                           15.sp,
                                           accentColor,
                                           1,
@@ -385,9 +375,6 @@ class itemData extends StatelessWidget {
               ),
             ),
           );
-    
-    
-    
         });
   }
 }

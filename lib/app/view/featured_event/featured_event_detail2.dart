@@ -13,10 +13,12 @@ import 'package:readmore/readmore.dart';
 
 import '../../../base/constant.dart';
 import '../../chat_logic/pages/chat_page.dart';
+import '../../widget/empty_screen.dart';
 import '../../widget/love_icon.dart';
 import '../../widget/map_sheet.dart';
 import '../bloc/bookmark_bloc.dart';
 import '../bloc/sign_in_bloc.dart';
+import '../home/tab/tab_home.dart';
 import 'buy_ticket.dart';
 
 class FeaturedEvent2Detail extends StatefulWidget {
@@ -55,15 +57,80 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
         },
         child: Scaffold(
           backgroundColor: Colors.white,
-          body: Container(
-            height: double.infinity,
-            width: double.infinity,
-            color: Colors.white,
-            child: ListView(
-              children: [
-                buildImageWidget(),
-              ],
-            ),
+          body: Stack(
+            children: [
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                color: Colors.white,
+                child: ListView(
+                  children: [
+                    buildImageWidget(),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: getPaddingWidget(
+                  EdgeInsets.symmetric(horizontal: 0.h),
+                  Container(
+                    color: Colors.white,
+                    height: 60.0,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 20.0,
+                        ),
+                        Center(
+                          child: Container(
+                            height: 55.h,
+                            width: 55.h,
+                            margin: EdgeInsets.only(top: 0.h, right: 20.h),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 13.h, horizontal: 13.h),
+                            decoration: BoxDecoration(
+                                color: accentColor.withOpacity(0.09),
+                                borderRadius: BorderRadius.circular(22.h)),
+                            child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChatPage(
+                                        arguments: ChatPageArguments(
+                                          peerId: event.title ?? '',
+                                          peerAvatar: sb.imageUrl ?? '',
+                                          peerNickname: sb.name ?? '',
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: getSvg("message.svg",
+                                    color: accentColor,
+                                    height: 24.h,
+                                    width: 24.h)),
+                          ),
+                        ),
+                        getButton(
+                            context, accentColor, "Buy Ticket", Colors.white,
+                            () {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => new BuyTicket(
+                                    event: event,
+                                  )));
+                        }, 18.sp,
+                            weight: FontWeight.w700,
+                            buttonHeight: 60.h,
+                            buttonWidth:
+                                MediaQuery.of(context).size.width - 148.h,
+                            borderRadius: BorderRadius.circular(22.h)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ));
   }
@@ -71,20 +138,6 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   handleLoveClick() {
     final Event event = widget.event!;
     context.read<BookmarkBloc>().onBookmarkIconClick(event.title);
-  }
-
- 
-
-  Widget buildButtonWidget(BuildContext context) {
-    return getPaddingWidget(
-      EdgeInsets.symmetric(horizontal: 20.h),
-      getButton(context, accentColor, "Buy Ticket", Colors.white, () {
-        Constant.sendToNext(context, Routes.buyTicketRoute);
-      }, 18.sp,
-          weight: FontWeight.w700,
-          buttonHeight: 60.h,
-          borderRadius: BorderRadius.circular(22.h)),
-    );
   }
 
   Widget buildFollowWidget(BuildContext context) {
@@ -238,7 +291,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
               ),
             ),
             Positioned(
-                top: 295.h,
+                top: 300.h,
                 child: Container(
                   height: 50.0,
                   width: MediaQuery.of(context).size.width,
@@ -255,7 +308,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
           ],
         ),
         Positioned(
-            top: 255.h,
+            top: 295.h,
             // width: 374.w,
             child: Container(
               width: MediaQuery.of(context).size.width,
@@ -268,9 +321,46 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   getVerSpace(0.h),
+                  Center(
+                    child: Container(
+                      height: 8.0,
+                      width: 70.0,
+                      decoration: BoxDecoration(
+                          color: greyColor.withOpacity(0.1),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(30.0))),
+                    ),
+                  ),
+                  getVerSpace(20.h),
+                  Row(
+                    children: [
+                      getCustomFont(
+                        date ?? '',
+                        15.sp,
+                        greyColor,
+                        1,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Container(
+                          height: 5.0,
+                          width: 3.0,
+                          color: greyColor.withOpacity(0.5),
+                        ),
+                      ),
+                      getCustomFont(
+                        event.time ?? '',
+                        15.sp,
+                        greyColor,
+                        1,
+                        fontWeight: FontWeight.w500,
+                      )
+                    ],
+                  ),
                   getCustomFont(event.title ?? '', 27.sp, Colors.black, 1,
                       fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                  getVerSpace(20.h),
+                  getVerSpace(10.h),
                   Row(
                     children: [
                       getSvg("Location.svg",
@@ -285,54 +375,56 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       )
                     ],
                   ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  //     Row(
+                  //       children: [
+                  //         getSvg(
+                  //           "calender.svg",
+                  //           width: 20.h,
+                  //           height: 20.h,
+                  //           color: accentColor,
+                  //         ),
+                  //         getHorSpace(5.h),
+                  //         getCustomFont(
+                  //           date ?? '',
+                  //           17.sp,
+                  //           greyColor,
+                  //           1,
+                  //           fontWeight: FontWeight.w500,
+                  //         )
+                  //       ],
+                  //     ),
+                  //     Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         Row(
+                  //           children: [
+                  //             getSvg("time.svg",
+                  //                 width: 19.h,
+                  //                 height: 19.h,
+                  //                 color: accentColor),
+                  //             getHorSpace(5.h),
+                  //             getCustomFont(
+                  //               event.time ?? '',
+                  //               17.sp,
+                  //               greyColor,
+                  //               1,
+                  //               fontWeight: FontWeight.w500,
+                  //             )
+                  //           ],
+                  //         ),
+                  //         Container(
+                  //           width: 100.w,
+                  //           height: 30.h,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ],
+                  // ),
+
                   getVerSpace(15.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          getSvg(
-                            "calender.svg",
-                            width: 20.h,
-                            height: 20.h,
-                            color: accentColor,
-                          ),
-                          getHorSpace(5.h),
-                          getCustomFont(
-                            date ?? '',
-                            17.sp,
-                            greyColor,
-                            1,
-                            fontWeight: FontWeight.w500,
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              getSvg("time.svg",
-                                  width: 19.h, height: 19.h, color: accentColor),
-                              getHorSpace(5.h),
-                              getCustomFont(
-                                event.time ?? '',
-                                17.sp,
-                                greyColor,
-                                1,
-                                fontWeight: FontWeight.w500,
-                              )
-                            ],
-                          ),
-                          Container(
-                            width: 100.w,
-                            height: 30.h,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  getVerSpace(10.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -377,20 +469,23 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                     EdgeInsets.symmetric(horizontal: 20.h),
                     ReadMoreText(
                       event.description ?? "",
-                      trimLines: 3,
+                      trimLines: 5,
                       trimMode: TrimMode.Line,
                       trimCollapsedText: 'Read more...',
                       trimExpandedText: 'Show less',
                       style: TextStyle(
+                          fontFamily: 'Gilroy',
                           color: greyColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 15.sp,
                           height: 1.5.h),
                       lessStyle: TextStyle(
+                          fontFamily: 'Gilroy',
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           color: accentColor),
                       moreStyle: TextStyle(
+                          fontFamily: 'Gilroy',
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w600,
                           color: accentColor),
@@ -404,35 +499,32 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   getVerSpace(30.h),
                   Row(
                     children: [
-                                InkWell
-                      (
+                      InkWell(
                         onTap: (() {
-                           MapsSheet.show(
-                                              context: context,
-                                              onMapTap: (map) {
-                                                map.showDirections(
-                                                  destination: Coords(
-                                                   event.mapsLatLink as double,
-                                    event.mapsLangLink as double
-                                                  ),
-                                                  directionsMode:
-                                                      DirectionsMode.driving,
-                                                );
-                                              },
-                                            );
+                          MapsSheet.show(
+                            context: context,
+                            onMapTap: (map) {
+                              map.showDirections(
+                                destination: Coords(event.mapsLatLink as double,
+                                    event.mapsLangLink as double),
+                                directionsMode: DirectionsMode.driving,
+                              );
+                            },
+                          );
                         }),
                         child: Container(
                           height: 206.h,
                           width: 40.0,
-                          decoration: BoxDecoration(color: Colors.white,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
                                     color: Colors.black12.withOpacity(0.1),
                                     blurRadius: 27,
                                     offset: const Offset(0, 8))
                               ],
-                          borderRadius: BorderRadius.all(Radius.circular(5.0))
-                          ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0))),
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -442,7 +534,9 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                                   Icons.navigation_rounded,
                                   color: Colors.black,
                                 ),
-                                SizedBox(height: 5,),
+                                SizedBox(
+                                  height: 5,
+                                ),
                                 RotatedBox(
                                   quarterTurns:
                                       3, // mengatur rotasi sebesar 90 derajat
@@ -459,8 +553,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                             ),
                           ),
                         ),
-                      )
-             ,
+                      ),
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 5.h),
@@ -499,69 +592,120 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                           ),
                         ),
                       ),
-                   ],
+                    ],
                   ),
-                  getVerSpace(22.h),
-                  getVerSpace(16.h),
-
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: getPaddingWidget(
-                      EdgeInsets.symmetric(horizontal: 20.h),
-                      Container(
-                        color: Colors.white,
-                        child: Row(
-                          children: [
-                            Center(
-                              child: Container(
-                                height: 55.h,
-                                width: 55.h,
-                                margin: EdgeInsets.only(top: 0.h, right: 20.h),
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 13.h, horizontal: 13.h),
-                                decoration: BoxDecoration(
-                                    color: accentColor.withOpacity(0.09),
-                                    borderRadius: BorderRadius.circular(22.h)),
-                                child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatPage(
-                                            arguments: ChatPageArguments(
-                                              peerId: event.title ?? '',
-                                              peerAvatar: sb.imageUrl ?? '',
-                                              peerNickname: sb.name ?? '',
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: getSvg("message.svg",
-                                    color: accentColor,
-                                        height: 24.h, width: 24.h)),
-                              ),
-                            ),
-                            getButton(context, accentColor, "Buy Ticket",
-                                Colors.white, () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                  pageBuilder: (_, __, ___) => new BuyTicket(
-                                        event: event,
-                                      )));
-                            }, 18.sp,
-                                weight: FontWeight.w700,
-                                buttonHeight: 60.h,
-                                buttonWidth:
-                                    MediaQuery.of(context).size.width - 148.h,
-                                borderRadius: BorderRadius.circular(22.h)),
-                          ],
-                        ),
-                      ),
+                  getVerSpace(35.h),
+                  getPaddingWidget(
+                    EdgeInsets.only(right: 20.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        getCustomFont("Upcoming Events", 19.sp, Colors.black, 1,
+                            fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                        GestureDetector(
+                          onTap: () {
+                            Constant.sendToNext(
+                                context, Routes.featureEventListRoute);
+                          },
+                          child: getCustomFont("View All", 15.sp, greyColor, 1,
+                              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                        )
+                      ],
                     ),
                   ),
+                  getVerSpace(15.h),
+
+                  Container(
+                    height: 330.h,
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection("event")
+                          .where('date',
+                              isGreaterThanOrEqualTo:
+                                  Timestamp.fromDate(DateTime.now()))
+                          .orderBy('date', descending: false)
+                          .limit(10)
+                          .snapshots(),
+                      builder: (BuildContext ctx,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.data!.docs.isEmpty) {
+                          return Center(child: EmptyScreen());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error'));
+                        }
+
+                        return snapshot.hasData
+                            ? TrendingEventCard2(
+                                list: snapshot.data?.docs,
+                              )
+                            : Container();
+                      },
+                    ),
+                  ),
+                  getVerSpace(16.h),
                 ],
               ),
-            ))
+            )),
+
+        // Align(
+        //   alignment: Alignment.bottomCenter,
+        //   child: getPaddingWidget(
+        //     EdgeInsets.symmetric(horizontal: 20.h),
+        //     Container(
+        //       color: Colors.white,
+        //       child: Row(
+        //         children: [
+        //           Center(
+        //             child: Container(
+        //               height: 55.h,
+        //               width: 55.h,
+        //               margin: EdgeInsets.only(top: 0.h, right: 20.h),
+        //               padding: EdgeInsets.symmetric(
+        //                   vertical: 13.h, horizontal: 13.h),
+        //               decoration: BoxDecoration(
+        //                   color: accentColor.withOpacity(0.09),
+        //                   borderRadius: BorderRadius.circular(22.h)),
+        //               child: GestureDetector(
+        //                   onTap: () {
+        //                     Navigator.push(
+        //                       context,
+        //                       MaterialPageRoute(
+        //                         builder: (context) => ChatPage(
+        //                           arguments: ChatPageArguments(
+        //                             peerId: event.title ?? '',
+        //                             peerAvatar: sb.imageUrl ?? '',
+        //                             peerNickname: sb.name ?? '',
+        //                           ),
+        //                         ),
+        //                       ),
+        //                     );
+        //                   },
+        //                   child: getSvg("message.svg",
+        //                       color: accentColor, height: 24.h, width: 24.h)),
+        //             ),
+        //           ),
+        //           getButton(context, accentColor, "Buy Ticket", Colors.white,
+        //               () {
+        //             Navigator.of(context).push(PageRouteBuilder(
+        //                 pageBuilder: (_, __, ___) => new BuyTicket(
+        //                       event: event,
+        //                     )));
+        //           }, 18.sp,
+        //               weight: FontWeight.w700,
+        //               buttonHeight: 60.h,
+        //               buttonWidth: MediaQuery.of(context).size.width - 148.h,
+        //               borderRadius: BorderRadius.circular(22.h)),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

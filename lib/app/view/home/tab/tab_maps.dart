@@ -193,7 +193,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
         Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 0.0),
+              padding: const EdgeInsets.only(top: 27.0),
               child: Container(
                 height: 55.0,
                 width: double.infinity,
@@ -433,14 +433,15 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                           }
 
                           if (snapshot.data!.docs.isEmpty) {
-                            return Center(child:  Text(
-                                      "No one has joined yet",
-                                      style: TextStyle(
-                                          color: greyColor,
-                                          fontSize: 12.5,
-                                          fontFamily: "Gilroy",
-                                          fontWeight: FontWeight.w500),
-                                    ));
+                            return Center(
+                                child: Text(
+                              "No one has joined yet",
+                              style: TextStyle(
+                                  color: greyColor,
+                                  fontSize: 12.5,
+                                  fontFamily: "Gilroy",
+                                  fontWeight: FontWeight.w500),
+                            ));
                           }
                           if (snapshot.hasError) {
                             return Center(child: Text('Error'));
