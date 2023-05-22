@@ -27,15 +27,18 @@ class _TicketConfirmDialogState extends State<TicketConfirmDialog> {
           Container(
             height: 190.h,
             decoration: BoxDecoration(
-                color: lightColor,
+                color: accentColor.withOpacity(0.01),
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(34.h))),
             width: double.infinity,
             margin: EdgeInsets.symmetric(horizontal: 30.h),
             child: Column(
               children: [
-                getVerSpace(40.h),
-                getAssetImage("password1.png", width: 90.h, height: 90.h)
+                getVerSpace(40.h),   
+                 Image.asset( 'assets/images/Sukses.gif',
+              width: 150,
+              
+            ),
               ],
             ),
           ),
@@ -53,7 +56,7 @@ class _TicketConfirmDialogState extends State<TicketConfirmDialog> {
             child: Column(
               children: [
                 getVerSpace(30.h),
-                getCustomFont("Ticket Confirmed!", 22.sp, Colors.black, 1,
+                getCustomFont("Success", 22.sp, Colors.black, 1,
                     fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                 getVerSpace(8.h),
                 getMultilineCustomFont(
@@ -62,8 +65,7 @@ class _TicketConfirmDialogState extends State<TicketConfirmDialog> {
                 getVerSpace(30.h),
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 30.h),
-                  getButton(context, accentColor, "View", Colors.white, () {
-                    // Constant.sendToNext(context, Routes.ticketDetailRoute);
+                  getButton(context, accentColor, "Ok", Colors.white, () {
                     Navigator.of(context).pop();                  }, 18.sp,
                       weight: FontWeight.w700,
                       buttonHeight: 60.h,

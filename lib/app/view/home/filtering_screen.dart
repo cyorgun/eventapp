@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/view/home/tab/tab_home.dart';
 import 'package:event_app/base/color_data.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../../base/widget_utils.dart';
-import '../../modal/modal_event.dart';
+
 import '../../widget/empty_screen.dart';
 import '../featured_event/featured_event_detail2.dart';
 
@@ -28,6 +29,8 @@ class _FilterScreenState extends State<FilterScreen> {
   bool _isCategoryJSelected = false;
   bool _isCategoryKSelected = false;
   bool _isCategoryLSelected = false;
+  bool _isCategoryMSelected = false;
+  bool _isCategoryNSelected = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +76,6 @@ class _FilterScreenState extends State<FilterScreen> {
               spacing: 8.0,
               runSpacing: 12.0,
               children: [
-        
                 Container(
                   width: 120.0,
                   decoration: BoxDecoration(
@@ -202,8 +204,6 @@ class _FilterScreenState extends State<FilterScreen> {
                     ],
                   ),
                 ),
-           
-            
                 Container(
                   width: 120.0,
                   decoration: BoxDecoration(
@@ -364,6 +364,70 @@ class _FilterScreenState extends State<FilterScreen> {
                     ],
                   ),
                 ),
+                Container(
+                  width: 120.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 2,
+                          offset: Offset(0, 3), // changes position of shadow
+                        ),
+                      ]),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        activeColor: accentColor,
+                        value: _isCategoryMSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            _isCategoryMSelected = value!;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Swimming',
+                        style: TextStyle(
+                            fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 120.0,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 2,
+                          offset: Offset(0, 3), // changes position of shadow
+                        ),
+                      ]),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        activeColor: accentColor,
+                        value: _isCategoryNSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            _isCategoryNSelected = value!;
+                          });
+                        },
+                      ),
+                      Text(
+                        'Tour',
+                        style: TextStyle(
+                            fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             SizedBox(
@@ -397,6 +461,8 @@ class _FilterScreenState extends State<FilterScreen> {
                     if (_isCategoryJSelected) 'party',
                     if (_isCategoryKSelected) 'olympic',
                     if (_isCategoryLSelected) 'culture',
+                    if (_isCategoryMSelected) 'swimming',
+                    if (_isCategoryNSelected) 'tour',
                   ]
 
                       //  whereIn: [
@@ -494,13 +560,16 @@ class _FilterScreenState extends State<FilterScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            getCustomFont(
-                                                events?[i].title ?? "",
-                                                20.5.sp,
-                                                Colors.black,
-                                                1,
-                                                fontWeight: FontWeight.w700,
-                                                txtHeight: 1.5.h),
+                                            Container(
+                                              width: 200.w,
+                                              child: getCustomFont(
+                                                  events?[i].title ?? "",
+                                                  20.5.sp,
+                                                  Colors.black,
+                                                  1,
+                                                  fontWeight: FontWeight.w700,
+                                                  txtHeight: 1.5.h),
+                                            ),
                                             SizedBox(
                                               height: 5.0,
                                             ),
@@ -528,33 +597,89 @@ class _FilterScreenState extends State<FilterScreen> {
                                                     width: 18.h,
                                                     height: 18.h),
                                                 getHorSpace(5.h),
-                                                getCustomFont(
-                                                    events?[i].location ?? "",
-                                                    15.sp,
-                                                    greyColor,
-                                                    1,
-                                                    fontWeight: FontWeight.w500,
-                                                    txtHeight: 1.5.h),
+                                                Container(
+                                                  width: 150.w,
+                                                  child: getCustomFont(
+                                                      events?[i].location ?? "",
+                                                      15.sp,
+                                                      greyColor,
+                                                      1,
+                                                      fontWeight: FontWeight.w500,
+                                                      txtHeight: 1.5.h),
+                                                ),
                                               ],
                                             ),
                                             getVerSpace(7.h),
-                                            StreamBuilder(
-                                              stream: FirebaseFirestore.instance
-                                                  .collection("JoinEvent")
-                                                  .doc("user")
-                                                  .collection(
-                                                      events[i].title ?? '')
-                                                  .snapshots(),
-                                              builder: (BuildContext ctx,
-                                                  AsyncSnapshot<QuerySnapshot>
-                                                      snapshot) {
-                                                return snapshot.hasData
-                                                    ? new joinEvents(
-                                                        list:
-                                                            snapshot.data?.docs,
-                                                      )
-                                                    : Container();
-                                              },
+                                            Row(
+                                              children: [
+                                                StreamBuilder(
+                                                  stream: FirebaseFirestore.instance
+                                                      .collection("JoinEvent")
+                                                      .doc("user")
+                                                      .collection(
+                                                          events[i].title ?? '')
+                                                      .snapshots(),
+                                                  builder: (BuildContext ctx,
+                                                      AsyncSnapshot<QuerySnapshot>
+                                                          snapshot) {
+                                                    return snapshot.hasData
+                                                        ? new joinEvents(
+                                                            list:
+                                                                snapshot.data?.docs,
+                                                          )
+                                                        : Container();
+                                                  },
+                                                ),
+                                                 if(events[i].price!>0)
+                                     Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
+                            child: Container(
+                              height: 35.h,
+                              width: 80.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.051),
+                                  borderRadius: BorderRadius.circular(50.h)),
+                              child: Center(
+                                  child: Text(
+                                "\$ " + (events?[i].price.toString() ?? ""),
+                                style: TextStyle(
+                                    color: accentColor,
+                                    fontSize: 15.sp,
+                                            fontFamily: 'Gilroy',
+                                    fontWeight: FontWeight.w700),
+                                textAlign: TextAlign.center,
+                              )),
+                            )),
+                      ),
+                       if(events[i].price==0)  
+                         Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
+                            child: Container(
+                              height: 35.h,
+                              width: 80.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.051),
+                                  borderRadius: BorderRadius.circular(50.h)),
+                              child: Center(
+                                  child: Text(
+                                "Free",
+                                style: TextStyle(
+                                    color: accentColor,
+                                    fontSize: 15.sp,
+                                            fontFamily: 'Gilroy',
+                                    fontWeight: FontWeight.w700),
+                                textAlign: TextAlign.center,
+                              )),
+                            )),
+                      ),
+                              
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -562,23 +687,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  height: 35.h,
-                                  width: 80.0,
-                                  decoration: BoxDecoration(
-                                      color: accentColor.withOpacity(0.051),
-                                      borderRadius:
-                                          BorderRadius.circular(50.h)),
-                                  child: Center(
-                                      child: Text(
-                                    "\$ " + (events?[i].price.toString() ?? ""),
-                                    style: TextStyle(
-                                        color: accentColor,
-                                        fontSize: 15.sp,
-                                        fontWeight: FontWeight.w700),
-                                    textAlign: TextAlign.center,
-                                  )),
-                                ),
+                               
                               ],
                             ),
                           ),

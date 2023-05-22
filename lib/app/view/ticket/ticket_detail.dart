@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
 import 'package:dotted_line/dotted_line.dart';
-import 'package:event_app/app/modal/modal_event.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +23,6 @@ import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 import 'package:screenshot/screenshot.dart';
 
-import '../../service/helper_notifications.dart';
 
 class TicketDetail extends StatefulWidget {
   Event? event;
@@ -179,16 +178,16 @@ class _TicketDetailState extends State<TicketDetail> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                       color: accentColor,
-                      borderRadius: BorderRadius.circular(40.h),
+                      borderRadius: BorderRadius.circular(20.h),
                       boxShadow: [
                         BoxShadow(
                             color: shadowColor,
                             offset: const Offset(0, 8),
                             blurRadius: 27)
                       ]),
-                  padding: EdgeInsets.only(left: 20.h, right: 20.0),
+                  padding: EdgeInsets.only(left: 8.h, right: 8.0),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
+                    padding: const EdgeInsets.only(top: 8.0),
                     child: Column(
                       children: [
                         Container(

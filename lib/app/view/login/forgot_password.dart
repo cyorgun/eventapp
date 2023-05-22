@@ -1,4 +1,5 @@
-import 'package:event_app/app/controller/controller.dart';
+
+import 'package:evente/evente.dart';
 import 'package:event_app/app/dialog/snacbar.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,6 +1,6 @@
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/controller/controller.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/app/view/featured_event/featured_event_detail2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,8 +9,6 @@ import 'package:get/get.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../modal/modal_event.dart';
-import '../../modal/modal_popular_event.dart';
 import '../../widget/empty_screen.dart';
 import '../home/search_screen.dart';
 import '../home/tab/tab_home.dart';
@@ -27,7 +25,6 @@ class _PopularEventListState extends State<PopularEventList> {
     Constant.backToPrev(context);
   }
 
-  PopularEventController controller = Get.put(PopularEventController());
 
   @override
   Widget build(BuildContext context) {
@@ -102,27 +99,6 @@ class _PopularEventListState extends State<PopularEventList> {
     );
   }
 
-  Widget buildSearchWidget(BuildContext context) {
-    return getPaddingWidget(
-      EdgeInsets.symmetric(horizontal: 20.h),
-      getDefaultTextFiledWithLabel(
-          context, "Search events...", controller.searchController,
-          isEnable: false, isprefix: true, onTap: () {
-        Navigator.of(context).push(
-            PageRouteBuilder(pageBuilder: (_, __, ___) => new SearchPage()));
-      },
-          prefix: Row(
-            children: [
-              getHorSpace(18.h),
-              getSvgImage("search.svg", height: 24.h, width: 24.h),
-            ],
-          ),
-          constraint: BoxConstraints(maxHeight: 24.h, maxWidth: 55.h),
-          vertical: 18,
-          horizontal: 16,
-          onChanged: controller.onItemChanged),
-    );
-  }
 }
 
 class buildFeatureEventList2 extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/data/data_file.dart';
-import 'package:event_app/app/modal/modal_past.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/base/constant.dart';
@@ -12,8 +11,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 import 'dart:math' as math;
-
-import '../../modal/modal_event.dart';
 import '../bloc/sign_in_bloc.dart';
 
 class PastScreen extends StatefulWidget {
@@ -24,7 +21,6 @@ class PastScreen extends StatefulWidget {
 }
 
 class _PastScreenState extends State<PastScreen> {
-  List<ModalPast> pastLists = DataFile.pastList;
   @override
   Widget build(BuildContext context) {
     final sb = context.watch<SignInBloc>();
@@ -236,11 +232,7 @@ class itemData extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                QrImage(
-                                  data: sb.name??'${code!}',
-                                  version: QrVersions.auto,
-                                  size: 90.0,
-                                ),
+                           
                                 // getAssetImage("code.png",
                                 //     width: 100.h, height: 100.h),
                                 CustomPaint(

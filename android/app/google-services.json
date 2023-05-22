@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "531047962965-6ibg2hu6br9ncnsgrso7s6l67uh1cjhb.apps.googleusercontent.com",
+          "client_id": "531047962965-on7lojdfsqbi8frjucklog75ftalk2at.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.evente.proevent",
+            "certificate_hash": "74392d785abd2b267bd68dabe56bd64d0fb26fac"
+          }
+        },
+        {
+          "client_id": "531047962965-sgld6dmvsch2a684ck1e2n34m3dkq3bt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

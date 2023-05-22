@@ -8,10 +8,9 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../controller/controller.dart';
 import '../../dialog/snacbar copy.dart';
 import '../../routes/app_routes.dart';
-import '../../service/app_service.dart';
+import 'package:evente/evente.dart';
 import '../bloc/sign_in_bloc.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../modal/notification_model.dart';
+import 'package:evente/evente.dart';
 
 
 class CustomNotificationCard extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/controller/controller.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,10 +8,6 @@ import 'package:get/get.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../data/data_file.dart';
-import '../../modal/modal_event.dart';
-import '../../modal/modal_event_category.dart';
-import '../../modal/modal_trending_event.dart';
 import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
 import '../featured_event/featured_event_detail2.dart';
@@ -31,7 +27,6 @@ class _TrendingScreenState extends State<TrendingScreen> {
   }
 
   TrendingController controller = Get.put(TrendingController());
-  List<ModalEventCategory> eventCategoryLists = DataFile.eventCategoryList;
 
   @override
   Widget build(BuildContext context) {

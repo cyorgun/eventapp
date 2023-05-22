@@ -1,4 +1,4 @@
-import 'package:event_app/app/data/data_file.dart';
+
 import 'package:event_app/base/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
 import '../../../dialog/loading_cards.dart';
-import '../../../modal/modal_favourite.dart';
+import 'package:evente/evente.dart';
 import '../../../widget/card4.dart';
 import '../../../widget/card5.dart';
 import '../../bloc/bookmark_bloc.dart';
@@ -20,7 +20,6 @@ class TabFavourite extends StatefulWidget {
 }
 
 class _TabFavouriteState extends State<TabFavourite> {
-  List<ModalFavourite> favouriteLists = DataFile.favouriteList;
 
   @override
   Widget build(BuildContext context) {

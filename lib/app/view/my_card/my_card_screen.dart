@@ -1,4 +1,5 @@
-import 'package:event_app/app/controller/controller.dart';
+
+import 'package:evente/evente.dart';
 import 'package:event_app/app/dialog/delete_dialog.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:get/get.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../modal/modal_card.dart';
 
 class MyCardScreen extends StatefulWidget {
   const MyCardScreen({Key? key}) : super(key: key);

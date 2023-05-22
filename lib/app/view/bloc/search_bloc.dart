@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../modal/modal_event.dart';
+import 'package:evente/evente.dart';
 
 class SearchBloc with ChangeNotifier {
 

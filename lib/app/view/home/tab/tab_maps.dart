@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/view/home/tab/tab_home.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
-import '../../../modal/modal_event.dart';
 import '../../featured_event/featured_event_detail2.dart';
 import '../cardSlider/cardSlider.dart';
 import '../cardSlider/lokasimodel.dart';
@@ -144,7 +145,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
           child: GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: CameraPosition(
-                target: LatLng(40.7078523, -74.008981), zoom: 13.0),
+                target: LatLng(40.7078523, -74.008981), zoom: 10.0),
 
             // markers: markers,
             onTap: (pos) {
@@ -238,15 +239,24 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   }
 
   moveCamera() {
-    _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: coffeeShops[_pageController!.page!.toInt()].locationCoords!,
-        zoom: 14.0,
+      firestoreInstance.collection("event").get().then((querySnapshot) {
+          final events = querySnapshot.docs.map((e) {
+              return Event.fromFirestore(e);
+            }).toList();
+            
+   
+      _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: events[_pageController!.page!.toInt()].latLng!,
+        zoom: 13.0,
         bearing: 45.0,
         tilt: 45.0)));
+    });
+    
   }
 
   Widget cardMaps(index) {
     return StreamBuilder<QuerySnapshot>(
+      
         stream: FirebaseFirestore.instance.collection('event').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();

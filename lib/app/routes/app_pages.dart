@@ -1,3 +1,4 @@
+
 import 'package:event_app/app/view/create_event/create_event_screen.dart';
 import 'package:event_app/app/view/featured_event/buy_ticket.dart';
 import 'package:event_app/app/view/featured_event/feature_event_list.dart';
@@ -22,6 +23,7 @@ import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/app/view/trending/trending_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../view/intro/welcome.dart';
 import '../view/login/login_screen.dart';
 
 import '../view/login/login_screens.dart';
@@ -38,12 +40,11 @@ class AppPages {
     Routes.forgotPasswordRoute: (context) => const ForgotPassword(),
     Routes.resetPasswordRoute: (context) => const ResetPassword(),
     Routes.signUpRoute: (context) => const SignUpScreen(),
-    Routes.selectCountryRoute: (context) => const SelectCountryScreen(),
     Routes.verifyRoute: (context) => const VerifyScreen(),
     Routes.selectInterestRoute: (context) => const SelectInterestScreen(),
     Routes.trendingScreenRoute: (context) => const TrendingScreen(),
-
-    Routes.paymentRoute: (context) => const PaymentScreen(),
+    Routes.welcomePage: (context) => const WelcomePage(),
+    Routes.paymentRoute: (context) =>  PaymentScreen(),
     Routes.createEventRoute: (context) => const CreateEventScreen(),
     Routes.ticketDetailRoute: (context) =>  TicketDetail(),
     Routes.settingRoute: (context) => const SettingScreen(),

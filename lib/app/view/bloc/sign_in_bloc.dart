@@ -3,10 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:the_apple_sign_in/the_apple_sign_in.dart';
 
 class SignInBloc extends ChangeNotifier {
 
@@ -34,7 +37,6 @@ class SignInBloc extends ChangeNotifier {
 
   String? _errorCode;
   String? get errorCode => _errorCode;
-
 
   String? _name;
   String? get name => _name;
@@ -65,6 +67,8 @@ class SignInBloc extends ChangeNotifier {
   String _packageName = '';
   String get packageName => _packageName;
 
+  final GoogleSignIn _googlSignIn = new GoogleSignIn();
+  // final FacebookAuth _fbAuth = FacebookAuth.instance;
 
 
   void initPackageInfo () async{
@@ -75,6 +79,60 @@ class SignInBloc extends ChangeNotifier {
     
   }
 
+
+
+  Future signInWithApple () async {
+
+    final _firebaseAuth = FirebaseAuth.instance;
+    final result = await TheAppleSignIn.performRequests(
+        [AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])]);
+
+    if(result.status == AuthorizationStatus.authorized){
+      try
+      {
+        final appleIdCredential = result.credential;
+        final oAuthProvider = OAuthProvider('apple.com');
+        final credential = oAuthProvider.credential(
+          idToken: String.fromCharCodes(appleIdCredential!.identityToken!),
+          accessToken: String.fromCharCodes(appleIdCredential.authorizationCode!),
+        );
+        final authResult = await _firebaseAuth.signInWithCredential(credential);
+        final firebaseUser = authResult.user;
+
+        this._uid = firebaseUser!.uid;
+        this._name = '${appleIdCredential.fullName!.givenName} ${appleIdCredential.fullName!.familyName}';
+        this._email = appleIdCredential.email ?? 'null';
+        this._imageUrl = firebaseUser.photoURL ?? defaultUserImageUrl;
+        this._signInProvider = 'apple';
+
+        
+        print(firebaseUser);
+        _hasError = false;
+        notifyListeners();
+
+
+      }
+      catch(e)
+      {
+        _hasError = true;
+        _errorCode = e.toString();
+        notifyListeners();
+      }
+    }
+    else if (result.status == AuthorizationStatus.error)
+    {
+      _hasError = true;
+      _errorCode = 'Appple Sign In Error! Please try again';
+      notifyListeners();
+    }
+    else if (result.status == AuthorizationStatus.cancelled)
+    {
+      _hasError = true;
+      _errorCode = 'Sign In Cancelled!';
+      notifyListeners();
+    }
+    
+  }
 
 
 
@@ -123,6 +181,83 @@ class SignInBloc extends ChangeNotifier {
     }
   }
 
+  
+
+  Future signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await _googlSignIn.signIn();
+    if (googleUser != null) {
+      try {
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        User userDetails = (await _firebaseAuth.signInWithCredential(credential)).user!;
+
+        this._name = userDetails.displayName;
+        this._email = userDetails.email;
+        this._imageUrl = userDetails.photoURL;
+        this._uid = userDetails.uid;
+        this._signInProvider = 'google';
+
+        _hasError = false;
+        notifyListeners();
+      } catch (e) {
+        _hasError = true;
+        _errorCode = e.toString();
+        notifyListeners();
+      }
+    } else {
+      _hasError = true;
+      notifyListeners();
+    }
+  }
+
+
+
+  // Future signInwithFacebook() async {
+
+  //   User currentUser;
+  //   final LoginResult facebookLoginResult = await FacebookAuth.instance.login(permissions: ['email', 'public_profile']);
+  //   if(facebookLoginResult.status == LoginStatus.success){
+  //     final _accessToken = await FacebookAuth.instance.accessToken;
+  //     if(_accessToken != null){
+  //       try{
+  //         final AuthCredential credential = FacebookAuthProvider.credential(_accessToken.token);
+  //         final User user = (await _firebaseAuth.signInWithCredential(credential)).user!;
+  //         assert(user.email != null);
+  //         assert(user.displayName != null);
+  //         assert(!user.isAnonymous);
+  //         await user.getIdToken();
+  //         currentUser = _firebaseAuth.currentUser!;
+  //         assert(user.uid == currentUser.uid);
+
+  //         this._name = user.displayName;
+  //         this._email = user.email;
+  //         this._imageUrl = user.photoURL;
+  //         this._uid = user.uid;
+  //         this._signInProvider = 'facebook';
+        
+        
+  //         _hasError = false;
+  //         notifyListeners();
+  //       }catch(e){
+  //         _hasError = true;
+  //         _errorCode = e.toString();
+  //         notifyListeners();
+  //       }
+        
+  //     }
+  //   }else{
+  //     _hasError = true;
+  //     _errorCode = 'cancel or error';
+  //     notifyListeners();
+  //   }
+  // }
+
+
 
 
   Future<bool> checkUserExists() async {
@@ -170,10 +305,10 @@ class SignInBloc extends ChangeNotifier {
     final SharedPreferences sp = await SharedPreferences.getInstance();
 
     await sp.setString('name', _name!);
-    await sp.setString('phone', _phone!);
+    await sp.setString('phone', _phone??"");
     await sp.setString('email', _email!);
     await sp.setString('image_url', _imageUrl!);
-    await sp.setString('role', _role!);
+    await sp.setString('role', _role??"user");
     await sp.setString('uid', _uid!);
     await sp.setString('sign_in_provider', _signInProvider!);
   }
@@ -244,7 +379,7 @@ class SignInBloc extends ChangeNotifier {
     
     else{
       await _firebaseAuth.signOut();
-      // await _googlSignIn.signOut();
+      await _googlSignIn.signOut();
     }
     
   }

@@ -1,14 +1,12 @@
-import 'package:event_app/app/controller/controller.dart';
-import 'package:event_app/app/data/data_file.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../base/pref_data.dart';
-import '../../modal/modal_intro.dart';
 import '../../routes/app_routes.dart';
 
 class IntroScreen extends StatefulWidget {

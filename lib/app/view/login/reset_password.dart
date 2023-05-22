@@ -1,4 +1,5 @@
-import 'package:event_app/app/controller/controller.dart';
+
+import 'package:evente/evente.dart';
 import 'package:event_app/app/dialog/pass_change_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

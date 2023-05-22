@@ -21,6 +21,7 @@ abstract class Routes {
   static const myCardScreenRoute = Paths.myCardScreenPath;
   static const editCardScreenRoute = Paths.editCardScreenPath;
   static const privacyScreenRoute = Paths.privacyScreenPath;
+  static const welcomePage = Paths.welcomePage;
   static const helpScreenRoute = Paths.helpScreenPath;
   static const featureEventListRoute = Paths.featureEventListPath;
   static const popularEventListRoute = Paths.popularEventListPath;
@@ -28,6 +29,7 @@ abstract class Routes {
 
 abstract class Paths {
   static const homePath = "/";
+  static const welcomePage = "/WelcomePage";
   static const introPath = "/IntroScreen";
   static const loginPath = "/LoginScreen";
   static const homeScreenPath = "/HomeScreen";

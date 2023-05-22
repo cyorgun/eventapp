@@ -20,8 +20,7 @@ import 'app/chat_logic/providers/home_provider.dart';
 import 'app/chat_logic/providers/setting_provider.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
-import 'app/service/helper_notifications.dart';
-import 'app/service/notification_hive.dart';
+import 'package:evente/evente.dart';
 import 'app/view/bloc/sign_in_bloc.dart';
 import 'app/view/bloc/theme_bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,6 +44,18 @@ void main() async {
    await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
+
+    // Konfigurasi untuk platform Android
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    const IOSInitializationSettings initializationSettingsIOs =
+        IOSInitializationSettings();
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOs,
+    );
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 

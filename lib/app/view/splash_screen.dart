@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 
 import '../../base/color_data.dart';
 import '../../base/pref_data.dart';
+import 'intro/welcome.dart';
 import 'bloc/sign_in_bloc.dart';
 import 'intro/OnBoarding.dart';
 
@@ -36,7 +37,7 @@ afterSplash(){
       sb.isSignedIn == true 
       ? gotoHomePage()
       : gotoSignInPage();
-      
+      // : WelcomePage();
     });
   }
 
@@ -57,6 +58,7 @@ afterSplash(){
   }
 
   gotoSignInPage (){
+    //  Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
      Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new OnBoarding()));
   }
 

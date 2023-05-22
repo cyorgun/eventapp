@@ -54,6 +54,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                       getMultilineCustomFont(
                           "   At our company, we take user privacy very seriously, especially in the context of our event mobile app. We understand that our users trust us with their personal information, and we strive to uphold that trust by implementing strict privacy policies and security measures. Our event mobile app is designed to collect only the data necessary to provide our users with a seamless event experience, such as event registration information, schedule preferences, and contact details for event organizers. We use industry-standard security protocols to protect this information, including encryption and multi-factor authentication, to ensure that our users' data is kept safe and confidential.",
                           16.sp,
+                          // https://gitlab.com/JipauDev/event_baru
                           Colors.black,
                           fontWeight: FontWeight.w500,
                           txtHeight: 1.46.h,

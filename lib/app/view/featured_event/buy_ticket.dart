@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/controller/controller.dart';
-import 'package:event_app/app/modal/modal_event.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:event_app/app/view/featured_event/payment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +11,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:evente/evente.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
@@ -35,7 +36,6 @@ class _BuyTicketState extends State<BuyTicket> {
   void backClick() {
     Constant.backToPrev(context);
   }
-  BuyTicketController controller = Get.put(BuyTicketController());
 
   int _itemCount = 1;
 
@@ -144,7 +144,6 @@ class _BuyTicketState extends State<BuyTicket> {
                           getVerSpace(10.h),
                           GestureDetector(
                             onTap: () {
-                              controller.onChange(0.obs);
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(horizontal: 20.h),
@@ -360,20 +359,60 @@ class _BuyTicketState extends State<BuyTicket> {
                       ],
                     ),
                     getVerSpace(30.h),
-                   
-                      if(event.price==0)   getButton(context, accentColor, "Booking", Colors.white,
+                               Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        getButton(
+                            context, accentColor, "Checkout COD", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
+                           
+                           
+                            () async {
+                          Constant.sendToNext(context, Routes.paymentRoute);
+                          showDialog(
+                              builder: (context) {
+                                return const TicketConfirmDialog();
+                              },
+                              context: context);
+                          userSaved();
+                          addData();
+
+                          Navigator.of(context).pushReplacement(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => TicketDetail(
+                                    event: widget.event,
+                                  )));
+                        }, 18.sp,
+                            weight: FontWeight.w700,
+                            buttonHeight: 60.h,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        getVerSpace(30.h),
+                                  if(event.price!>0)
+                 getButton(
+                            context, accentColor, "Checkout Payment", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
+                            () async {
+                                Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (_, __, ___) => PaymentScreen(
+                               event: event,
+                              )));
+                          // await makePayment();
+                        }, 18.sp,
+                            weight: FontWeight.w700,
+                            buttonHeight: 60.h,
+                            borderRadius: BorderRadius.circular(22.h)),
+                        getVerSpace(30.h),
+
+                         if(event.price==0)   getButton(context, accentColor, "Booking", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
                         () async {
                           
                           
+                        userSaved();
+                        addData();
                       Constant.sendToNext(context, Routes.paymentRoute);
                       showDialog(
                           builder: (context) {
                             return const TicketConfirmDialog();
                           },
                           context: context);
-                        userSaved();
-                        addData();
-                        Navigator.of(context).push(PageRouteBuilder(
+                        Navigator.of(context).pushReplacement(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => TicketDetail(
                                event: event,
                               )));
@@ -383,55 +422,12 @@ class _BuyTicketState extends State<BuyTicket> {
                         buttonHeight: 60.h,
                         borderRadius: BorderRadius.circular(22.h)),
            
-                   if(event.price!>0)  getButton(context, accentColor, "Checkout", Colors.white,
-                        () async {
-                          
-                               
-                      Constant.sendToNext(context, Routes.paymentRoute);
-                      // showDialog(
-                      //     builder: (context) {
-                      //       return const TicketConfirmDialog();
-                      //     },
-                      //     context: context);
-                       
-                        userSaved();
-                        addData();
-                        Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => TicketDetail(
-                               event: event,
-                              )));     
-                // await makePayment();
-                      // Constant.sendToNext(context, Routes.paymentRoute);
-                      // showDialog(
-                      //     builder: (context) {
-                      //       return const TicketConfirmDialog();
-                      //     },
-                      //     context: context);
-                      //   userSaved();
-                      //   addData();
-
-                      //   Navigator.of(context).push(PageRouteBuilder(
-                      //     pageBuilder: (_, __, ___) => TicketDetail(
-                      //           category: widget.category,
-                      //           date: widget.date,
-                      //           description: widget.description,
-                      //           id: widget.id,
-                      //           image: widget.image,
-                      //           location: widget.location,
-                      //           mapsLangLink: widget.mapsLangLink,
-                      //           mapsLatLink: widget.mapsLatLink,
-                      //           price: totalPrice,
-                      //           title: widget.title,
-                      //           type: widget.type,
-                      //           userDesc: widget.userDesc,
-                      //           userName: widget.userName,
-                      //           userProfile: widget.userProfile,
-                      //         )));
-
-                    }, 18.sp,
-                        weight: FontWeight.w700,
-                        buttonHeight: 60.h,
-                        borderRadius: BorderRadius.circular(22.h)),
+       
+                      ],
+                    ),
+        
+                     
+               
                     getVerSpace(30.h), 
                   ],
                 ),
@@ -540,78 +536,8 @@ class _BuyTicketState extends State<BuyTicket> {
     final calculatedAmout = (int.parse(amount)) * 100;
     return calculatedAmout.toString();
   }
-}
-  Column buildSeatWidget() {
-    return Column(
-      children: [
-        getPaddingWidget(
-          EdgeInsets.symmetric(horizontal: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              getCustomFont("Seat", 16.sp, Colors.black, 1,
-                  fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-              getCustomFont("64/100", 15.sp, greyColor, 1,
-                  fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-            ],
-          ),
-        ),
-        getVerSpace(10.h),
-        GetX<BuyTicketController>(
-          init: BuyTicketController(),
-          builder: (controller) => Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.h),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: borderColor, width: 1.h),
-                borderRadius: BorderRadius.circular(22.h)),
-            padding: EdgeInsets.symmetric(horizontal: 6.h, vertical: 6.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: "#E8F6F6".toColor(),
-                        borderRadius: BorderRadius.circular(18.h)),
-                    height: 68.h,
-                    width: 68.h,
-                    padding: EdgeInsets.all(22.h),
-                    child: getSvgImage("minus.svg", width: 24.h, height: 24.h),
-                  ),
-                  onTap: () {
-                    if (controller.count.value == 0) {
-                    } else {
-                      controller.countChange(controller.count.obs.value--);
-                    }
-                  },
-                ),
-                getCustomFont(
-                    controller.count.value.toString(), 22.sp, Colors.black, 1,
-                    fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                GestureDetector(
-                  onTap: () {
-                    controller.countChange(controller.count.obs.value++);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: "#E8F6F6".toColor(),
-                        borderRadius: BorderRadius.circular(18.h)),
-                    height: 68.h,
-                    width: 68.h,
-                    padding: EdgeInsets.all(22.h),
-                    child: getSvgImage("add.svg",
-                        width: 24.h, height: 24.h, color: Colors.black),
-                  ),
-                )
-              ],
-            ),
-          ),
-        )
-      ],
-    );
-  }
 
+}
   // Column buildTicketTypeWidget() {
   //   return Column(
   //     children: [

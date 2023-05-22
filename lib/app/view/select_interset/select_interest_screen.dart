@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/data/data_file.dart';
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/base/pref_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../modal/modal_select_interest.dart';
 import '../bloc/bookmark_bloc.dart';
 import '../bloc/sign_in_bloc.dart';
 

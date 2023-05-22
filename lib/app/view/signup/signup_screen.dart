@@ -1,4 +1,5 @@
-import 'package:event_app/app/controller/controller.dart';
+
+import 'package:evente/evente.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar.dart';
-import '../../service/app_service.dart';
 import '../bloc/sign_in_bloc.dart';
 
 class SignUpScreen extends StatefulWidget {

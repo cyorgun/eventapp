@@ -1,4 +1,3 @@
-import 'package:event_app/app/controller/controller.dart';
 import 'package:event_app/app/dialog/pass_change_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,6 @@ class _ChangePasswordState extends State<ChangePassword> {
     Constant.backToPrev(context);
   }
 
-  ResetController controller = Get.put(ResetController());
 
   late String passold;
 

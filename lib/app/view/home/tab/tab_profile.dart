@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../base/color_data.dart';
 import '../../bloc/sign_in_bloc.dart';
+import '../../create_event/create_event_screen.dart';
 import '../../profile/change_password.dart';
 
 class TabProfile extends StatefulWidget {
@@ -73,6 +74,12 @@ class _TabProfileState extends State<TabProfile>
                       // getCustomFont("Preferences", 16.sp, greyColor, 1,
                       //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                       getVerSpace(20.h),
+                        settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => CreateEventScreen()));
+                        // Constant.sendToNext(context, Routes.createEventRoute);
+                      }, "Create Event", "add.svg"),
+                      getVerSpace(20.h),
                       settingContainer(() {
                         Constant.sendToNext(
                             context, Routes.notificationScreenRoute);
@@ -95,7 +102,8 @@ class _TabProfileState extends State<TabProfile>
                               .then((value) =>
                                   context.read<SignInBloc>().afterUserSignOut())
                               .then((value) {
-                            Constant.sendToNext(context, Routes.loginRoute);
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              Routes.welcomePage, (route) => false);
                           });
                         },
                         child: Container(
@@ -218,7 +226,7 @@ class _TabProfileState extends State<TabProfile>
                 width: 15.0,
               ),
               getCustomFont(
-                  sb.email!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+                  sb.email??"", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -234,7 +242,7 @@ class _TabProfileState extends State<TabProfile>
                 width: 15.0,
               ),
               getCustomFont(
-                  sb.phone!, 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+                  sb.phone??"Not have phone number", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -284,7 +292,7 @@ class _TabProfileState extends State<TabProfile>
                           const BorderRadius.all(Radius.circular(100.0)),
                       image: DecorationImage(
                           image: NetworkImage(
-                            sb.imageUrl!,
+                            sb.imageUrl??"",
                           ),
                           fit: BoxFit.cover)),
                 ),
@@ -307,7 +315,7 @@ class _TabProfileState extends State<TabProfile>
               ],
             ),
             getVerSpace(5.h),
-            getCustomFont(sb.name!, 22.sp, Colors.black, 1,
+            getCustomFont(sb.name??"", 22.sp, Colors.black, 1,
                 fontWeight: FontWeight.w700, txtHeight: 1.5.h),
             getVerSpace(20.h),
             // getPaddingWidget(

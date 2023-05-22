@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:event_app/app/controller/controller.dart';
+import 'package:evente/evente.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +14,6 @@ import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar.dart';
-import '../../service/app_service.dart';
 import '../bloc/sign_in_bloc.dart';
 
 class EditProfile extends StatefulWidget {
@@ -25,7 +24,6 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  EditProfileController controller = Get.put(EditProfileController());
 
   void backClick() {
     Constant.backToPrev(context);
@@ -147,8 +145,8 @@ class _EditProfileState extends State<EditProfile> {
      @override
   void initState() {
     super.initState();
-    nameCtrl.text = sb.name!;
-    phoneCtrl.text = sb.phone!;
+    nameCtrl.text = sb.name??"";
+    phoneCtrl.text = sb.phone??"";
     
   }
     // TODO: implement initState
@@ -158,9 +156,6 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     final sb = context.watch<SignInBloc>();
-    controller.fullnameController.text = "Jenny Wilson";
-    controller.emailController.text = "jennywilson@gmail.com";
-    controller.dateController.text = "June 25, 1998";
     setStatusBarColor(Colors.white);
     return WillPopScope(
       onWillPop: () async {
@@ -239,7 +234,7 @@ class _EditProfileState extends State<EditProfile> {
                         getVerSpace(4.h),
                         getDefaultTextFiledWithLabel(
                           context,
-                          sb.name!,
+                          sb.name??"",
                           nameCtrl,
                           isEnable: false,
                           height: 60.h,
@@ -254,7 +249,7 @@ class _EditProfileState extends State<EditProfile> {
                             fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                         getVerSpace(4.h),
                         getDefaultTextFiledWithLabel2(context,
-                            sb.phone!, 
+                            sb.phone??"", 
                             phoneCtrl,
                             isEnable: false,
                             

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/data/data_file.dart';
+import 'package:evente/evente.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/base/color_data.dart';
@@ -12,8 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:math' as math;
 
-import '../../modal/modal_event.dart';
-import '../../modal/modal_upcoming.dart';
 import '../bloc/sign_in_bloc.dart';
 
 class UpComingScreen extends StatefulWidget {
@@ -24,7 +22,6 @@ class UpComingScreen extends StatefulWidget {
 }
 
 class _UpComingScreenState extends State<UpComingScreen> {
-  List<ModalUpComing> upComingLists = DataFile.upComingList;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +32,7 @@ class _UpComingScreenState extends State<UpComingScreen> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.only(
-                  right: 20.h, left: 20.h, top: 15.h, bottom: 50.h),
+                  right: 20.h, left: 20.h, top: 0.h, bottom: 50.h),
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection("users")
@@ -279,7 +276,7 @@ class itemData extends StatelessWidget {
           String date = DateFormat('d MMMM, yyyy').format(dateTime!);
 
           return Padding(
-            padding: const EdgeInsets.only(top: 15.0),
+            padding: const EdgeInsets.only(bottom: 15.0),
             child: Transform.rotate(
               angle: math.pi,
               child: GestureDetector(
@@ -345,7 +342,7 @@ class itemData extends StatelessWidget {
                                         1,
                                         fontWeight: FontWeight.w500,
                                         txtHeight: 1.46.h),
-                                    Container(
+                                if(events[i].price!>0)      Container(
                                       decoration: BoxDecoration(
                                         color: lightAccent,
                                         borderRadius:
@@ -356,6 +353,22 @@ class itemData extends StatelessWidget {
                                       child: getCustomFont(
                                           "\$ ${events?[i].price.toString()}" ??
                                               '',
+                                          15.sp,
+                                          accentColor,
+                                          1,
+                                          fontWeight: FontWeight.w600,
+                                          txtHeight: 1.46.h),
+                                    ),
+                                     if(events[i].price==0)      Container(
+                                      decoration: BoxDecoration(
+                                        color: lightAccent,
+                                        borderRadius:
+                                            BorderRadius.circular(12.h),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 12.h, vertical: 6.h),
+                                      child: getCustomFont(
+                                          "Free",
                                           15.sp,
                                           accentColor,
                                           1,

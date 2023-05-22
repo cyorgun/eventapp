@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../controller/controller.dart';
 
 import 'cardSlider/cardSlider.dart';
 import 'tab/tab_favourite.dart';
@@ -48,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? role;
 
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   void onTabTapped(int index) {
     setState(() {
@@ -60,7 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
     const TabHome(),
     const TabFavourite(),
     MapsScreenT1(),
-    //  const CreateEventScreen(),
     const TabTicket(),
     const TabProfile()
   ];
@@ -110,11 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
             activeIcon: getSvg("profile2.svg",
                 height: 24.h, width: 24.h, color: accentColor))
       ],
-      height: 75.h,
+      height: 70.h,
       elevation: 5,
       color: accentColor,
-      top: -78.h,
-      curveSize: 70.h,
+      top: -58.h,
+      curveSize: 40.h,
       activeColor: accentColor,
       style: TabStyle.fixedCircle,
       backgroundColor: Colors.white,

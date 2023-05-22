@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:html/parser.dart';
 
-import '../modal/notification_model.dart';
+import 'package:evente/modal/notification_model.dart';
 
 void openNotificationDialog(context, NotificationModel notificationModel) {
     showDialog(

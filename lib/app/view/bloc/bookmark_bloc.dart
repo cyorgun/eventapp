@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/modal/modal_event.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:evente/modal/modal_event.dart';
 class BookmarkBloc extends ChangeNotifier {
 
 

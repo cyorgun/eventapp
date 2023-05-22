@@ -1,9 +1,10 @@
-import 'package:event_app/app/controller/controller.dart';
+
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:evente/controller/controller.dart';
 
 class EventpublishDialog extends StatefulWidget {
   const EventpublishDialog({Key? key}) : super(key: key);
@@ -32,14 +33,16 @@ class _EventpublishDialogState extends State<EventpublishDialog> {
             height: 190.h,
             margin: EdgeInsets.symmetric(horizontal: 30.h),
             decoration: BoxDecoration(
-                color: lightColor,
+              color: Colors.white,
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(34.h))),
             child: Column(
               children: [
-                getVerSpace(40.h),
-                getAssetImage("password1.png", width: 90.h, height: 90.h)
-              ],
+                getVerSpace(40.h),  
+                 Image.asset( 'assets/images/Sukses.gif',
+              width: 150,
+              
+            ),   ],
             ),
           ),
           Container(

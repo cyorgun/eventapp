@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/modal/modal_event.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
@@ -11,10 +10,12 @@ import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 
+import 'package:evente/evente.dart';
 import '../../../base/constant.dart';
 import '../../chat_logic/pages/chat_page.dart';
 import '../../widget/empty_screen.dart';
 import '../../widget/love_icon.dart';
+import 'package:evente/evente.dart';
 import '../../widget/map_sheet.dart';
 import '../bloc/bookmark_bloc.dart';
 import '../bloc/sign_in_bloc.dart';
@@ -366,12 +367,15 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       getSvg("Location.svg",
                           height: 20.h, width: 20.h, color: accentColor),
                       getHorSpace(5.h),
-                      getCustomFont(
-                        event.location ?? '',
-                        17.sp,
-                        greyColor,
-                        1,
-                        fontWeight: FontWeight.w500,
+                      Container(
+                        width: 300.w,
+                        child: getCustomFont(
+                          event.location ?? '',
+                          17.sp,
+                          greyColor,
+                          1,
+                          fontWeight: FontWeight.w500,
+                        ),
                       )
                     ],
                   ),
@@ -469,7 +473,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                     EdgeInsets.symmetric(horizontal: 20.h),
                     ReadMoreText(
                       event.description ?? "",
-                      trimLines: 5,
+                      trimLines: 8,
                       trimMode: TrimMode.Line,
                       trimCollapsedText: 'Read more...',
                       trimExpandedText: 'Show less',
@@ -496,64 +500,9 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   // buildFollowWidget(context),
                   // getVerSpace(20.h),
 
-                  getVerSpace(30.h),
-                  Row(
+                  getVerSpace(45.h),
+                  Stack(
                     children: [
-                      InkWell(
-                        onTap: (() {
-                          MapsSheet.show(
-                            context: context,
-                            onMapTap: (map) {
-                              map.showDirections(
-                                destination: Coords(event.mapsLatLink as double,
-                                    event.mapsLangLink as double),
-                                directionsMode: DirectionsMode.driving,
-                              );
-                            },
-                          );
-                        }),
-                        child: Container(
-                          height: 206.h,
-                          width: 40.0,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.black12.withOpacity(0.1),
-                                    blurRadius: 27,
-                                    offset: const Offset(0, 8))
-                              ],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5.0))),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.navigation_rounded,
-                                  color: Colors.black,
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                RotatedBox(
-                                  quarterTurns:
-                                      3, // mengatur rotasi sebesar 90 derajat
-                                  child: Text(
-                                    'Navigate',
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.black,
-                                        fontFamily: 'Gilroy',
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.symmetric(horizontal: 5.h),
@@ -592,9 +541,68 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                           ),
                         ),
                       ),
+                                     InkWell(
+                        onTap: (() {
+                          MapsSheet.show(
+                            context: context,
+                            onMapTap: (map) {
+                              map.showDirections(
+                                destination: Coords(event.mapsLatLink as double,
+                                    event.mapsLangLink as double),
+                                directionsMode: DirectionsMode.driving,
+                              );
+                            },
+                          );
+                        }),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left:5.0),
+                          child: Container(
+                            height: 150.h,
+                            width: 40.0,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black12.withOpacity(0.1),
+                                      blurRadius: 27,
+                                      offset: const Offset(0, 8))
+                                ],
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0))),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.navigation_rounded,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  RotatedBox(
+                                    quarterTurns:
+                                        3, // mengatur rotasi sebesar 90 derajat
+                                    child: Text(
+                                      'Navigate',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontFamily: 'Gilroy',
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+       
                     ],
                   ),
-                  getVerSpace(35.h),
+                  getVerSpace(45.h),
                   getPaddingWidget(
                     EdgeInsets.only(right: 20.h),
                     Row(

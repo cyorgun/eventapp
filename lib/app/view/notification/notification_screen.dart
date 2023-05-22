@@ -1,4 +1,4 @@
-import 'package:event_app/app/data/data_file.dart';
+
 import 'package:event_app/app/view/notification/custom_notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,9 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../modal/modal_notification.dart';
-import '../../modal/notification_model.dart';
-import '../../service/notification_hive.dart';
+import 'package:evente/evente.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({Key? key}) : super(key: key);
@@ -25,7 +23,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     Constant.backToPrev(context);
   }
 
-  List<ModalNotification> notificationLists = DataFile.notificationList;
 
   @override
   Widget build(BuildContext context) {

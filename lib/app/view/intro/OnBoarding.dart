@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
+import 'welcome.dart';
 import '../../routes/app_routes.dart';
 import '../../widget/intro_views_flutter-2.4.0/lib/Models/page_view_model.dart';
 
@@ -123,7 +124,8 @@ class _OnBoardingState extends State<OnBoarding> {
             letterSpacing: 1.0),
       ),
       onTapDoneButton: () async {
-                                Get.toNamed(Routes.loginRoute);
+     Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
+                                // Get.toNamed(Routes.loginRoute);
       },
     );
   }

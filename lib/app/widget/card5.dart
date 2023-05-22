@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/modal/modal_event.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -146,10 +146,13 @@ class Card5 extends StatelessWidget {
                                       width: 18.h,
                                       height: 18.h),
                                   getHorSpace(5.h),
-                                  getCustomFont(events?.location ?? "",
-                                      15.sp, greyColor, 1,
-                                      fontWeight: FontWeight.w500,
-                                      txtHeight: 1.5.h),
+                                  Container(
+                                    width: 150.0,
+                                    child: getCustomFont(events?.location ?? "",
+                                        15.sp, greyColor, 1,
+                                        fontWeight: FontWeight.w500,
+                                        txtHeight: 1.5.h),
+                                  ),
                                 ],
                               ),
                               getVerSpace(7.h),

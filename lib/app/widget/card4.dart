@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/modal/modal_event.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,7 +62,7 @@ class Card4 extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 110.w,
+                          width: 200.w,
                           child: getCustomFont(
                               events?.title ?? "", 20.5.sp, Colors.black, 1,
                               fontWeight: FontWeight.w700,
@@ -72,7 +72,11 @@ class Card4 extends StatelessWidget {
                         SizedBox(
                           height: 5.0,
                         ),
-                        Row(
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+ Row(
                           children: [
                             getSvg("calender.svg",
                                 color: accentColor, width: 16.h, height: 16.h),
@@ -88,33 +92,33 @@ class Card4 extends StatelessWidget {
                             getSvg("Location.svg",
                                 color: accentColor, width: 18.h, height: 18.h),
                             getHorSpace(5.h),
-                            getCustomFont(
-                                events?.location ?? "", 15.sp, greyColor, 1,
-                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                            Container(
+                          width: 150.w,
+                              child: getCustomFont(
+                                  events?.location ?? "", 15.sp, greyColor, 1,
+                                  fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                            ),
                           ],
                         ),
                         getVerSpace(7.h),
-                        StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("JoinEvent")
-                              .doc("user")
-                              .collection(events.title ?? '')
-                              .snapshots(),
-                          builder: (BuildContext ctx,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            return snapshot.hasData
-                                ? new joinEvents(
-                                    list: snapshot.data?.docs,
-                                  )
-                                : Container();
-                          },
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+                        Row(
+                          children: [
+                            StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("JoinEvent")
+                                  .doc("user")
+                                  .collection(events.title ?? '')
+                                  .snapshots(),
+                              builder: (BuildContext ctx,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                return snapshot.hasData
+                                    ? new joinEvents(
+                                        list: snapshot.data?.docs,
+                                      )
+                                    : Container();
+                              },
+                            ),
+                            
             Container(
               height: 35.h,
               width: 80.0,
@@ -130,6 +134,18 @@ class Card4 extends StatelessWidget {
                     fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
               )),
+            ),
+                          ],
+                        ),
+                          ],
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+
+                ],
+              ),
             ),
           ],
         ),
