@@ -5,7 +5,7 @@
 	logallrefupdates = true
 	ignorecase = true
 [remote "origin"]
-	url = https://JipauDev@gitlab.com/JipauDev/event_baru.git
+	url = https://github.com/cyorgun/eventapp.git
 	fetch = +refs/heads/*:refs/remotes/origin/*
 [branch "main"]
 	remote = origin
