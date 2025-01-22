@@ -37,7 +37,7 @@ class LoadingCard extends StatelessWidget {
       child: SkeletonAnimation(
         child: Container(
           decoration: BoxDecoration(
-              color:accentColor, 
+              color:Colors.black12, 
               borderRadius: BorderRadius.circular(5)),
           height: height,
           width: MediaQuery.of(context).size.width,

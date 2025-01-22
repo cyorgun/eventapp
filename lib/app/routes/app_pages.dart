@@ -33,7 +33,7 @@ import 'app_routes.dart';
 class AppPages {
   static const initialRoute = Routes.homeRoute;
   static Map<String, WidgetBuilder> routes = {
-    Routes.homeRoute: (context) => const SplashScreen(),
+    Routes.splashScreen: (context) => const SplashScreen(),
     Routes.introRoute: (context) => const IntroScreen(),
     Routes.loginRoute: (context) =>  LoginScreen(),
     Routes.homeScreenRoute: (context) => const HomeScreen(),
@@ -54,7 +54,7 @@ class AppPages {
     Routes.editCardScreenRoute: (context) => const EditCardScreen(),
     Routes.privacyScreenRoute: (context) => const PrivacyScreen(),
     Routes.helpScreenRoute: (context) => const HelpScreen(),
-    Routes.featureEventListRoute: (context) => const FeatureEventList(),
+    // Routes.featureEventListRoute: (context) => const FeatureEventList(),
     Routes.popularEventListRoute: (context) => const PopularEventList()
   };
 }

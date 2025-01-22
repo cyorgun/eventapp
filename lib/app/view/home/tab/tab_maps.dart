@@ -1,8 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/home/tab/tab_home.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:flutter/services.dart' show rootBundle;
@@ -14,6 +18,28 @@ import '../../../../base/widget_utils.dart';
 import '../../featured_event/featured_event_detail2.dart';
 import '../cardSlider/cardSlider.dart';
 import '../cardSlider/lokasimodel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
+
+class showCaseMaps extends StatefulWidget {
+  const showCaseMaps({super.key});
+
+  @override
+  State<showCaseMaps> createState() => _showCaseMapsState();
+}
+
+class _showCaseMapsState extends State<showCaseMaps> {
+  @override
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+      builder:Builder(
+    builder : (context)=> MapsScreenT1()
+  ),
+      
+    );
+    
+  }
+}
 
 class MapsScreenT1 extends StatefulWidget {
   MapsScreenT1({Key? key}) : super(key: key);
@@ -36,9 +62,10 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
   final firestoreInstance = FirebaseFirestore.instance;
   // List<DocumentSnapshot> dataList = [];
-
+ LatLng? currentPosition;
   int? prevPage;
 
+  GlobalKey _one = GlobalKey();
   @override
   void initState() {
     // TODO: implement initState
@@ -86,9 +113,34 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
     getDataFromFirestore();
     _pageController = PageController(initialPage: 1, viewportFraction: 0.8)
       ..addListener(_onScroll);
-
+  Geolocator.getCurrentPosition().then((value) {
+      setState(() {
+        currentPosition = LatLng(value.latitude, value.longitude);
+      });
+    });
+    _getCurrentLocation();
     super.initState();
   }
+
+
+  CameraPosition initialCameraPosition = CameraPosition(
+    target: LatLng(40.7078523, -74.008981),
+    zoom: 10.0,
+  );
+ Future<void> _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    LatLng currentLocation = LatLng(position.latitude, position.longitude);
+    setState(() {
+      initialCameraPosition = CameraPosition(
+        target: currentLocation,
+        zoom: 15.0, // Atur zoom sesuai keinginan Anda
+      );
+    });
+  }
+
+
 
   Set<Marker> markers = Set<Marker>();
 
@@ -132,122 +184,186 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
   @override
   Widget build(BuildContext context) {
+
+      SharedPreferences preferences;
+
+    displayShowcase() async {
+      preferences = await SharedPreferences.getInstance();
+      bool? showcaseVisibilityStatus = preferences.getBool("mapsShowcasesssss");
+
+      if (showcaseVisibilityStatus == null) {
+        preferences.setBool("mapsShowcasesssss", false).then((bool success) {
+          if (success)
+            print("Successfull in writing showshoexase");
+          else
+            print("some bloody problem occured");
+        });
+
+        return true;
+      }
+
+      return false;
+    }
+
+    displayShowcase().then((status) {
+      if (status) {
+        ShowCaseWidget.of(context).startShowCase([
+          _one,
+        ]);
+      }
+    });
+
     // if (isMapCreated) {
     //   getJsonFile("assets/nightmode.json").then(setMapStyle);
     // }
 
-    return Scaffold(
-        body: Stack(
-      children: <Widget>[
-        Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: GoogleMap(
-            mapType: MapType.normal,
-            initialCameraPosition: CameraPosition(
-                target: LatLng(40.7078523, -74.008981), zoom: 10.0),
-
-            // markers: markers,
-            onTap: (pos) {
-              print(pos);
-              Marker m = Marker(
-                  markerId: MarkerId('1'), icon: customIcon!, position: pos);
-              setState(() {
-                markers.add(m);
-              });
-            },
-            markers: Set.from(markers),
-            //                {
-            // Marker(
-            //   markerId: const MarkerId("marker1"),
-            //   position:  LatLng(40.7078523, -74.008981),
-            //   draggable: true,
-            //   onDragEnd: (value) {
-            //     // value is the new position
-            //   },
-            //   // To do: custom marker icon
-            // ),},
-
-            onMapCreated: (GoogleMapController controller) {
-              _controller = controller;
-            },
-          ),
-        ),
-        dataList.length == 0
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: 200.0,
-                  width: MediaQuery.of(context).size.width,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: dataList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return cardMaps(index);
-                    },
-                  ),
+    return KeysToBeInherited(
+      notification: _one,
+      child: Scaffold(
+          body: Stack(
+        children: <Widget>[
+        if (currentPosition == null) CircularProgressIndicator(),
+          if (currentPosition != null)   Showcase(
+                              key: _one,
+                              description:
+                                  "Here to set maps location.",
+                          
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: GoogleMap(
+                mapType: MapType.normal,
+               initialCameraPosition: CameraPosition(
+                  target: currentPosition!,
+                  zoom: 15,
                 ),
+                // markers: markers,
+                onTap: (pos) {
+                  print(pos);
+                  Marker m = Marker(
+                      markerId: MarkerId('1'), icon: customIcon!, position: pos);
+                  setState(() {
+                    markers.add(m);
+                  });
+                },
+                markers: Set.from(markers),
+                //                {
+                // Marker(
+                //   markerId: const MarkerId("marker1"),
+                //   position:  LatLng(40.7078523, -74.008981),
+                //   draggable: true,
+                //   onDragEnd: (value) {
+                //     // value is the new position
+                //   },
+                //   // To do: custom marker icon
+                // ),},
+                  
+                onMapCreated: (GoogleMapController controller) {
+                  _controller = controller;
+                },
               ),
-        Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 27.0),
-              child: Container(
-                height: 55.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0),
-                  child: Center(
-                    child: Text(
-                      "Locations",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: "Gilroy",
-                        fontWeight: FontWeight.w700,
-                        fontSize: 22.0,
-                      ),
+            ),
+          ),
+          dataList.length == 0
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 200.0,
+                    width: MediaQuery.of(context).size.width,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: dataList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return cardMaps(index);
+                      },
                     ),
                   ),
                 ),
-              ),
-            ),
-            Container(
-              height: 40.0,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: <Color>[
-                    Colors.white.withOpacity(0.1),
-                    Colors.white.withOpacity(0.6),
-                    Colors.white,
-                  ],
+          Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(top: 27.0),
+                child: Container(
+                  height: 55.0,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(),
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0),
+                        child: Center(
+                          child: Text(
+                            ("Locations").tr(),
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w700,
+                              fontSize: 22.0,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                       Padding(
+                        padding: const EdgeInsets.only(right: 15.0),
+                        child: InkWell(
+                            onTap: () {
+                              if (currentPosition != null &&
+                                  _controller != null) {
+                                _controller!.animateCamera(
+                                  CameraUpdate.newLatLng(currentPosition!),
+                                );
+                              }
+                            },
+                            child: Icon(
+                              Icons.my_location_outlined,
+                              size: 21,
+                              color: Colors.grey[800],
+                            )),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ));
+              Container(
+                height: 40.0,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: <Color>[
+                      Colors.white.withOpacity(0.1),
+                      Colors.white.withOpacity(0.6),
+                      Colors.white,
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      )),
+    );
   }
 
   moveCamera() {
       firestoreInstance.collection("event").get().then((querySnapshot) {
           final events = querySnapshot.docs.map((e) {
-              return Event.fromFirestore(e);
+              return EventBaru.fromFirestore(e,1);
             }).toList();
             
    
       _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
         target: events[_pageController!.page!.toInt()].latLng!,
-        zoom: 13.0,
+        zoom: 15.0,
         bearing: 45.0,
         tilt: 45.0)));
     });
@@ -260,13 +376,13 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
         stream: FirebaseFirestore.instance.collection('event').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();
-          final List<Event> lokasiList = snapshot.data!.docs.map((doc) {
+          final List<EventBaru> lokasiList = snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final events = snapshot.data?.docs.map((e) {
-              return Event.fromFirestore(e);
+              return EventBaru.fromFirestore(e,1);
             }).toList();
 
-            return Event(
+            return EventBaru(
               category: data['category'],
               date: data['date'],
               image: data['image'],
@@ -282,7 +398,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
               userName: data['userName'],
               userProfile: data['userProfile'],
             );
-            // return Event.fromFirestore(events);
+            // return 5fromFirestore(events);
           }).toList();
           // return CardSlider(lokasiList: lokasiList);
           return AnimatedBuilder(
@@ -445,7 +561,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                           if (snapshot.data!.docs.isEmpty) {
                             return Center(
                                 child: Text(
-                              "No one has joined yet",
+                              ("No one has joined yet").tr(),
                               style: TextStyle(
                                   color: greyColor,
                                   fontSize: 12.5,
@@ -460,7 +576,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                               ? Row(
                                   children: [
                                     Text(
-                                      "People Join :",
+                                      ("People Join :").tr(),
                                       style: TextStyle(
                                           color: greyColor,
                                           fontSize: 12.5,
@@ -496,5 +612,99 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
         ),
       ),
     );
+  }
+}
+
+class joinEvents extends StatelessWidget {
+  joinEvents({this.list});
+  final List<DocumentSnapshot>? list;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0),
+          child: Container(
+              height: 25.0,
+              width: 54.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
+                itemCount: list!.length > 3 ? 3 : list?.length,
+                itemBuilder: (context, i) {
+                  String? _title = list?[i]['name'].toString();
+                  String? _uid = list?[i]['uid'].toString();
+                  String? _img = list?[i]['photoProfile'].toString();
+
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 0.0),
+                    child: Container(
+                      height: 24.0,
+                      width: 24.0,
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(70.0)),
+                          image: DecorationImage(
+                              image: NetworkImage(_img ?? ''),
+                              fit: BoxFit.cover)),
+                    ),
+                  );
+                },
+              )),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 3.0,
+            left: 0.0,
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 32.h,
+                width: 32.h,
+                decoration: BoxDecoration(
+                                color: accentColor,
+                    borderRadius: BorderRadius.circular(30.h),
+                    border: Border.all(color: Colors.white, width: 1.5.h)),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    getCustomFont(list?.length.toString() ?? '', 12.sp,
+                        Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                    getCustomFont(" +", 12.sp, Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                  ],
+                ),
+              ),
+
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+
+
+class KeysToBeInherited extends InheritedWidget {
+  final GlobalKey notification;
+
+  KeysToBeInherited({
+    required this.notification,
+    required Widget child,
+  }) : super(child: child);
+
+  static KeysToBeInherited? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<KeysToBeInherited>();
+  }
+
+  @override
+  bool updateShouldNotify(InheritedWidget oldWidget) {
+    return true;
   }
 }

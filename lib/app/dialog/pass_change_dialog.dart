@@ -1,4 +1,5 @@
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:event_app/app/view/login/login_screens.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
@@ -63,7 +64,10 @@ class _PassChangeDialogState extends State<PassChangeDialog> {
                     txtHeight: 1.5.h),
                 getVerSpace(30.h),
                 getButton(context, accentColor, "Ok", Colors.white, () {
-                  Constant.sendToNext(context, Routes.loginRoute);
+                  // Constant.sendToNext(context, Routes.loginRoute);
+                     Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => LoginScreen()));
+               
                 }, 18.sp,
                     weight: FontWeight.w700,
                     buttonHeight: 60.h,

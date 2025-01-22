@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
+import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
 import 'package:event_app/app/view/bloc/event_bloc.dart';
 import 'package:event_app/app/view/bloc/search_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:event_app/app/view/bloc/search_bloc.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,10 @@ import 'package:evente/evente.dart';
 import 'app/view/bloc/sign_in_bloc.dart';
 import 'app/view/bloc/theme_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'package:easy_localization/easy_localization.dart';
+
+import 'app/view/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();  //Assign publishable key to flutter_stripe
@@ -48,12 +54,10 @@ void main() async {
     // Konfigurasi untuk platform Android
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
-    const IOSInitializationSettings initializationSettingsIOs =
-        IOSInitializationSettings();
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOs,
     );
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -70,14 +74,29 @@ void main() async {
     }
   });
 
-   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-    .then((_) {
+        
+  await EasyLocalization.ensureInitialized();
+
       runApp( 
-    MaterialApp(
-    debugShowCheckedModeBanner: false,
+    EasyLocalization(
+    startLocale: Locale('en','US'),
+      path: 'assets/Lang',
+      supportedLocales:  const [
+        Locale('en', 'US'),
+        Locale('ar', 'DZ'),
+        Locale('de', 'DE'),
+        Locale('en', 'ES'),
+        Locale('fi', 'FI'),
+        Locale('hi', 'IN'),
+        Locale('zh', 'CN'),
+        Locale('fr', 'CH'),
+      ],
+      child: MaterialApp(
+      debugShowCheckedModeBanner: false,
+      
+      home: const MyApp()),
+    ));
     
-    home: const MyApp()));
-    });
 }
 
 class MyApp extends StatefulWidget {
@@ -159,9 +178,28 @@ String? notifTitle, notifBody;
           ),
         ),
             ],
-            child: GetMaterialApp(
+            child: MaterialApp(
+             locale: context.locale,
+             supportedLocales: context.supportedLocales,
+             localizationsDelegates: context.localizationDelegates,
+           
               debugShowCheckedModeBanner: false,
-              initialRoute: "/",
+               initialRoute: "/SplashScreen",
+             theme: ThemeData(
+                pageTransitionsTheme: PageTransitionsTheme(builders: {
+                  TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                  TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                }),
+                // textTheme: GoogleFonts.manropeTextTheme(),
+                scaffoldBackgroundColor: Colors.white,
+                appBarTheme: AppBarTheme(
+                  centerTitle: false,
+                  elevation: 0.0,
+                  backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.transparent,
+                ),
+              ),
+            home: const SplashScreen(),
               // initialRoute:  "/SelectInterestScreen",
 
               routes: AppPages.routes,

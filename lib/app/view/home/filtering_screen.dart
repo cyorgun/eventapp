@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/home/tab/tab_home.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../base/widget_utils.dart';
 
@@ -39,7 +42,7 @@ class _FilterScreenState extends State<FilterScreen> {
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.black),
         title: Text(
-          'Filter Event By Category',
+          ('Filter Event By Category').tr(),
           style: TextStyle(
               fontFamily: 'Gilroy',
               fontWeight: FontWeight.w700,
@@ -61,7 +64,7 @@ class _FilterScreenState extends State<FilterScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
               child: Text(
-                "Category",
+                ("Category").tr(),
                 style: TextStyle(
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w700,
@@ -101,7 +104,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Game',
+                        ('Game').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -133,7 +136,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Football',
+                        ('Football').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -165,7 +168,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Comedy',
+                        ('Comedy').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -197,7 +200,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Konser',
+                        ('Konser').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -229,7 +232,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Festival',
+                        ('Festival').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -261,7 +264,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Study',
+                        ('Study').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -293,7 +296,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Party',
+                        ('Party').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -325,7 +328,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Olympic',
+                        ('Olympic').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -357,7 +360,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Culture',
+                        ('Culture').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -389,7 +392,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Swimming',
+                        ('Swimming').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -421,7 +424,7 @@ class _FilterScreenState extends State<FilterScreen> {
                         },
                       ),
                       Text(
-                        'Tour',
+                        ('Tour').tr(),
                         style: TextStyle(
                             fontFamily: 'Gilroy', fontWeight: FontWeight.w600),
                       ),
@@ -436,7 +439,7 @@ class _FilterScreenState extends State<FilterScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
               child: Text(
-                "Result",
+                ("Result").tr(),
                 style: TextStyle(
                     fontFamily: "Gilroy",
                     fontWeight: FontWeight.w700,
@@ -496,7 +499,7 @@ class _FilterScreenState extends State<FilterScreen> {
                       itemCount: snapshot.data?.docs.length,
                       itemBuilder: (context, i) {
                         final events = snapshot.data?.docs.map((e) {
-                          return Event.fromFirestore(e);
+                          return EventBaru.fromFirestore(e,1);
                         }).toList();
                         DateTime? dateTime = events![i].date?.toDate();
                         String date =
@@ -668,7 +671,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                   borderRadius: BorderRadius.circular(50.h)),
                               child: Center(
                                   child: Text(
-                                "Free",
+                                ("Free").tr(),
                                 style: TextStyle(
                                     color: accentColor,
                                     fontSize: 15.sp,
@@ -702,3 +705,81 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 }
+
+
+
+class joinEvents extends StatelessWidget {
+  joinEvents({this.list});
+  final List<DocumentSnapshot>? list;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 0.0),
+          child: Container(
+              height: 25.0,
+              width: 54.0,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
+                itemCount: list!.length > 3 ? 3 : list?.length,
+                itemBuilder: (context, i) {
+                  String? _title = list?[i]['name'].toString();
+                  String? _uid = list?[i]['uid'].toString();
+                  String? _img = list?[i]['photoProfile'].toString();
+
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 0.0),
+                    child: Container(
+                      height: 24.0,
+                      width: 24.0,
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(70.0)),
+                          image: DecorationImage(
+                              image: NetworkImage(_img ?? ''),
+                              fit: BoxFit.cover)),
+                    ),
+                  );
+                },
+              )),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 3.0,
+            left: 0.0,
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 32.h,
+                width: 32.h,
+                decoration: BoxDecoration(
+                                color: accentColor,
+                    borderRadius: BorderRadius.circular(30.h),
+                    border: Border.all(color: Colors.white, width: 1.5.h)),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    getCustomFont(list?.length.toString() ?? '', 12.sp,
+                        Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                    getCustomFont(" +", 12.sp, Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                  ],
+                ),
+              ),
+
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+

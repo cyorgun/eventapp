@@ -2,6 +2,7 @@
 import 'package:event_app/app/view/notification/custom_notification_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jiffy/jiffy.dart';
@@ -9,6 +10,7 @@ import 'package:jiffy/jiffy.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:evente/evente.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -19,9 +21,7 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
 
   @override
@@ -46,7 +46,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('clear all notification-dialog', 
+            Text(('clear all notification-dialog').tr(), 
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -60,7 +60,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TextButton(
-                  child: Text('Yes', style: TextStyle(
+                  child: Text(('Yes').tr(), style: TextStyle(
                     fontSize: 17,
                     color: Colors.white,
                     fontWeight: FontWeight.w600
@@ -82,7 +82,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 SizedBox(width: 20,),
 
                 TextButton(
-                  child: Text('Cancel', style: TextStyle(
+                  child: Text(('Cancel').tr(), style: TextStyle(
                   fontSize: 17,
                   color: Colors.white,
                   fontWeight: FontWeight.w600
@@ -108,92 +108,86 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
 
 
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          iconTheme: IconThemeData(
-            
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          
     color: Colors.black, 
-          ),
-          elevation: 0.0,
-          centerTitle: true,
-          backgroundColor: Colors.white,
-        actions: [
-          TextButton(
-            onPressed: () => _openClearAllDialog(),
-            child: Text('clear all',style: TextStyle(color: Colors.white),),
-            style: ButtonStyle(
-                padding: MaterialStateProperty.resolveWith(
-                    (states) => EdgeInsets.only(right: 15, left: 15))),
-          ),
-        ],
-          title: getCustomFont("Notifications", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
         ),
-        
-        body:Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ValueListenableBuilder(
-              valueListenable: notificationList.listenable(),
-              builder: (BuildContext context, dynamic value, Widget? child) {
-                List items = notificationList.values.toList();
-                items.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
-                // ignore: curly_braces_in_flow_control_structures
-                if (items.isEmpty) return Center(
-                  child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                 
-                     Container(
-                              height: 208.h,
-                              width: 208.h,
-                              decoration: BoxDecoration(
-                                  color: lightColor,
-                                  borderRadius: BorderRadius.circular(187.h)),
-                              padding: EdgeInsets.all(27.h),
-                              child: getSvg("notification2.svg",
-                                  height: 414.h, width: 414.h,boxFit: BoxFit.cover),
+        elevation: 0.0,
+        centerTitle: true,
+        backgroundColor: Colors.white,
+      actions: [
+        TextButton(
+          onPressed: () => _openClearAllDialog(),
+          child: Text(('clear all').tr(),style: TextStyle(color: Colors.white),),
+          style: ButtonStyle(
+              padding: MaterialStateProperty.resolveWith(
+                  (states) => EdgeInsets.only(right: 15, left: 15))),
+        ),
+      ],
+        title: getCustomFont(("Notifications").tr(), 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      ),
+      
+      body:Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ValueListenableBuilder(
+            valueListenable: notificationList.listenable(),
+            builder: (BuildContext context, dynamic value, Widget? child) {
+              List items = notificationList.values.toList();
+              items.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+              // ignore: curly_braces_in_flow_control_structures
+              if (items.isEmpty) return Center(
+                child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+               
+                   Container(
+                            height: 208.h,
+                            width: 208.h,
+                            decoration: BoxDecoration(
+                                color: lightColor,
+                                borderRadius: BorderRadius.circular(187.h)),
+                            padding: EdgeInsets.all(27.h),
+                            child: getSvg("notification2.svg",
+                                height: 414.h, width: 414.h,boxFit: BoxFit.cover),
+                          ),
+                          getVerSpace(28.h),
+                          getCustomFont(
+                              ("Not Have Notification").tr(), 23.sp, Colors.black, 1,
+                              fontWeight: FontWeight.w800, txtHeight: 1.5.h),
+                          getVerSpace(8.h),
+                          Padding(
+                            padding: const EdgeInsets.only(left:20.0,right: 20.0),
+                            child: Center(
+                              child: getMultilineCustomFont(
+                                  ("You will get notification when you have new information").tr(),
+                                  17.sp,
+                                  greyColor,
+                                  textAlign: TextAlign.center,
+                                  fontWeight: FontWeight.w500,
+                                  txtHeight: 1.5.h),
                             ),
-                            getVerSpace(28.h),
-                            getCustomFont(
-                                "Not Have Notification", 23.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w800, txtHeight: 1.5.h),
-                            getVerSpace(8.h),
-                            Padding(
-                              padding: const EdgeInsets.only(left:20.0,right: 20.0),
-                              child: Center(
-                                child: getMultilineCustomFont(
-                                    "You will get notification when you have new information",
-                                    17.sp,
-                                    greyColor,
-                                    textAlign: TextAlign.center,
-                                    fontWeight: FontWeight.w500,
-                                    txtHeight: 1.5.h),
-                              ),
-                            )
-              ],
-            ),
-                );
-                
-                  // return EmptyPageWithImage(
-                  //   image: Config.notificationImage,
-                  //   title: 'no notification title'.tr(),
-                  //   description: 'no notification description'.tr(),
-                  // );
-                 return _NotificationList(items: items);
-              //  return Text("s"); 
-              }),
-        ],
-      ),
-      ),
+                          )
+            ],
+          ),
+              );
+              
+                // return EmptyPageWithImage(
+                //   image: Config.notificationImage,
+                //   title: 'no notification title'.tr(),
+                //   description: 'no notification description'.tr(),
+                // );
+               return _NotificationList(items: items);
+            //  return Text("s"); 
+            }),
+      ],
+    ),
     );
   }
 }
@@ -230,8 +224,12 @@ class _NotificationList extends StatelessWidget {
           );
 
             
-            String date = Jiffy(notificationModel.date).format("dd MMMM yyyy"); 
-          final String timeAgo = Jiffy(notificationModel.date).format('HH:mm');
+            // String date = Jiffy(notificationModel.date).format("dd MMMM yyyy"); 
+          String date = Jiffy.parseFromDateTime(notificationModel.date??DateTime.now()).yMMMMd; 
+         
+          String timeAgo = Jiffy.parseFromDateTime(notificationModel.date??DateTime.now()).Hm; 
+        
+          // final String timeAgo = Jiffy(notificationModel.date).format('HH:mm');
           // return Text("data");
  return CustomNotificationCard(notificationModel: notificationModel, timeAgo: timeAgo,date:date);
           // if(notificationModel.postID == null){

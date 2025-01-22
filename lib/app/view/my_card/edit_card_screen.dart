@@ -20,9 +20,7 @@ class EditCardScreen extends StatefulWidget {
 class _EditCardScreenState extends State<EditCardScreen> {
   EditCardController controller = Get.put(EditCardController());
 
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -31,181 +29,176 @@ class _EditCardScreenState extends State<EditCardScreen> {
     controller.dateController.text = "12/24";
     controller.cvvController.text = "123";
     setStatusBarColor(Colors.white);
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getCustomFont("Edit Card", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              getDivider(
-                dividerColor,
-                1.h,
-              ),
-              Expanded(
-                  flex: 1,
-                  child: ListView(
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
-                    primary: true,
-                    shrinkWrap: true,
-                    children: [
-                      getVerSpace(20.h),
-                      getCustomFont("Name On Card", 16.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                      getVerSpace(4.h),
-                      getDefaultTextFiledWithLabel(
-                        context,
-                        "Enter name on card",
-                        controller.cardNameController,
-                        isEnable: false,
-                        height: 60.h,
-                      ),
-                      getVerSpace(20.h),
-                      getCustomFont("Card Number", 16.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                      getVerSpace(4.h),
-                      getDefaultTextFiledWithLabel(
-                        context,
-                        "Enter card number",
-                        controller.cardNumberController,
-                        isEnable: false,
-                        isPass: true,
-                        height: 60.h,
-                        length: 19,
-                        obscuringCharacter: "x",
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          CardNumberFormatter(),
-                        ],
-                      ),
-                      getVerSpace(20.h),
-                      Row(
-                        children: [
-                          Expanded(
-                              flex: 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  getCustomFont("MM/YY", 16.sp, Colors.black, 1,
-                                      fontWeight: FontWeight.w600,
-                                      txtHeight: 1.5.h),
-                                  getVerSpace(4.h),
-                                  getDefaultTextFiledWithLabel(
-                                    context,
-                                    "Enter expiry date",
-                                    controller.dateController,
-                                    isEnable: false,
-                                    height: 60.h,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        value =
-                                            value.replaceAll(RegExp(r"\D"), "");
-                                        switch (value.length) {
-                                          case 0:
-                                            controller
-                                                    .dateController.selection =
-                                                const TextSelection.collapsed(
-                                                    offset: 0);
-                                            break;
-                                          case 1:
-                                            controller.dateController.text =
-                                                "$value/";
-                                            controller
-                                                    .dateController.selection =
-                                                const TextSelection.collapsed(
-                                                    offset: 1);
-                                            break;
-                                          case 2:
-                                            controller.dateController.text =
-                                                "$value/";
-                                            controller
-                                                    .dateController.selection =
-                                                const TextSelection.collapsed(
-                                                    offset: 2);
-                                            break;
-                                          case 3:
-                                            controller.dateController.text =
-                                                "${value.substring(0, 2)}/${value.substring(2)}";
-                                            controller
-                                                    .dateController.selection =
-                                                const TextSelection.collapsed(
-                                                    offset: 4);
-                                            break;
-                                          case 4:
-                                            controller.dateController.text =
-                                                "${value.substring(0, 2)}/${value.substring(2, 4)}";
-                                            controller
-                                                    .dateController.selection =
-                                                const TextSelection.collapsed(
-                                                    offset: 5);
-                                            break;
-                                        }
-                                        if (value.length > 4) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: getToolBar(
+        () {
+          
+        Navigator.of(context).pop();
+        },
+        title: getCustomFont("Edit Card", 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            getDivider(
+              dividerColor,
+              1.h,
+            ),
+            Expanded(
+                flex: 1,
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 20.h),
+                  primary: true,
+                  shrinkWrap: true,
+                  children: [
+                    getVerSpace(20.h),
+                    getCustomFont("Name On Card", 16.sp, Colors.black, 1,
+                        fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                    getVerSpace(4.h),
+                    getDefaultTextFiledWithLabel(
+                      context,
+                      "Enter name on card",
+                      controller.cardNameController,
+                      isEnable: false,
+                      height: 60.h,
+                    ),
+                    getVerSpace(20.h),
+                    getCustomFont("Card Number", 16.sp, Colors.black, 1,
+                        fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                    getVerSpace(4.h),
+                    getDefaultTextFiledWithLabel(
+                      context,
+                      "Enter card number",
+                      controller.cardNumberController,
+                      isEnable: false,
+                      isPass: true,
+                      height: 60.h,
+                      length: 19,
+                      obscuringCharacter: "x",
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        CardNumberFormatter(),
+                      ],
+                    ),
+                    getVerSpace(20.h),
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                getCustomFont("MM/YY", 16.sp, Colors.black, 1,
+                                    fontWeight: FontWeight.w600,
+                                    txtHeight: 1.5.h),
+                                getVerSpace(4.h),
+                                getDefaultTextFiledWithLabel(
+                                  context,
+                                  "Enter expiry date",
+                                  controller.dateController,
+                                  isEnable: false,
+                                  height: 60.h,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      value =
+                                          value.replaceAll(RegExp(r"\D"), "");
+                                      switch (value.length) {
+                                        case 0:
+                                          controller
+                                                  .dateController.selection =
+                                              const TextSelection.collapsed(
+                                                  offset: 0);
+                                          break;
+                                        case 1:
+                                          controller.dateController.text =
+                                              "$value/";
+                                          controller
+                                                  .dateController.selection =
+                                              const TextSelection.collapsed(
+                                                  offset: 1);
+                                          break;
+                                        case 2:
+                                          controller.dateController.text =
+                                              "$value/";
+                                          controller
+                                                  .dateController.selection =
+                                              const TextSelection.collapsed(
+                                                  offset: 2);
+                                          break;
+                                        case 3:
+                                          controller.dateController.text =
+                                              "${value.substring(0, 2)}/${value.substring(2)}";
+                                          controller
+                                                  .dateController.selection =
+                                              const TextSelection.collapsed(
+                                                  offset: 4);
+                                          break;
+                                        case 4:
                                           controller.dateController.text =
                                               "${value.substring(0, 2)}/${value.substring(2, 4)}";
-                                          controller.dateController.selection =
+                                          controller
+                                                  .dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 5);
-                                        }
-                                      });
-                                    },
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          getHorSpace(20.h),
-                          Expanded(
-                              flex: 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  getCustomFont("CVV", 16.sp, Colors.black, 1,
-                                      fontWeight: FontWeight.w600,
-                                      txtHeight: 1.5.h),
-                                  getVerSpace(4.h),
-                                  getDefaultTextFiledWithLabel(
-                                    context,
-                                    "Enter cvv",
-                                    controller.cvvController,
-                                    isEnable: false,
-                                    height: 60.h,
-                                    length: 3,
-                                    isPass: true,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                    ],
-                                  ),
-                                ],
-                              ))
-                        ],
-                      )
-                    ],
-                  )),
-              getPaddingWidget(
-                EdgeInsets.symmetric(horizontal: 20.h),
-                getButton(context, accentColor, "Save Card", Colors.white, () {
-                  backClick();
-                }, 18.sp,
-                    weight: FontWeight.w700,
-                    buttonHeight: 60.h,
-                    borderRadius: BorderRadius.circular(22.h)),
-              ),
-              getVerSpace(30.h)
-            ],
-          ),
+                                          break;
+                                      }
+                                      if (value.length > 4) {
+                                        controller.dateController.text =
+                                            "${value.substring(0, 2)}/${value.substring(2, 4)}";
+                                        controller.dateController.selection =
+                                            const TextSelection.collapsed(
+                                                offset: 5);
+                                      }
+                                    });
+                                  },
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                ),
+                              ],
+                            )),
+                        getHorSpace(20.h),
+                        Expanded(
+                            flex: 1,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                getCustomFont("CVV", 16.sp, Colors.black, 1,
+                                    fontWeight: FontWeight.w600,
+                                    txtHeight: 1.5.h),
+                                getVerSpace(4.h),
+                                getDefaultTextFiledWithLabel(
+                                  context,
+                                  "Enter cvv",
+                                  controller.cvvController,
+                                  isEnable: false,
+                                  height: 60.h,
+                                  length: 3,
+                                  isPass: true,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                ),
+                              ],
+                            ))
+                      ],
+                    )
+                  ],
+                )),
+            getPaddingWidget(
+              EdgeInsets.symmetric(horizontal: 20.h),
+              getButton(context, accentColor, "Save Card", Colors.white, () {
+                ;
+              }, 18.sp,
+                  weight: FontWeight.w700,
+                  buttonHeight: 60.h,
+                  borderRadius: BorderRadius.circular(22.h)),
+            ),
+            getVerSpace(30.h)
+          ],
         ),
       ),
     );

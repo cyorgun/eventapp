@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:event_app/app/view/intro/welcome.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+// import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:evente/evente.dart';
 import '../../../base/constant.dart';
@@ -23,7 +27,7 @@ import '../home/tab/tab_home.dart';
 import 'buy_ticket.dart';
 
 class FeaturedEvent2Detail extends StatefulWidget {
-  Event? event;
+  EventBaru? event;
   FeaturedEvent2Detail({
     Key? key,
     this.event,
@@ -34,9 +38,7 @@ class FeaturedEvent2Detail extends StatefulWidget {
 }
 
 class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+
 
   late GoogleMapController mapController;
 
@@ -49,100 +51,131 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   @override
   Widget build(BuildContext context) {
     final sb = context.watch<SignInBloc>();
-    final Event event = widget.event!;
-
-    return WillPopScope(
-        onWillPop: () async {
-          backClick();
-          return false;
-        },
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Stack(
-            children: [
-              Container(
-                height: double.infinity,
+    final EventBaru event = widget.event!;
+// event.joinEvent!.forEach((id, data) {
+//     String name = data['name'];
+//     String photoProfile = data['photoProfile'];
+//     String id = data['id'];
+//     print('Name: $name');
+//     print('Name: $photoProfile');
+//     print('Name: $id');
+//   });
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          Container(
+            height: double.infinity,
+            width: double.infinity,
+            color: Colors.white,
+            child: buildImageWidget(),
+          ),
+         
+         if(sb.name == null )
+         Align(
+            alignment: Alignment.bottomCenter,
+           child: Padding(
+             padding: const EdgeInsets.only(left:20.0,right: 20.0),
+             child: InkWell(
+              onTap: (){
+                Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>WelcomePage()));
+              },
+               child: Container(
+                height: 55.0,
                 width: double.infinity,
-                color: Colors.white,
-                child: ListView(
-                  children: [
-                    buildImageWidget(),
-                  ],
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.all(Radius.circular(50.0))
                 ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: getPaddingWidget(
-                  EdgeInsets.symmetric(horizontal: 0.h),
-                  Container(
-                    color: Colors.white,
-                    height: 60.0,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 20.0,
-                        ),
-                        Center(
-                          child: Container(
-                            height: 55.h,
-                            width: 55.h,
-                            margin: EdgeInsets.only(top: 0.h, right: 20.h),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 13.h, horizontal: 13.h),
-                            decoration: BoxDecoration(
-                                color: accentColor.withOpacity(0.09),
-                                borderRadius: BorderRadius.circular(22.h)),
-                            child: GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ChatPage(
-                                        arguments: ChatPageArguments(
-                                          peerId: event.title ?? '',
-                                          peerAvatar: sb.imageUrl ?? '',
-                                          peerNickname: sb.name ?? '',
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: getSvg("message.svg",
-                                    color: accentColor,
-                                    height: 24.h,
-                                    width: 24.h)),
-                          ),
-                        ),
-                        getButton(
-                            context, accentColor, "Buy Ticket", Colors.white,
-                            () {
-                          Navigator.of(context).push(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => new BuyTicket(
-                                    event: event,
-                                  )));
-                        }, 18.sp,
-                            weight: FontWeight.w700,
-                            buttonHeight: 60.h,
-                            buttonWidth:
-                                MediaQuery.of(context).size.width - 148.h,
-                            borderRadius: BorderRadius.circular(22.h)),
-                      ],
+                child: Center(
+                  child: Text(
+                    "Login to buy ticket",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600
                     ),
                   ),
                 ),
+               ),
+             ),
+           ),
+         )
+         else         
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: getPaddingWidget(
+              EdgeInsets.symmetric(horizontal: 0.h),
+              Container(
+                color: Colors.white,
+                height: 60.0,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Center(
+                      child: Container(
+                        height: 55.h,
+                        width: 55.h,
+                        margin: EdgeInsets.only(top: 0.h, right: 20.h),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 13.h, horizontal: 13.h),
+                        decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.09),
+                            borderRadius: BorderRadius.circular(22.h)),
+                        child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatPage(
+                                    arguments: ChatPageArguments(
+                                      peerId: event.title ?? '',
+                                      peerAvatar: sb.imageUrl ?? '',
+                                      peerNickname: sb.name ?? '',
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: getSvg("message.svg",
+                                color: accentColor,
+                                height: 24.h,
+                                width: 24.h)),
+                      ),
+                    ),
+                    getButton(
+                        context, accentColor, ("Buy Ticket").tr(), Colors.white,
+                        () {
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (_, __, ___) => new BuyTicket(
+                                event: event,
+                              )));
+                    }, 18.sp,
+                        weight: FontWeight.w700,
+                        buttonHeight: 60.h,
+                        buttonWidth:
+                            MediaQuery.of(context).size.width - 148.h,
+                        borderRadius: BorderRadius.circular(22.h)),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ));
+       
+        ],
+      ),
+    );
   }
 
   handleLoveClick() {
-    final Event event = widget.event!;
+    final EventBaru event = widget.event!;
     context.read<BookmarkBloc>().onBookmarkIconClick(event.title);
   }
 
   Widget buildFollowWidget(BuildContext context) {
-    final Event event = widget.event!;
+    final EventBaru event = widget.event!;
     return getPaddingWidget(
       EdgeInsets.symmetric(horizontal: 20.h),
       Container(
@@ -186,28 +219,53 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   }
 
   Container buildTicketPrice() {
-    final Event event = widget.event!;
+    final EventBaru event = widget.event!;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.h),
       padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 16.h),
       decoration: BoxDecoration(
-          color: accentColor.withOpacity(0.03),
+          color: accentColor.withOpacity(0.3),
           borderRadius: BorderRadius.circular(22.h)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              getSvgImage("ticket.svg",
-                  width: 24.h, height: 24.h, color: Colors.black),
+              // getSvgImage("ticket.svg",
+              //     width: 24.h, height: 24.h, color: Colors.black),
+          
+              getAssetImage("tiket.png", width: 28.h, height: 28.h),
               getHorSpace(5.h),
-              getRichText("Ticket Price ", Colors.black, FontWeight.w600, 15.sp,
+              getRichText(("Ticket Price ").tr(), Colors.black, FontWeight.w600, 15.sp,
                   "", greyColor, FontWeight.w500, 13.sp),
             ],
           ),
-          getCustomFont(
+               event.price==0?
+                         Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
+                            child: Container(
+                              height: 35.h,
+                              width: 80.0,
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.051),
+                                  borderRadius: BorderRadius.circular(50.h)),
+                              child: Center(
+                                  child: Text(
+                                ("Free").tr(),
+                                style: TextStyle(
+                                    color: accentColor,
+                                    fontSize: 15.sp,
+                                            fontFamily: 'Gilroy',
+                                    fontWeight: FontWeight.w700),
+                                textAlign: TextAlign.center,
+                              )),
+                            )),
+                      ): getCustomFont(
               "\$" + event.price.toString() ?? "", 20.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700)
+              fontWeight: FontWeight.w700),
         ],
       ),
     );
@@ -215,11 +273,11 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 
   Widget buildImageWidget() {
     final sb = context.watch<SignInBloc>();
-    final Event event = widget.event!;
+    final EventBaru event = widget.event!;
 
     DateTime? dateTime = event.date?.toDate();
     String date = DateFormat('d MMMM, yyyy').format(dateTime!);
-    return Column(
+    return ListView(
       children: [
         Stack(
           alignment: Alignment.topCenter,
@@ -261,7 +319,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                             color: Colors.white),
                         child: GestureDetector(
                           onTap: () {
-                            backClick();
+                           Navigator.of(context).pop();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(9.0),
@@ -308,48 +366,93 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                 ))
           ],
         ),
-        Positioned(
-            top: 295.h,
-            // width: 374.w,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22.h),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(22.h),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 16.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              getVerSpace(0.h),
+              Center(
+                child: Container(
+                  height: 8.0,
+                  width: 70.0,
+                  decoration: BoxDecoration(
+                      color: greyColor.withOpacity(0.1),
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(30.0))),
+                ),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 16.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              getVerSpace(20.h),
+              Row(
                 children: [
-                  getVerSpace(0.h),
-                  Center(
+                  getCustomFont(
+                    date ?? '',
+                    15.sp,
+                    greyColor,
+                    1,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: Container(
-                      height: 8.0,
-                      width: 70.0,
-                      decoration: BoxDecoration(
-                          color: greyColor.withOpacity(0.1),
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(30.0))),
+                      height: 5.0,
+                      width: 3.0,
+                      color: greyColor.withOpacity(0.5),
                     ),
                   ),
-                  getVerSpace(20.h),
-                  Row(
+                  getCustomFont(
+                    event.time ?? '',
+                    15.sp,
+                    greyColor,
+                    1,
+                    fontWeight: FontWeight.w500,
+                  )
+                ],
+              ),
+             
+             
+//               Text(
+//   event.joinEvent != null && event.joinEvent!.isNotEmpty
+//       ? event.joinEvent!.values.first['name']
+//       : 'Tidak ada data joinEvent',
+// ),
+              getCustomFont(event.title ?? '', 27.sp, Colors.black, 1,
+                  fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+              getVerSpace(10.h),
+               Row(
+                children: [
+                  CircleAvatar(
+                    radius: 19.0,
+                    backgroundColor: Colors.grey.withOpacity(0.11),
+                    child: getAssetImage("calendar.png", width: 22.h, height: 22.h),
+                  ),
+                  SizedBox(
+                    width: 10.0,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       getCustomFont(
                         date ?? '',
                         15.sp,
-                        greyColor,
+                        Colors.black,
                         1,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Container(
-                          height: 5.0,
-                          width: 3.0,
-                          color: greyColor.withOpacity(0.5),
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      //   child: Container(
+                      //     height: 5.0,
+                      //     width: 3.0,
+                      //     color: greyColor.withOpacity(0.5),
+                      //   ),
+                      // ),
                       getCustomFont(
                         event.time ?? '',
                         15.sp,
@@ -359,307 +462,338 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       )
                     ],
                   ),
-                  getCustomFont(event.title ?? '', 27.sp, Colors.black, 1,
-                      fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                  getVerSpace(10.h),
-                  Row(
-                    children: [
-                      getSvg("Location.svg",
-                          height: 20.h, width: 20.h, color: accentColor),
-                      getHorSpace(5.h),
-                      Container(
-                        width: 300.w,
-                        child: getCustomFont(
-                          event.location ?? '',
-                          17.sp,
-                          greyColor,
-                          1,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    ],
-                  ),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
-                  //     Row(
-                  //       children: [
-                  //         getSvg(
-                  //           "calender.svg",
-                  //           width: 20.h,
-                  //           height: 20.h,
-                  //           color: accentColor,
-                  //         ),
-                  //         getHorSpace(5.h),
-                  //         getCustomFont(
-                  //           date ?? '',
-                  //           17.sp,
-                  //           greyColor,
-                  //           1,
-                  //           fontWeight: FontWeight.w500,
-                  //         )
-                  //       ],
-                  //     ),
-                  //     Row(
-                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         Row(
-                  //           children: [
-                  //             getSvg("time.svg",
-                  //                 width: 19.h,
-                  //                 height: 19.h,
-                  //                 color: accentColor),
-                  //             getHorSpace(5.h),
-                  //             getCustomFont(
-                  //               event.time ?? '',
-                  //               17.sp,
-                  //               greyColor,
-                  //               1,
-                  //               fontWeight: FontWeight.w500,
-                  //             )
-                  //           ],
-                  //         ),
-                  //         Container(
-                  //           width: 100.w,
-                  //           height: 30.h,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ],
-                  // ),
-
-                  getVerSpace(15.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      getCustomFont(
-                        'People Joined :',
-                        17.sp,
-                        greyColor,
-                        1,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      Container(
-                        width: 20.w,
-                        height: 30.h,
-                      ),
-                      Expanded(
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("JoinEvent")
-                              .doc("user")
-                              .collection(event.title ?? '')
-                              .snapshots(),
-                          builder: (BuildContext ctx,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            return snapshot.hasData
-                                ? new joinEvent(
-                                    list: snapshot.data?.docs,
-                                  )
-                                : Container();
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  getVerSpace(20.h),
-                  buildTicketPrice(),
-                  getVerSpace(20.h),
-                  getCustomFont('Description', 19.sp, Colors.black, 1,
-                      fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                  getVerSpace(20.h),
-                  getPaddingWidget(
-                    EdgeInsets.symmetric(horizontal: 20.h),
-                    ReadMoreText(
-                      event.description ?? "",
-                      trimLines: 8,
-                      trimMode: TrimMode.Line,
-                      trimCollapsedText: 'Read more...',
-                      trimExpandedText: 'Show less',
-                      style: TextStyle(
-                          fontFamily: 'Gilroy',
-                          color: greyColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15.sp,
-                          height: 1.5.h),
-                      lessStyle: TextStyle(
-                          fontFamily: 'Gilroy',
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: accentColor),
-                      moreStyle: TextStyle(
-                          fontFamily: 'Gilroy',
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: accentColor),
-                    ),
-                  ),
-
-                  // getVerSpace(20.h),
-                  // buildFollowWidget(context),
-                  // getVerSpace(20.h),
-
-                  getVerSpace(45.h),
-                  Stack(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 5.h),
-                          height: 206.h,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(22.h)),
-                          child: GoogleMap(
-                            trafficEnabled: true,
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(event.mapsLatLink as double,
-                                  event.mapsLangLink as double),
-                              zoom: 12,
-                            ),
-                            onMapCreated: _onMapCreated,
-                            markers: {
-                              Marker(
-                                markerId: const MarkerId("marker1"),
-                                position: LatLng(event.mapsLatLink as double,
-                                    event.mapsLangLink as double),
-                                draggable: true,
-                                onDragEnd: (value) {
-                                  // value is the new position
-                                },
-                                // To do: custom marker icon
-                              ),
-
-                              // Marker(
-                              //   markerId: const MarkerId("marker2"),
-                              //   position: const LatLng(37.415768808487435, -122.08440050482749),
-                              // ),
-                            },
-                            zoomControlsEnabled: false,
-                            zoomGesturesEnabled: true,
-                            myLocationEnabled: true,
-                            myLocationButtonEnabled: false,
-                          ),
-                        ),
-                      ),
-                                     InkWell(
-                        onTap: (() {
-                          MapsSheet.show(
-                            context: context,
-                            onMapTap: (map) {
-                              map.showDirections(
-                                destination: Coords(event.mapsLatLink as double,
-                                    event.mapsLangLink as double),
-                                directionsMode: DirectionsMode.driving,
-                              );
-                            },
-                          );
-                        }),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left:5.0),
-                          child: Container(
-                            height: 150.h,
-                            width: 40.0,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black12.withOpacity(0.1),
-                                      blurRadius: 27,
-                                      offset: const Offset(0, 8))
-                                ],
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0))),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.navigation_rounded,
-                                    color: Colors.black,
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  RotatedBox(
-                                    quarterTurns:
-                                        3, // mengatur rotasi sebesar 90 derajat
-                                    child: Text(
-                                      'Navigate',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.black,
-                                          fontFamily: 'Gilroy',
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-       
-                    ],
-                  ),
-                  getVerSpace(45.h),
-                  getPaddingWidget(
-                    EdgeInsets.only(right: 20.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        getCustomFont("Upcoming Events", 19.sp, Colors.black, 1,
-                            fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                        GestureDetector(
-                          onTap: () {
-                            Constant.sendToNext(
-                                context, Routes.featureEventListRoute);
-                          },
-                          child: getCustomFont("View All", 15.sp, greyColor, 1,
-                              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                        )
-                      ],
-                    ),
-                  ),
-                  getVerSpace(15.h),
-
-                  Container(
-                    height: 330.h,
-                    child: StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection("event")
-                          .where('date',
-                              isGreaterThanOrEqualTo:
-                                  Timestamp.fromDate(DateTime.now()))
-                          .orderBy('date', descending: false)
-                          .limit(10)
-                          .snapshots(),
-                      builder: (BuildContext ctx,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-
-                        if (snapshot.data!.docs.isEmpty) {
-                          return Center(child: EmptyScreen());
-                        }
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error'));
-                        }
-
-                        return snapshot.hasData
-                            ? TrendingEventCard2(
-                                list: snapshot.data?.docs,
-                              )
-                            : Container();
-                      },
-                    ),
-                  ),
-                  getVerSpace(16.h),
                 ],
               ),
-            )),
+
+              SizedBox(
+                height: 15,
+              ),
+
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 19.0,
+                    backgroundColor: Colors.grey.withOpacity(0.11),
+                    child: getAssetImage("location.png", width: 22.h, height: 22.h),
+                  ),
+                  getHorSpace(10.h),
+                  Container(
+                    width: 310.w,
+                    // color: Colors.yellow,
+                    child: getCustomFont(
+                      event.location ?? '',
+                      17.sp,
+                      Colors.black,
+                      3,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                ],
+              ),
+             
+              // Row(
+              //   children: [
+              //     getSvg("Location.svg",
+              //         height: 20.h, width: 20.h, color: accentColor),
+              //     getHorSpace(5.h),
+              //     Container(
+              //       width: 300.w,
+              //       child: getCustomFont(
+              //         event.location ?? '',
+              //         17.sp,
+              //         greyColor,
+              //         1,
+              //         fontWeight: FontWeight.w500,
+              //       ),
+              //     )
+              //   ],
+              // ),
+
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Row(
+              //       children: [
+              //         getSvg(
+              //           "calender.svg",
+              //           width: 20.h,
+              //           height: 20.h,
+              //           color: accentColor,
+              //         ),
+              //         getHorSpace(5.h),
+              //         getCustomFont(
+              //           date ?? '',
+              //           17.sp,
+              //           greyColor,
+              //           1,
+              //           fontWeight: FontWeight.w500,
+              //         )
+              //       ],
+              //     ),
+              //     Row(
+              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //       children: [
+              //         Row(
+              //           children: [
+              //             getSvg("time.svg",
+              //                 width: 19.h,
+              //                 height: 19.h,
+              //                 color: accentColor),
+              //             getHorSpace(5.h),
+              //             getCustomFont(
+              //               event.time ?? '',
+              //               17.sp,
+              //               greyColor,
+              //               1,
+              //               fontWeight: FontWeight.w500,
+              //             )
+              //           ],
+              //         ),
+              //         Container(
+              //           width: 100.w,
+              //           height: 30.h,
+              //         ),
+              //       ],
+              //     ),
+              //   ],
+              // ),
+
+
+              getVerSpace(20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  getCustomFont(
+                    ('People Joined :').tr(),
+                    17.sp,
+                    Colors.black,
+                    1,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  Container(
+                    width: 20.w,
+                    height: 30.h,
+                  ),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("JoinEvent")
+                        .doc("user")
+                        .collection(event.title ?? '')
+                        .snapshots(),
+                    builder: (BuildContext ctx,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      return snapshot.hasData
+                          ? new joinEvents(
+                              list: snapshot.data?.docs,
+                            )
+                          : Container();
+                    },
+                  ),
+                ],
+              ),
+                getVerSpace(15.h),
+
+
+        
+        
+              buildTicketPrice(),
+        
+              getVerSpace(20.h),
+              getCustomFont(('Description').tr(), 19.sp, Colors.black, 1,
+                  fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+              getVerSpace(20.h),
+              getPaddingWidget(
+                EdgeInsets.symmetric(horizontal: 20.h),
+                ReadMoreText(
+                  event.description ?? "",
+                  trimLines: 8,
+                  trimMode: TrimMode.Line,
+                  trimCollapsedText: ('Read more...').tr(),
+                  trimExpandedText: ('Show less').tr(),
+                  style: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: greyColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15.sp,
+                      height: 1.5.h),
+                  lessStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: accentColor),
+                  moreStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: accentColor),
+                ),
+              ),
+
+              // getVerSpace(20.h),
+              // buildFollowWidget(context),
+              // getVerSpace(20.h),
+
+              getVerSpace(45.h),
+              Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5.h),
+                    height: 150.h,
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(40.h)),
+                    child: GoogleMap(
+                      trafficEnabled: true,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(event.mapsLatLink as double,
+                            event.mapsLangLink as double),
+                        zoom: 12,
+                      ),
+                      onMapCreated: _onMapCreated,
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId("marker1"),
+                          position: LatLng(event.mapsLatLink as double,
+                              event.mapsLangLink as double),
+                          draggable: true,
+                          onDragEnd: (value) {
+                            // value is the new position
+                          },
+                          // To do: custom marker icon
+                        ),
+
+                        // Marker(
+                        //   markerId: const MarkerId("marker2"),
+                        //   position: const LatLng(37.415768808487435, -122.08440050482749),
+                        // ),
+                      },
+                      zoomControlsEnabled: false,
+                      zoomGesturesEnabled: true,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                    ),
+                  ),
+                                 InkWell(
+                    onTap: (() {
+                      MapsSheet.show(
+                        context: context,
+                        onMapTap: (map) {
+                          map.showDirections(
+                            destination: Coords(event.mapsLatLink as double,
+                                event.mapsLangLink as double),
+                            directionsMode: DirectionsMode.driving,
+                          );
+                        },
+                      );
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left:5.0),
+                      child: Container(
+                        height: 150.h,
+                        width: 40.0,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black12.withOpacity(0.1),
+                                  blurRadius: 27,
+                                  offset: const Offset(0, 8))
+                            ],
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0))),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.navigation_rounded,
+                                color: Colors.black,
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              RotatedBox(
+                                quarterTurns:
+                                    3, // mengatur rotasi sebesar 90 derajat
+                                child: Text(
+                                  ('Navigate').tr(),
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                      fontFamily: 'Gilroy',
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+       
+                ],
+              ),
+              getVerSpace(45.h),
+              getPaddingWidget(
+                EdgeInsets.only(right: 20.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    
+                    getCustomFont(("Upcoming Events").tr(), 19.sp, Colors.black, 1,
+                        fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                    GestureDetector(
+                      onTap: () {
+                           Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => FeaturedEvent2Detail()));
+               
+                        // Constant.sendToNext(
+                        //     context, Routes.featureEventListRoute);
+                      },
+                      child: getCustomFont(("View All").tr(), 15.sp, greyColor, 1,
+                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                    )
+                  ],
+                ),
+              ),
+              getVerSpace(15.h),
+
+              Container(
+                height: 330.h,
+                child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("event")
+                      .where('date',
+                          isGreaterThanOrEqualTo:
+                              Timestamp.fromDate(DateTime.now()))
+                      .orderBy('date', descending: false)
+                      .limit(10)
+                      .snapshots(),
+                  builder: (BuildContext ctx,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.data!.docs.isEmpty) {
+                      return Center(child: EmptyScreen());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error'));
+                    }
+
+                    return snapshot.hasData
+                        ? TrendingEventCard2(
+                            list: snapshot.data?.docs,
+                          )
+                        : Container();
+                  },
+                ),
+              ),
+              getVerSpace(16.h),
+            ],
+          ),
+        ),
 
         // Align(
         //   alignment: Alignment.bottomCenter,
@@ -719,18 +853,97 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   }
 }
 
-class joinEvent extends StatelessWidget {
-  joinEvent({this.list});
+// class joinEvents extends StatelessWidget {
+//   joinEvents({this.list});
+//   final List<DocumentSnapshot>? list;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: <Widget>[
+//         Padding(
+//           padding: const EdgeInsets.only(left: 0.0),
+//           child: Container(
+//               height: 25.0,
+//               width: 54.0,
+//               child: ListView.builder(
+//                 scrollDirection: Axis.horizontal,
+//                 padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
+//                 itemCount: list!.length > 3 ? 3 : list?.length,
+//                 itemBuilder: (context, i) {
+//                   String? _title = list?[i]['name'].toString();
+//                   String? _uid = list?[i]['uid'].toString();
+//                   String? _img = list?[i]['photoProfile'].toString();
+
+//                   return Padding(
+//                     padding: const EdgeInsets.only(left: 0.0),
+//                     child: Container(
+//                       height: 24.0,
+//                       width: 24.0,
+//                       decoration: BoxDecoration(
+//                           borderRadius:
+//                               BorderRadius.all(Radius.circular(70.0)),
+//                           image: DecorationImage(
+//                               image: NetworkImage(_img ?? ''),
+//                               fit: BoxFit.cover)),
+//                     ),
+//                   );
+//                 },
+//               )),
+//         ),
+//         Padding(
+//           padding: const EdgeInsets.only(
+//             top: 3.0,
+//             left: 0.0,
+//           ),
+//           child: Row(
+//             children: [
+//               Container(
+//                 height: 32.h,
+//                 width: 32.h,
+//                 decoration: BoxDecoration(
+//                                 color: accentColor,
+//                     borderRadius: BorderRadius.circular(30.h),
+//                     border: Border.all(color: Colors.white, width: 1.5.h)),
+//                 alignment: Alignment.center,
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   crossAxisAlignment: CrossAxisAlignment.center,
+//                   children: [
+//                     getCustomFont(list?.length.toString() ?? '', 12.sp,
+//                         Colors.white, 1,
+//                         fontWeight: FontWeight.w600),
+//                     getCustomFont(" +", 12.sp, Colors.white, 1,
+//                         fontWeight: FontWeight.w600),
+//                   ],
+//                 ),
+//               ),
+
+//             ],
+//           ),
+//         )
+//       ],
+//     );
+//   }
+// }
+
+
+
+
+
+class joinEvents extends StatelessWidget {
+  joinEvents({this.list});
   final List<DocumentSnapshot>? list;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Row(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 50.0),
+          padding: const EdgeInsets.only(left: 0.0),
           child: Container(
-              height: 35.0,
+              height: 25.0,
+              width: 54.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
@@ -740,64 +953,50 @@ class joinEvent extends StatelessWidget {
                   String? _uid = list?[i]['uid'].toString();
                   String? _img = list?[i]['photoProfile'].toString();
 
-                  return Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 0.0),
-                        child: Container(
-                          height: 27.0,
-                          width: 27.0,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(70.0)),
-                              image: DecorationImage(
-                                  image: NetworkImage(_img ?? ''),
-                                  fit: BoxFit.cover)),
-                        ),
-                      ),
-                    ],
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 0.0),
+                    child: Container(
+                      height: 24.0,
+                      width: 24.0,
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(70.0)),
+                          image: DecorationImage(
+                              image: NetworkImage(_img ?? ''),
+                              fit: BoxFit.cover)),
+                    ),
                   );
                 },
               )),
         ),
         Padding(
           padding: const EdgeInsets.only(
-            top: 0.0,
-            left: 130.0,
+            top: 3.0,
+            left: 0.0,
           ),
           child: Row(
             children: [
-              Positioned(
-                  left: 22.h,
-                  child: Container(
-                    height: 36.h,
-                    width: 36.h,
-                    decoration: BoxDecoration(
-                        color: accentColor,
-                        borderRadius: BorderRadius.circular(30.h),
-                        border: Border.all(color: Colors.white, width: 1.5.h)),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        getCustomFont(list?.length.toString() ?? '', 12.sp,
-                            Colors.white, 1,
-                            fontWeight: FontWeight.w600),
-                        getCustomFont(" +", 12.sp, Colors.white, 1,
-                            fontWeight: FontWeight.w600),
-                      ],
-                    ),
-                  )),
+              Container(
+                height: 32.h,
+                width: 32.h,
+                decoration: BoxDecoration(
+                                color: accentColor,
+                    borderRadius: BorderRadius.circular(30.h),
+                    border: Border.all(color: Colors.white, width: 1.5.h)),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    getCustomFont(list?.length.toString() ?? '', 12.sp,
+                        Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                    getCustomFont(" +", 12.sp, Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                  ],
+                ),
+              ),
 
-              // Text(
-              //   list?.length.toString()??'',
-              //   style: TextStyle(fontFamily: "Popins"),
-              // ),
-              //  Text(
-              //   " People Join",
-              //   style: TextStyle(fontFamily: "Popins"),
-              // ),
             ],
           ),
         )
@@ -805,3 +1004,5 @@ class joinEvent extends StatelessWidget {
     );
   }
 }
+
+

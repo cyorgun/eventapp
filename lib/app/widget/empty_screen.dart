@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../base/color_data.dart';
 import '../../base/widget_utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class EmptyScreen extends StatelessWidget {
   const EmptyScreen({super.key});
@@ -24,11 +25,11 @@ class EmptyScreen extends StatelessWidget {
                                    width: 214.h,boxFit: BoxFit.cover),
                             ),
                             getCustomFont(
-                                "Item Empty", 20.sp, Colors.black, 1,
+                                ("Item Empty").tr(), 20.sp, Colors.black, 1,
                                 fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                             getVerSpace(8.h),
                             getMultilineCustomFont(
-                                "Sorry, we couldn't find any results for your item.",
+                                ("Sorry, we couldn't find any results for your item.").tr(),
                                 16.sp,
                                 Colors.black,
                                 fontWeight: FontWeight.w500,

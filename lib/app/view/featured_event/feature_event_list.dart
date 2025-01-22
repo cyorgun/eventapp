@@ -4,6 +4,7 @@ import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
@@ -22,9 +23,7 @@ class FeatureEventList extends StatefulWidget {
 }
 
 class _FeatureEventListState extends State<FeatureEventList> {
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+
 
   FeatureEventController controller = Get.put(FeatureEventController());
 
@@ -34,7 +33,7 @@ class _FeatureEventListState extends State<FeatureEventList> {
     setStatusBarColor(Colors.white);
     return WillPopScope(
       onWillPop: () async {
-        backClick();
+        ;
         return false;
       },
       child: Scaffold(
@@ -140,7 +139,7 @@ class buildFeatureEventList2 extends StatelessWidget {
       itemCount: list?.length,
       itemBuilder: (context, i) {
         final events = list?.map((e) {
-          return Event.fromFirestore(e);
+          return EventBaru.fromFirestore(e,1);
         }).toList();
         //  String? category = list?[i]['category'].toString();
         // String? date = list?[i]['date'].toString();

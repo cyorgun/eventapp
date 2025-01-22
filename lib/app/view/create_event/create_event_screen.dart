@@ -8,22 +8,20 @@ import 'package:event_app/base/constant.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 
 import 'package:evente/evente.dart';
 import 'package:http/http.dart' as http;
+import 'package:easy_localization/easy_localization.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({Key? key}) : super(key: key);
@@ -33,22 +31,26 @@ class CreateEventScreen extends StatefulWidget {
 }
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
-  CreateEventController controller = Get.put(CreateEventController());
-  String dropdownvalue = 'swimming';
+  // CreateEventController controller =Get.put(CreateEventController());
+  String dropdownvalue = ('swimming').tr();
   String dropdownvalue2 = 'trending';
-  
- int _latitude = 0;
-  var items = ['swimming',"game", "football","comedy","konser","trophy","tour","festival","study","party","olympic","cultrure"
+
+  int _latitude = 0;
+  var items = [
+    ('swimming').tr(),
+    ('game').tr(),
+    ('football').tr(),
+    ('comedy').tr(),
+    ('konser').tr(),
+    ('trophy').tr(),
+    ('tour').tr(),
+    ('festival').tr(),
+    ('study').tr(),
+    ('party').tr(),
+    ('olympic').tr(),
+    ('culture').tr()
   ];
   var items2 = ['trending', "feature", "popular"];
-
-  _onPictureSelection1() async {
-    controller.getImage1();
-  }
-
-  _onPictureSelection2() async {
-    controller.getImage2();
-  }
 
   String? imageUrl;
 
@@ -84,102 +86,98 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   void onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
-    Geolocator.getCurrentPosition().then((value) {
-      setState(() {
-        currentPosition = LatLng(40.730610, -73.935242);
-        if (currentPosition != null) {
-          MarkerId markerId = MarkerId(markerIdVal());
-          LatLng position = currentPosition!;
-          Marker marker = Marker(
-            markerId: markerId,
-            position: position,
-            draggable: false,
-          );
-          markersgm(markerId, marker);
+    // Geolocator.getCurrentPosition().then((value) {
+    //   setState(() {
+    //     currentPosition = LatLng(40.730610, -73.935242);
+    //     if (currentPosition != null) {
+    //       MarkerId markerId = MarkerId(markerIdVal());
+    //       LatLng position = currentPosition!;
+    //       Marker marker = Marker(
+    //         markerId: markerId,
+    //         position: position,
+    //         draggable: false,
+    //       );
+    //       markersgm(markerId, marker);
 
-          Future.delayed(
-            const Duration(seconds: 1),
-            () async {
-              GoogleMapController controller = await _controller.future;
-              controller.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                    target: position,
-                    zoom: 10.0,
-                  ),
-                ),
-              );
-            },
-          );
-        }
-      });
-    });
+    //       Future.delayed(
+    //         const Duration(seconds: 1),
+    //         () async {
+    //           GoogleMapController controller = await _controller.future;
+    //           controller.animateCamera(
+    //             CameraUpdate.newCameraPosition(
+    //               CameraPosition(
+    //                 target: position,
+    //                 zoom: 10.0,
+    //               ),
+    //             ),
+    //           );
+    //         },
+    //       );
+    //     }
+    //   });
+    // });
   }
 
-  
   void sendNotification(String title, String body) async {
- 
     List<String> allTokens = [];
 
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("UserTokens").get();
-snapshot.docs.forEach((doc) {
-   Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-  if (data != null) {
-    String token = data['token'];
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection("UserTokens").get();
+    snapshot.docs.forEach((doc) {
+      Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+      if (data != null) {
+        String token = data['token'];
 
-    allTokens.add(token);
-    
-  }
-print(allTokens);
-  // setState(() {
-  //   allTokens.add(token);
-  // });
-});
+        allTokens.add(token);
+      }
+      print(allTokens);
+      // setState(() {
+      //   allTokens.add(token);
+      // });
+    });
 
-
-        // Send notification to each FCM token
+    // Send notification to each FCM token
     for (String token in allTokens) {
-    try {
-      await http.post(
-        Uri.parse('https://fcm.googleapis.com/fcm/send'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'key=AAAAe6Ts2VU:APA91bELeOqnREA-0yruuVPGCIEgZESZ7_iFK7LNqFMHUGIHT9VmuKaISotsAZfagEok5QNndb6O3D6eoPQ7V-VFq_MTyOhj6zOYfeLBiMC1kd1IixGtz1t54e7weACj-T8epfHb4Je9',
-        },
-        body: jsonEncode(
-          <String, dynamic>{
-            'notification': <String, dynamic>{
-              'body': body,
-              'title': title,
-
-            },
-            'priority': 'high',
-            'data': 
-            // [
-              
-            // ],
-             <String, dynamic>{
-              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-              'id': '1',
-              'status': 'done'
-            },
-            "to":token,
+      try {
+        await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'key=AAAAe6Ts2VU:APA91bELeOqnREA-0yruuVPGCIEgZESZ7_iFK7LNqFMHUGIHT9VmuKaISotsAZfagEok5QNndb6O3D6eoPQ7V-VFq_MTyOhj6zOYfeLBiMC1kd1IixGtz1t54e7weACj-T8epfHb4Je9',
           },
-        ),
-      );
-    } catch (e) {
-      print("error push notification");
-    }}
+          body: jsonEncode(
+            <String, dynamic>{
+              'notification': <String, dynamic>{
+                'body': body,
+                'title': title,
+              },
+              'priority': 'high',
+              'data':
+                  // [
+
+                  // ],
+                  <String, dynamic>{
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done'
+              },
+              "to": token,
+            },
+          ),
+        );
+      } catch (e) {
+        print("error push notification");
+      }
+    }
   }
- 
 
   void markersgm(MarkerId markerId, Marker updateMarker) {
     markers[markerId] = updateMarker;
     print(markers);
     setState(() {
-      
-    _controllerLatitude.text = updateMarker.position.latitude.toString();
-    _controllerLongitude.text = updateMarker.position.longitude.toString();
+      _controllerLatitude.text = updateMarker.position.latitude.toString();
+      _controllerLongitude.text = updateMarker.position.longitude.toString();
     });
     // update();
   }
@@ -199,7 +197,8 @@ print(allTokens);
       print('No image selected!');
     }
   }
-   void _onLatitudeTextChanged() {
+
+  void _onLatitudeTextChanged() {
     setState(() {
       _latitude = int.tryParse(_controllerLatitude.text) ?? 0;
     });
@@ -232,7 +231,7 @@ print(allTokens);
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              'No internet',
+              ('noInternet').tr(),
               textAlign: TextAlign.center,
             ),
           ),
@@ -260,8 +259,10 @@ print(allTokens);
                         double.tryParse(_controllerLongitude.text) ?? 0.0),
                     'createdAt': FieldValue.serverTimestamp(),
                     "loves": "",
-                      "mapsLangLink":num.tryParse(_controllerLongitude.text)??0.0,
-                      "mapsLatLink": num.tryParse(_controllerLatitude.text)??0.0,
+                    "mapsLangLink":
+                        num.tryParse(_controllerLongitude.text) ?? 0.0,
+                    "mapsLatLink":
+                        num.tryParse(_controllerLatitude.text) ?? 0.0,
                     'count': 0,
                     "price": int.tryParse(priceCtrl.text) ?? 0,
                     "title": titleCtrl.text,
@@ -275,7 +276,7 @@ print(allTokens);
                     SnackBar(
                       backgroundColor: Colors.redAccent,
                       content: Text(
-                        'Upload Success',
+                        ('uploadSuccess').tr(),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -298,8 +299,12 @@ print(allTokens);
                       "location": locCtrl.text,
                       "loves": "",
                       'count': 0,
-                      "mapsLangLink":num.tryParse(_controllerLongitude.text)??0.0,
-                      "mapsLatLink": num.tryParse(_controllerLatitude.text)??0.0,
+                      "mapsLangLink": double.tryParse(double.tryParse(_controllerLongitude.text)
+                              !.toStringAsFixed(2) )??
+                          '0.00',
+                      "mapsLatLink": double.tryParse(double.tryParse(_controllerLatitude.text)
+                              !.toStringAsFixed(2) )??
+                          '0.00',
                       "price": int.tryParse(priceCtrl.text) ?? 0,
                       "title": titleCtrl.text,
                       "type": dropdownvalue2.toString(),
@@ -317,7 +322,8 @@ print(allTokens);
                     //     ),
                     //   ),
                     // );
-  sendNotification("New Event!", titleCtrl.text);
+                    sendNotification(("newEvent").tr(), titleCtrl.text);
+                    Navigator.of(context).pop();
                     showDialog(
                         builder: (context) {
                           return const EventpublishDialog();
@@ -330,42 +336,50 @@ print(allTokens);
     });
   }
 
-  void permission() async {
-    LocationPermission permission;
-    permission = await Geolocator.requestPermission();
-  }
-
   @override
   void initState() {
     // TODO: implement initState
-    permission();
-   onMapCreated;
-   _onLatitudeTextChanged;
+    onMapCreated;
+    _onLatitudeTextChanged;
     _controllerLatitude.addListener(_onLatitudeTextChanged);
-    Geolocator.getCurrentPosition().then((value) {
-      setState(() {
-        currentPosition = LatLng(40.730610, -73.935242);
-      });
-    });
+    // Geolocator.getCurrentPosition().then((value) {
+    //   setState(() {
+    //     currentPosition = LatLng(40.730610, -73.935242);
+    //   });
+    // });
     super.initState();
   }
-  
 
   @override
   Widget build(BuildContext context) {
-num intValue = num.tryParse(_controllerLatitude.text)??0.0;
+    bool isButtonDisabled = false;
+    if (titleCtrl.text == "" ||
+        imageFile == null ||
+        descCtrl.text == "" ||
+        locCtrl.text == "" ||
+        priceCtrl.text == "" ||
+        dateCtrl.text == "" ||
+        timeCtrl.text == "" ||
+        _controllerLatitude.text == "" ||
+        _controllerLongitude.text == "") {
+      isButtonDisabled = true;
+    }
+    // int? intValue = int.tryParse(_controllerLatitude.text);
+    //
+
+    num intValue = num.tryParse(_controllerLatitude.text) ?? 0.0;
     return Scaffold(
       appBar: buildAppBar(),
       body: Form(
         key: formKey,
         child: Column(
           children: [
-          //   if(intValue==null)Text("null"),
-            
-          // Text("Latitude: $intValue"??''),
+            //   if(intValue==null)Text("null"),
 
-          // Text("Latitude2:" + num.tryParse(_controllerLatitude.text).toString()??''),
-          
+            // Text("Latitude: $intValue"??''),
+
+            // Text("Latitude2:" + num.tryParse(_controllerLatitude.text).toString()??''),
+
             Divider(color: dividerColor, thickness: 1.h, height: 1.h),
             Expanded(
                 flex: 1,
@@ -380,75 +394,72 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                       onTap: () {
                         pickImage();
                       },
-                      child: GetBuilder<CreateEventController>(
-                        init: CreateEventController(),
-                        builder: (controller) => imageFile == null
-                            ? Container(
-                                height: 155.h,
-                                decoration: BoxDecoration(
-                                    color: lightColor,
-                                    borderRadius: BorderRadius.circular(22.h)),
-                                child: DottedBorder(
-                                    dashPattern: const [6, 6],
-                                    color: accentColor,
-                                    strokeWidth: 1.h,
-                                    radius: Radius.circular(22.h),
-                                    borderType: BorderType.RRect,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Align(
-                                          alignment: Alignment.topCenter,
-                                          child: Container(
-                                            height: 48.h,
-                                            width: 48.h,
-                                            padding: EdgeInsets.all(14.h),
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                border: Border.all(
-                                                    color: accentColor,
-                                                    width: 1.h),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        13.h)),
-                                            child: getSvgImage("add.svg",
-                                                color: accentColor,
-                                                width: 20.h,
-                                                height: 20.h),
-                                          ),
+                      child: imageFile == null
+                          ? Container(
+                              height: 155.h,
+                              decoration: BoxDecoration(
+                                  color: lightColor,
+                                  borderRadius: BorderRadius.circular(22.h)),
+                              child: DottedBorder(
+                                  dashPattern: const [6, 6],
+                                  color: accentColor,
+                                  strokeWidth: 1.h,
+                                  radius: Radius.circular(22.h),
+                                  borderType: BorderType.RRect,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.topCenter,
+                                        child: Container(
+                                          height: 48.h,
+                                          width: 48.h,
+                                          padding: EdgeInsets.all(14.h),
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                  color: accentColor,
+                                                  width: 1.h),
+                                              borderRadius:
+                                                  BorderRadius.circular(13.h)),
+                                          child: getSvgImage("add.svg",
+                                              color: accentColor,
+                                              width: 20.h,
+                                              height: 20.h),
                                         ),
-                                        getVerSpace(10.h),
-                                        getCustomFont("Add Cover Image", 15.sp,
-                                            greyColor, 1,
-                                            fontWeight: FontWeight.w500,
-                                            txtHeight: 1.46.h),
-                                      ],
-                                    )),
-                              )
-                            : Container(
-                                height: 155,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(22.h),
-                                    image: DecorationImage(
-                                        image: FileImage(imageFile!),
-                                        fit: BoxFit.cover)),
-                              ),
-                      ),
+                                      ),
+                                      getVerSpace(10.h),
+                                      getCustomFont(("addCoverImage").tr(),
+                                          15.sp, greyColor, 1,
+                                          fontWeight: FontWeight.w500,
+                                          txtHeight: 1.46.h),
+                                    ],
+                                  )),
+                            )
+                          : Container(
+                              height: 155,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(22.h),
+                                  image: DecorationImage(
+                                      image: FileImage(imageFile!),
+                                      fit: BoxFit.cover)),
+                            ),
                     ),
 
                     getVerSpace(20.h),
-                    getCustomFont("Enter event title", 16.sp, Colors.black, 1,
+                    getCustomFont(
+                        ("enterEventTitle").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     getDefaultTextFiledWithLabel(
-                        context, "Enter event title", titleCtrl,
+                        context, ("enterEventTitle").tr(), titleCtrl,
                         isEnable: false, height: 60.h),
                     getVerSpace(20.h),
-                    getCustomFont("Event Category", 16.sp, Colors.black, 1,
+                    getCustomFont(
+                        ("eventCategory").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     Container(
@@ -485,14 +496,15 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                         },
                       ),
                     ),
-        
+
                     getVerSpace(20.h),
-              
-                    getCustomFont("Enter Description", 16.sp, Colors.black, 1,
+
+                    getCustomFont(
+                        ("enterDescription").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     getDefaultTextFiledWithLabel(
-                        context, "Enter description", descCtrl,
+                        context, ("enterDescription").tr(), descCtrl,
                         isEnable: false, height: 60.h, minLines: true),
                     // getVerSpace(20.h),
                     // getCustomFont("Event Type", 16.sp, Colors.black, 1,
@@ -567,7 +579,7 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                     // ),
 
                     getVerSpace(20.h),
-                    getCustomFont("Price", 16.sp, Colors.black, 1,
+                    getCustomFont(("price").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     TextFormField(
@@ -577,8 +589,8 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                           fontSize: 16.sp,
                           fontFamily: Constant.fontsFamily),
                       decoration: InputDecoration(
-                          hintText: 'Enter Price',
-                          labelText: 'Price',
+                          hintText: ('enterPrice').tr(),
+                          labelText: ("price").tr(),
                           counter: Container(),
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 20, horizontal: 20),
@@ -626,7 +638,7 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                       controller: priceCtrl,
                       keyboardType: TextInputType.number,
                       validator: (String? value) {
-                        if (value!.isEmpty) return "price can't be empty";
+                        if (value!.isEmpty) return ('priceCant').tr();
                         return null;
                       },
                       // onChanged: (String value){
@@ -639,11 +651,11 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                     //     context, "Enter price", priceCtrl,
                     //     isEnable: false, height: 60.h),
                     getVerSpace(20.h),
-                    getCustomFont("Date", 16.sp, Colors.black, 1,
+                    getCustomFont(("date").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     getDefaultTextFiledWithLabel(
-                        context, "Select date", dateCtrl,
+                        context, ('selectDate').tr(), dateCtrl,
                         isEnable: true,
                         height: 60.h,
                         withSufix: true,
@@ -661,7 +673,6 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                                 ),
                                 textButtonTheme: TextButtonThemeData(
                                   style: TextButton.styleFrom(
-                                    primary: accentColor, // button text color
                                   ),
                                 ),
                               ),
@@ -680,14 +691,14 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                       } else {}
                     }, isReadonly: true),
                     getVerSpace(20.h),
-                    getCustomFont("Time", 16.sp, Colors.black, 1,
+                    getCustomFont(('time').tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     Row(
                       children: [
                         Expanded(
                           child: getDefaultTextFiledWithLabel(
-                              context, "Start time", timeCtrl,
+                              context, ('startTime').tr(), timeCtrl,
                               isEnable: false,
                               height: 60.h,
                               isReadonly: true, onTap: () async {
@@ -735,71 +746,90 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                     ),
 
                     getVerSpace(20.h),
-                             getCustomFont("Venue Address", 16.sp, Colors.black, 1,
+                    getCustomFont(("venueAddress").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(4.h),
                     getDefaultTextFiledWithLabel(
-                        context, "Enter address", locCtrl,
+                        context, ("enterAddress").tr(), locCtrl,
                         isEnable: false, height: 60.h, minLines: true),
                     getVerSpace(20.h),
-         getCustomFont("Choose Location Address", 16.sp, Colors.black, 1,
+                    getCustomFont(
+                        ("chooseLocationAddress").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(10.h),
-                                 SizedBox(
-                      width: double.infinity,
-                      height: MediaQuery.of(context).size.height * .4,
-                      child: GoogleMap(
-                        mapType: MapType.normal,
-                        initialCameraPosition: CameraPosition(
-                          // target:  currentPosition == null? const LatLng(-6.1753924, 106.8249641): LatLng(currentPosition!.latitude, currentPosition!.longitude),
-                         target:const LatLng(40.730610, -73.935242),
-                          zoom: 10,
+                    Stack(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          height: MediaQuery.of(context).size.height * .4,
+                          child: GoogleMap(
+                            mapType: MapType.normal,
+                            initialCameraPosition: CameraPosition(
+                              // target:  currentPosition == null? const LatLng(-6.1753924, 106.8249641): LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                              target: const LatLng(40.730610, -73.935242),
+                              zoom: 10,
+                            ),
+                            markers: Set<Marker>.of(markers.values),
+                            // onMapCreated: onMapCreated,
+
+                            onCameraMove: (position) {
+                              setState(() {
+                                _controllerLatitude.text =
+                                    position.target.latitude.toString();
+                                _controllerLongitude.text =
+                                    position.target.longitude.toString();
+                              });
+
+                              if (markers.values.isNotEmpty) {
+                                MarkerId markerId = MarkerId(markerIdVal());
+                                Marker? marker = markers[markerId];
+                                Marker updatedMarker = marker!.copyWith(
+                                  positionParam: position.target,
+                                );
+                                setState(() {
+                                  markersgm(markerId, updatedMarker);
+                                });
+                              }
+                            },
+                            zoomControlsEnabled: false,
+                            zoomGesturesEnabled: true,
+                            myLocationEnabled: true,
+                            myLocationButtonEnabled: false,
+                          ),
                         ),
-                        markers: Set<Marker>.of(markers.values),
-                        onMapCreated: onMapCreated,
-                        
-                        onCameraMove: (position) {
-                          setState(() {
-      _controllerLatitude.text = position.target.latitude.toString();
-      _controllerLongitude.text = position.target.longitude.toString();
-    });
-  
-                          if (markers.values.isNotEmpty) {
-                            MarkerId markerId = MarkerId(markerIdVal());
-                            Marker? marker = markers[markerId];
-                            Marker updatedMarker = marker!.copyWith(
-                              positionParam: position.target,
-                            );
-                            setState(() {
-                              markersgm(markerId, updatedMarker);
-                            });
-                          }
-                        },
-                        zoomControlsEnabled: false,
-                        zoomGesturesEnabled: true,
-                        myLocationEnabled: true,
-                        myLocationButtonEnabled: false,
-                      ),
+                        Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  top:
+                                      MediaQuery.of(context).size.height * .17),
+                              child: Icon(
+                                Icons.location_on,
+                                color: Colors.red,
+                                size: 30,
+                              ),
+                            )),
+                      ],
                     ),
-         
+
                     getVerSpace(20.h),
-         getCustomFont("Latitude", 16.sp, Colors.black, 1,
+                    getCustomFont(("latitude").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(5.h),
-                      TextFormField(
+                    TextFormField(
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                           fontSize: 16.sp,
                           fontFamily: Constant.fontsFamily),
                       decoration: InputDecoration(
-                          hintText: 'Latitude',
-                          
+                          hintText: ("latitude").tr(),
                           counter: Container(),
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 16, horizontal: 20),
-                          isDense: true,prefixIcon:  Icon(Icons.multiple_stop),
-                          filled: true,  
+                          isDense: true,
+                          prefixIcon: Icon(Icons.multiple_stop),
+                          filled: true,
                           fillColor: Colors.white,
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(22.h),
@@ -840,7 +870,7 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                               fontSize: 16.sp,
                               fontFamily: Constant.fontsFamily)),
                       controller: _controllerLatitude,
-                      
+
                       keyboardType: TextInputType.number,
                       validator: (String? value) {
                         if (value!.isEmpty) return "Latitude can't be empty";
@@ -853,24 +883,24 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                       // },
                     ),
                     getVerSpace(10.h),
-                    
-         getCustomFont("Longitude", 16.sp, Colors.black, 1,
+
+                    getCustomFont(("longitude").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                     getVerSpace(5.h),
-                                 TextFormField(
+                    TextFormField(
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                           fontSize: 16.sp,
                           fontFamily: Constant.fontsFamily),
                       decoration: InputDecoration(
-                          hintText: 'Longitude',
-                          
+                          hintText: ("longitude").tr(),
                           counter: Container(),
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 16, horizontal: 20),
-                          isDense: true,prefixIcon:  Icon(Icons.multiple_stop),
-                          filled: true,  
+                          isDense: true,
+                          prefixIcon: Icon(Icons.multiple_stop),
+                          filled: true,
                           fillColor: Colors.white,
                           enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(22.h),
@@ -911,7 +941,7 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                               fontSize: 16.sp,
                               fontFamily: Constant.fontsFamily)),
                       controller: _controllerLongitude,
-                      
+
                       keyboardType: TextInputType.number,
                       validator: (String? value) {
                         if (value!.isEmpty) return "Longitude can't be empty";
@@ -923,24 +953,38 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
                       //   });
                       // },
                     ),
-         
-                 
-                  
-                   getVerSpace(30.h),
 
-                    loading == true
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              backgroundColor: Colors.white,
-                            ),
-                          )
-                        : getButton(
-                            context, accentColor, "Publish", Colors.white, () {
-                            handleUpdateData();
-                          }, 18.sp,
-                            weight: FontWeight.w700,
-                            borderRadius: BorderRadius.circular(22.h),
-                            buttonHeight: 60.h),
+                    getVerSpace(30.h),
+                    isButtonDisabled
+                        ? loading == true
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.white,
+                                ),
+                              )
+                            : getButton(
+                                context,
+                                accentColor,
+                                ("pleaseAddData").tr(),
+                                Colors.white,
+                                () {},
+                                18.sp,
+                                weight: FontWeight.w700,
+                                borderRadius: BorderRadius.circular(22.h),
+                                buttonHeight: 60.h)
+                        : loading == true
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.white,
+                                ),
+                              )
+                            : getButton(context, accentColor, ("publish").tr(),
+                                Colors.white, () {
+                                handleUpdateData();
+                              }, 18.sp,
+                                weight: FontWeight.w700,
+                                borderRadius: BorderRadius.circular(22.h),
+                                buttonHeight: 60.h),
                     getVerSpace(50.h),
                   ],
                 ))
@@ -950,266 +994,265 @@ num intValue = num.tryParse(_controllerLatitude.text)??0.0;
     );
   }
 
-  Column buildImageWidget() {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (controller.image1 == null) {
-              _onPictureSelection1();
-            }
-          },
-          child: GetBuilder<CreateEventController>(
-            init: CreateEventController(),
-            builder: (controller) => controller.image1 == null
-                ? Container(
-                    height: 155.h,
-                    decoration: BoxDecoration(
-                        color: lightColor,
-                        borderRadius: BorderRadius.circular(22.h)),
-                    child: DottedBorder(
-                        dashPattern: const [6, 6],
-                        color: accentColor,
-                        strokeWidth: 1.h,
-                        radius: Radius.circular(22.h),
-                        borderType: BorderType.RRect,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Align(
-                              alignment: Alignment.topCenter,
-                              child: Container(
-                                height: 48.h,
-                                width: 48.h,
-                                padding: EdgeInsets.all(14.h),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: accentColor, width: 1.h),
-                                    borderRadius: BorderRadius.circular(13.h)),
-                                child: getSvgImage("add.svg",
-                                    color: accentColor,
-                                    width: 20.h,
-                                    height: 20.h),
-                              ),
-                            ),
-                            getVerSpace(10.h),
-                            getCustomFont(
-                                "Add Cover Image", 15.sp, greyColor, 1,
-                                fontWeight: FontWeight.w500, txtHeight: 1.46.h),
-                          ],
-                        )),
-                  )
-                : Container(
-                    height: 155.h,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(22.h),
-                        image: DecorationImage(
-                            image: FileImage(controller.image1!),
-                            fit: BoxFit.fill)),
-                  ),
-          ),
-        ),
-        getVerSpace(20.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                if (controller.image2 == null) {
-                  _onPictureSelection2();
-                }
-              },
-              child: GetBuilder<CreateEventController>(
-                init: CreateEventController(),
-                builder: (controller) => controller.image2 == null
-                    ? Container(
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            color: lightColor,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        child: DottedBorder(
-                          dashPattern: const [6, 6],
-                          color: accentColor,
-                          strokeWidth: 1.h,
-                          padding: EdgeInsets.all(27.h),
-                          radius: Radius.circular(22.h),
-                          borderType: BorderType.RRect,
-                          child: getSvgImage("add.svg",
-                              color: accentColor, height: 24.h, width: 24.h),
-                        ),
-                      )
-                    : Container(
-                        width: 78.w,
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(22.h),
-                            image: DecorationImage(
-                                image: FileImage(controller.image2!),
-                                fit: BoxFit.fill)),
-                        padding: EdgeInsets.only(
-                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.onImage2Null();
-                          },
-                          child: getSvgImage("close.svg",
-                              width: 18.h, height: 18.h),
-                        ),
-                      ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                if (controller.image3 == null) {
-                  controller.getImage3();
-                }
-              },
-              child: GetBuilder<CreateEventController>(
-                init: CreateEventController(),
-                builder: (controller) => controller.image3 == null
-                    ? Container(
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            color: lightColor,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        child: DottedBorder(
-                          dashPattern: const [6, 6],
-                          color: accentColor,
-                          strokeWidth: 1.h,
-                          padding: EdgeInsets.all(27.h),
-                          radius: Radius.circular(22.h),
-                          borderType: BorderType.RRect,
-                          child: getSvgImage("add.svg",
-                              color: accentColor, height: 24.h, width: 24.h),
-                        ),
-                      )
-                    : Container(
-                        width: 78.w,
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(22.h),
-                            image: DecorationImage(
-                                image: FileImage(controller.image3!),
-                                fit: BoxFit.fill)),
-                        padding: EdgeInsets.only(
-                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.onImage3Null();
-                          },
-                          child: getSvgImage("close.svg",
-                              width: 18.h, height: 18.h),
-                        ),
-                      ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                if (controller.image4 == null) {
-                  controller.getImage4();
-                }
-              },
-              child: GetBuilder<CreateEventController>(
-                init: CreateEventController(),
-                builder: (controller) => controller.image4 == null
-                    ? Container(
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            color: lightColor,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        child: DottedBorder(
-                          dashPattern: const [6, 6],
-                          color: accentColor,
-                          strokeWidth: 1.h,
-                          padding: EdgeInsets.all(27.h),
-                          radius: Radius.circular(22.h),
-                          borderType: BorderType.RRect,
-                          child: getSvgImage("add.svg",
-                              color: accentColor, height: 24.h, width: 24.h),
-                        ),
-                      )
-                    : Container(
-                        width: 78.w,
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(22.h),
-                            image: DecorationImage(
-                                image: FileImage(controller.image4!),
-                                fit: BoxFit.fill)),
-                        padding: EdgeInsets.only(
-                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.onImage4Null();
-                          },
-                          child: getSvgImage("close.svg",
-                              width: 18.h, height: 18.h),
-                        ),
-                      ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                if (controller.image5 == null) {
-                  controller.getImage5();
-                }
-              },
-              child: GetBuilder<CreateEventController>(
-                init: CreateEventController(),
-                builder: (controller) => controller.image5 == null
-                    ? Container(
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            color: lightColor,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        child: DottedBorder(
-                          dashPattern: const [6, 6],
-                          color: accentColor,
-                          strokeWidth: 1.h,
-                          padding: EdgeInsets.all(27.h),
-                          radius: Radius.circular(22.h),
-                          borderType: BorderType.RRect,
-                          child: getSvgImage("add.svg",
-                              color: accentColor, height: 24.h, width: 24.h),
-                        ),
-                      )
-                    : Container(
-                        width: 78.w,
-                        height: 78.h,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(22.h),
-                            image: DecorationImage(
-                                image: FileImage(controller.image5!),
-                                fit: BoxFit.fill)),
-                        padding: EdgeInsets.only(
-                            top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-                        child: GestureDetector(
-                          onTap: () {
-                            controller.onImage5Null();
-                          },
-                          child: getSvgImage("close.svg",
-                              width: 18.h, height: 18.h),
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Column buildImageWidget() {
+  //   return Column(
+  //     children: [
+  //       GestureDetector(
+  //         onTap: () {
+  //           if (controller.image1 == null) {
+  //             _onPictureSelection1();
+  //           }
+  //         },
+  //         child: GetBuilder<CreateEventController>(
+  //           init: CreateEventController(),
+  //           builder: (controller) => controller.image1 == null
+  //               ? Container(
+  //                   height: 155.h,
+  //                   decoration: BoxDecoration(
+  //                       color: lightColor,
+  //                       borderRadius: BorderRadius.circular(22.h)),
+  //                   child: DottedBorder(
+  //                       dashPattern: const [6, 6],
+  //                       color: accentColor,
+  //                       strokeWidth: 1.h,
+  //                       radius: Radius.circular(22.h),
+  //                       borderType: BorderType.RRect,
+  //                       child: Column(
+  //                         mainAxisAlignment: MainAxisAlignment.center,
+  //                         crossAxisAlignment: CrossAxisAlignment.center,
+  //                         children: [
+  //                           Align(
+  //                             alignment: Alignment.topCenter,
+  //                             child: Container(
+  //                               height: 48.h,
+  //                               width: 48.h,
+  //                               padding: EdgeInsets.all(14.h),
+  //                               decoration: BoxDecoration(
+  //                                   color: Colors.white,
+  //                                   border: Border.all(
+  //                                       color: accentColor, width: 1.h),
+  //                                   borderRadius: BorderRadius.circular(13.h)),
+  //                               child: getSvgImage("add.svg",
+  //                                   color: accentColor,
+  //                                   width: 20.h,
+  //                                   height: 20.h),
+  //                             ),
+  //                           ),
+  //                           getVerSpace(10.h),
+  //                           getCustomFont(
+  //                               "Add Cover Image", 15.sp, greyColor, 1,
+  //                               fontWeight: FontWeight.w500, txtHeight: 1.46.h),
+  //                         ],
+  //                       )),
+  //                 )
+  //               : Container(
+  //                   height: 155.h,
+  //                   decoration: BoxDecoration(
+  //                       borderRadius: BorderRadius.circular(22.h),
+  //                       image: DecorationImage(
+  //                           image: FileImage(controller.image1!),
+  //                           fit: BoxFit.fill)),
+  //                 ),
+  //         ),
+  //       ),
+  //       getVerSpace(20.h),
+  //       Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           GestureDetector(
+  //             onTap: () {
+  //               if (controller.image2 == null) {
+  //                 _onPictureSelection2();
+  //               }
+  //             },
+  //             child: GetBuilder<CreateEventController>(
+  //               init: CreateEventController(),
+  //               builder: (controller) => controller.image2 == null
+  //                   ? Container(
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           color: lightColor,
+  //                           borderRadius: BorderRadius.circular(22.h)),
+  //                       child: DottedBorder(
+  //                         dashPattern: const [6, 6],
+  //                         color: accentColor,
+  //                         strokeWidth: 1.h,
+  //                         padding: EdgeInsets.all(27.h),
+  //                         radius: Radius.circular(22.h),
+  //                         borderType: BorderType.RRect,
+  //                         child: getSvgImage("add.svg",
+  //                             color: accentColor, height: 24.h, width: 24.h),
+  //                       ),
+  //                     )
+  //                   : Container(
+  //                       width: 78.w,
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           borderRadius: BorderRadius.circular(22.h),
+  //                           image: DecorationImage(
+  //                               image: FileImage(controller.image2!),
+  //                               fit: BoxFit.fill)),
+  //                       padding: EdgeInsets.only(
+  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+  //                       child: GestureDetector(
+  //                         onTap: () {
+  //                           controller.onImage2Null();
+  //                         },
+  //                         child: getSvgImage("close.svg",
+  //                             width: 18.h, height: 18.h),
+  //                       ),
+  //                     ),
+  //             ),
+  //           ),
+  //           GestureDetector(
+  //             onTap: () {
+  //               if (controller.image3 == null) {
+  //                 controller.getImage3();
+  //               }
+  //             },
+  //             child: GetBuilder<CreateEventController>(
+  //               init: CreateEventController(),
+  //               builder: (controller) => controller.image3 == null
+  //                   ? Container(
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           color: lightColor,
+  //                           borderRadius: BorderRadius.circular(22.h)),
+  //                       child: DottedBorder(
+  //                         dashPattern: const [6, 6],
+  //                         color: accentColor,
+  //                         strokeWidth: 1.h,
+  //                         padding: EdgeInsets.all(27.h),
+  //                         radius: Radius.circular(22.h),
+  //                         borderType: BorderType.RRect,
+  //                         child: getSvgImage("add.svg",
+  //                             color: accentColor, height: 24.h, width: 24.h),
+  //                       ),
+  //                     )
+  //                   : Container(
+  //                       width: 78.w,
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           borderRadius: BorderRadius.circular(22.h),
+  //                           image: DecorationImage(
+  //                               image: FileImage(controller.image3!),
+  //                               fit: BoxFit.fill)),
+  //                       padding: EdgeInsets.only(
+  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+  //                       child: GestureDetector(
+  //                         onTap: () {
+  //                           controller.onImage3Null();
+  //                         },
+  //                         child: getSvgImage("close.svg",
+  //                             width: 18.h, height: 18.h),
+  //                       ),
+  //                     ),
+  //             ),
+  //           ),
+  //           GestureDetector(
+  //             onTap: () {
+  //               if (controller.image4 == null) {
+  //                 controller.getImage4();
+  //               }
+  //             },
+  //             child: GetBuilder<CreateEventController>(
+  //               init: CreateEventController(),
+  //               builder: (controller) => controller.image4 == null
+  //                   ? Container(
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           color: lightColor,
+  //                           borderRadius: BorderRadius.circular(22.h)),
+  //                       child: DottedBorder(
+  //                         dashPattern: const [6, 6],
+  //                         color: accentColor,
+  //                         strokeWidth: 1.h,
+  //                         padding: EdgeInsets.all(27.h),
+  //                         radius: Radius.circular(22.h),
+  //                         borderType: BorderType.RRect,
+  //                         child: getSvgImage("add.svg",
+  //                             color: accentColor, height: 24.h, width: 24.h),
+  //                       ),
+  //                     )
+  //                   : Container(
+  //                       width: 78.w,
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           borderRadius: BorderRadius.circular(22.h),
+  //                           image: DecorationImage(
+  //                               image: FileImage(controller.image4!),
+  //                               fit: BoxFit.fill)),
+  //                       padding: EdgeInsets.only(
+  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+  //                       child: GestureDetector(
+  //                         onTap: () {
+  //                           controller.onImage4Null();
+  //                         },
+  //                         child: getSvgImage("close.svg",
+  //                             width: 18.h, height: 18.h),
+  //                       ),
+  //                     ),
+  //             ),
+  //           ),
+  //           GestureDetector(
+  //             onTap: () {
+  //               if (controller.image5 == null) {
+  //                 controller.getImage5();
+  //               }
+  //             },
+  //             child: GetBuilder<CreateEventController>(
+  //               init: CreateEventController(),
+  //               builder: (controller) => controller.image5 == null
+  //                   ? Container(
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           color: lightColor,
+  //                           borderRadius: BorderRadius.circular(22.h)),
+  //                       child: DottedBorder(
+  //                         dashPattern: const [6, 6],
+  //                         color: accentColor,
+  //                         strokeWidth: 1.h,
+  //                         padding: EdgeInsets.all(27.h),
+  //                         radius: Radius.circular(22.h),
+  //                         borderType: BorderType.RRect,
+  //                         child: getSvgImage("add.svg",
+  //                             color: accentColor, height: 24.h, width: 24.h),
+  //                       ),
+  //                     )
+  //                   : Container(
+  //                       width: 78.w,
+  //                       height: 78.h,
+  //                       decoration: BoxDecoration(
+  //                           borderRadius: BorderRadius.circular(22.h),
+  //                           image: DecorationImage(
+  //                               image: FileImage(controller.image5!),
+  //                               fit: BoxFit.fill)),
+  //                       padding: EdgeInsets.only(
+  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
+  //                       child: GestureDetector(
+  //                         onTap: () {
+  //                           controller.onImage5Null();
+  //                         },
+  //                         child: getSvgImage("close.svg",
+  //                             width: 18.h, height: 18.h),
+  //                       ),
+  //                     ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   AppBar buildAppBar() {
-    return getToolBar(() {
-      Navigator.of(context).pop();
-    },
-        title: getCustomFont("Create Event", 24.sp, Colors.black, 1,
-            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        leading: true,
-        
-        
-        );
+    return getToolBar(
+      () {
+        Navigator.of(context).pop();
+      },
+      title: getCustomFont(("createEvent").tr(), 24.sp, Colors.black, 1,
+          fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      leading: true,
+    );
   }
 }

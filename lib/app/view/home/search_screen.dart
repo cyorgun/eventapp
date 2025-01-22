@@ -9,6 +9,7 @@ import '../../widget/card4.dart';
 import '../../widget/empty_screen.dart';
 import '../bloc/search_bloc.dart';
 
+import 'package:easy_localization/easy_localization.dart';
 
 
 class SearchPage extends StatefulWidget {
@@ -52,8 +53,8 @@ class _SearchPageState extends State<SearchPage> {
                   top: 15, left: 15, bottom: 5, right: 15),
               child: Text(
                 context.watch<SearchBloc>().searchStarted == false
-                    ? 'Recent searchs'
-                    : 'We have found',
+                    ? ('Recent searchs').tr()
+                    : ('We have found').tr(),
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     fontSize: 18,
@@ -80,7 +81,7 @@ class _SearchPageState extends State<SearchPage> {
             fontSize: 16, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: "Search item" ,
+          hintText: ("Search item").tr() ,
           hintStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
@@ -99,7 +100,7 @@ class _SearchPageState extends State<SearchPage> {
         textInputAction: TextInputAction.search,
         onFieldSubmitted: (value) {
           if (value == '') {
-            openSnacbar(scaffoldKey, 'Type something!');
+            openSnacbar(scaffoldKey, ('Type something!').tr());
           } else {
             context.read<SearchBloc>().setSearchText(value);
             context.read<SearchBloc>().addToSearchList(value);

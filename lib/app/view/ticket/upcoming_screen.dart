@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evente/evente.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/base/color_data.dart';
@@ -13,6 +14,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:math' as math;
 
 import '../bloc/sign_in_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class UpComingScreen extends StatefulWidget {
   const UpComingScreen({Key? key}) : super(key: key);
@@ -173,11 +175,11 @@ class _UpComingScreenState extends State<UpComingScreen> {
           ),
           getAssetImage("ticket.png", height: 300.0, width: 400.0),
           getVerSpace(28.h),
-          getCustomFont("No have Ticket", 20.sp, Colors.black, 1,
+          getCustomFont(("No have Ticket").tr(), 20.sp, Colors.black, 1,
               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
           getVerSpace(8.h),
           getMultilineCustomFont(
-              "Explore more event and join get the ticket", 16.sp, Colors.black,
+              ("Explore more event and join get the ticket").tr(), 16.sp, Colors.black,
               fontWeight: FontWeight.w500, txtHeight: 1.5.h)
         ],
       ),
@@ -269,7 +271,7 @@ class itemData extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return Event.fromFirestore(e);
+            return EventBaru.fromFirestore(e,1);
           }).toList();
 
           DateTime? dateTime = events![i].date?.toDate();
@@ -301,11 +303,11 @@ class itemData extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                QrImage(
-                                  data: sb.name ?? '${events?[i].title!}',
-                                  version: QrVersions.auto,
-                                  size: 90.0,
-                                ),
+                                 QrImageView(
+                                    data:  '${events?[i].title!}',
+                                 version: QrVersions.auto,
+                                    size:80.0,
+                                  ),
                                 CustomPaint(
                                     size: Size(2.h, 105.h),
                                     painter: DashedLineVerticalPainter())
@@ -335,7 +337,7 @@ class itemData extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     getCustomFont(
-                                        "Ticket : ${events?[i].ticket.toString()}" ??
+                                        ("Ticket :").tr() + "${events?[i].ticket.toString()}" ??
                                             '',
                                         15.sp,
                                         Colors.black,
@@ -368,7 +370,7 @@ class itemData extends StatelessWidget {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 12.h, vertical: 6.h),
                                       child: getCustomFont(
-                                          "Free",
+                                          ("Free").tr(),
                                           15.sp,
                                           accentColor,
                                           1,

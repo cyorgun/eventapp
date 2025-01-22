@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:evente/modal/modal_event.dart';
@@ -31,7 +32,7 @@ if (bookmarkedList != null && bookmarkedList.isNotEmpty && bookmarkedList.length
         .where('title', whereIn: bookmarkedList)
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       });
 
     } else if(bookmarkedList == null || bookmarkedList.isEmpty){
@@ -51,14 +52,14 @@ print('bookmarkedList is empty or null');
         .where('title', whereIn: chunks[0])
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       }).then((value)async{
         await FirebaseFirestore.instance
         .collection(_collectionName)
         .where('title', whereIn: chunks[1])
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
         });
       });
 
@@ -76,14 +77,14 @@ print('bookmarkedList is empty or null');
         .where('title', whereIn: chunks[0])
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       }).then((value)async{
         await FirebaseFirestore.instance
         .collection(_collectionName)
         .where('title', whereIn: chunks[1])
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
         });
       }).then((value)async{
         await FirebaseFirestore.instance
@@ -91,7 +92,7 @@ print('bookmarkedList is empty or null');
         .where('title', whereIn: chunks[2])
         .get()
         .then((QuerySnapshot snap) {
-          d.addAll(snap.docs.map((e) => Event.fromFirestore(e)).toList());
+          d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
         });
       });
     }
@@ -106,7 +107,7 @@ print('bookmarkedList is empty or null');
 
   //   String _collectionName = 'event';
   //   String _fieldName = 'bookmarked items';
-  //   List<Event> data = [];
+  //   List<EventBaru> data = [];
   //   List<DocumentSnapshot> _snap = [];
 
   //   SharedPreferences sp = await SharedPreferences.getInstance();
@@ -125,7 +126,7 @@ print('bookmarkedList is empty or null');
   //     // .where('timestamp', whereIn: d)
   //     .get();
   //     _snap.addAll(rawData.docs);
-  //     data = _snap.map((e) => Event.fromFirestore(e)).toList();
+  //     data = _snap.map((e) => EventBaru.fromFirestore(e,1)).toList();
   //   }
 
     

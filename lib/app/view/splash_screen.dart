@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
+import 'package:event_app/app/view/home/home_screen.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,8 @@ afterSplash(){
       sb.getDataFromSp();
       b.getDataToSP();
     }
-        Constant.sendToNext(context, Routes.homeScreenRoute);
+    Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>new HomeScreen()));
+        // Constant.sendToNext(context, Routes.homeScreenRoute);
   }
 
 
@@ -59,7 +61,7 @@ afterSplash(){
 
   gotoSignInPage (){
     //  Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
-     Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new OnBoarding()));
+     Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>new OnBoarding()));
   }
 
   // _getIsFirst() async {

@@ -36,7 +36,6 @@ class SkipButton extends StatelessWidget {
     return  ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0.0,
-        primary: Colors.transparent,
       ),
       onPressed: onTap,
       child: Opacity(
@@ -79,7 +78,6 @@ class DoneButton extends StatelessWidget {
     return  ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0.0,
-        primary: Colors.transparent,
       ),
       onPressed: onTap,
       child: Opacity(

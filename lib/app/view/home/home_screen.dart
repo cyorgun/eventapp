@@ -13,6 +13,7 @@ import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 
 import 'cardSlider/cardSlider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'tab/tab_favourite.dart';
 import 'tab/tab_home.dart';
 import 'tab/tab_profile.dart';
@@ -26,9 +27,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  void backClick() {
-    Constant.closeApp();
-  }
+
 
   @override
   void initState() {
@@ -56,11 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   final List<Widget> _widgetOptions = [
-    const TabHome(),
-    const TabFavourite(),
-    MapsScreenT1(),
-    const TabTicket(),
-    const TabProfile()
+    const showCaseHome(),
+     showCaseFavorite(),
+        showCaseMaps(),
+    const showCaseTicket(),
+    const showCaseProfile()
   ];
 
   @override

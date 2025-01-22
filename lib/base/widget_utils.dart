@@ -444,7 +444,7 @@ AppBar getToolBar(Function function, {Widget? title, bool leading = true}) {
                 },
                 child:
                     getSvgImage("arrow_back.svg", height: 24.h, width: 24.h)))
-        : null,
+        : Icon(Icons.add,color: Colors.transparent,)
   );
 }
 

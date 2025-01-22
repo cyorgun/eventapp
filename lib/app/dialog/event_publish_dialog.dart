@@ -68,8 +68,8 @@ class _EventpublishDialogState extends State<EventpublishDialog> {
                     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                 getVerSpace(30.h),
                 getButton(context, accentColor, "Finish", Colors.white, () {
-                      Navigator.pop(context);
-                  // Get.back();
+                     Navigator.pop(context);
+                  //  Get.back();
                   controller.onChange(1.obs);
                 }, 18.sp,
                     weight: FontWeight.w700,

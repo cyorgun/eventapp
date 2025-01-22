@@ -6,9 +6,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
@@ -25,13 +26,8 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
 
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
-  String dropdownvalue = 'Female';
-
-  var items = ['Female', "Male"];
 
  String? name;
   String? imageUrl;
@@ -91,7 +87,7 @@ class _EditProfileState extends State<EditProfile> {
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              'No internet',
+              ('No internet').tr(),
               textAlign: TextAlign.center,
             ),
           ),
@@ -111,7 +107,7 @@ class _EditProfileState extends State<EditProfile> {
           SnackBar(
             backgroundColor: Colors.redAccent,
             content: Text(
-              'Upload Success',
+              ('Upload Success').tr(),
               textAlign: TextAlign.center,
             ),
           ),
@@ -127,7 +123,7 @@ class _EditProfileState extends State<EditProfile> {
           SnackBar(
             backgroundColor: Colors.blue,
             content: Text(
-              'Update Success',
+              ('Update Success').tr(),
               textAlign: TextAlign.center,
             ),
           ),
@@ -157,125 +153,120 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     final sb = context.watch<SignInBloc>();
     setStatusBarColor(Colors.white);
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getCustomFont("Edit Profile", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        ),
-        body: SafeArea(
-          child:
-            Form(
-              key: formKey,
-            child: Column(
-              children: [
-            getVerSpace(15.h),
-                InkWell(
-                  child: CircleAvatar(
-                  radius: 70,
-                  backgroundColor: Colors.grey[300],
-                    child: Container(
-                    height: 120,
-                    width: 120,
-                    
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 1,
-                          color: Colors.grey[800]!
-                        ),
-                        
-                        color: Colors.grey[500],
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            image: (imageFile == null ? CachedNetworkImageProvider(sb.imageUrl!) : FileImage(imageFile!)) as ImageProvider<Object>,
-                            fit: BoxFit.cover)),
-                    // ignore: prefer_const_constructors
-                    child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: const Icon(
-                          Icons.edit,
-                          size: 30,
-                          color: Colors.black,
-                        )),
-                  ),
-                ),
-                onTap: (){
-                  pickImage();
-                },
-            ),
-
-      getDivider(
-                  dividerColor,
-                  1.h,
-                ),
-                Expanded(
-                    flex: 1,
-                    child: ListView(
-                      padding: EdgeInsets.symmetric(horizontal: 20.h),
-                      primary: true,
-                      shrinkWrap: true,
-                      children: [
-                        getVerSpace(10.h),
-                      
-                        // getAssetImage("profile_image.png",
-                            // width: 110.h, height: 110.h),
-                        getVerSpace(30.h),
-                        getCustomFont('Full Name', 16.sp, Colors.black, 1,
-                            fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                        getVerSpace(4.h),
-                        getDefaultTextFiledWithLabel(
-                          context,
-                          sb.name??"",
-                          nameCtrl,
-                          isEnable: false,
-                          height: 60.h,
-                           validator: (value){
-                  if (value!.length == 0) return "Name can't be empty";
-                  return null;
-                },
-                        ),
-                        getVerSpace(20.h),
-                      
-                        getCustomFont('Phone Number', 16.sp, Colors.black, 1,
-                            fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                        getVerSpace(4.h),
-                        getDefaultTextFiledWithLabel2(context,
-                            sb.phone??"", 
-                            phoneCtrl,
-                            isEnable: false,
-                            
-                            height: 60.h, validator: (value){
-                  if (value!.length == 0) return "Phone can't be empty";
-                  return null;
-                },
-                          ),
-                      ],
-                    )),
-                getPaddingWidget(
-                  EdgeInsets.symmetric(horizontal: 20.h),
-                 loading == true 
-                  ? Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
-                  :   getButton(context, accentColor, "Save", Colors.white, () {
-                  handleUpdateData();
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      appBar: getToolBar(
+        () {
+          
+        Navigator.of(context).pop();
+        },
+        title: getCustomFont(("Edit Profile").tr(), 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      ),
+      body: SafeArea(
+        child:
+          Form(
+            key: formKey,
+          child: Column(
+            children: [
+          getVerSpace(15.h),
+              InkWell(
+                child: CircleAvatar(
+                radius: 70,
+                backgroundColor: Colors.grey[300],
+                  child: Container(
+                  height: 120,
+                  width: 120,
                   
-        sb.saveDataToSP();
-                  }, 18.sp,
-                      weight: FontWeight.w700,
-                      buttonHeight: 60.h,
-                      borderRadius: BorderRadius.circular(22.h)),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: Colors.grey[800]!
+                      ),
+                      
+                      color: Colors.grey[500],
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: (imageFile == null ? CachedNetworkImageProvider(sb.imageUrl!) : FileImage(imageFile!)) as ImageProvider<Object>,
+                          fit: BoxFit.cover)),
+                  // ignore: prefer_const_constructors
+                  child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: const Icon(
+                        Icons.edit,
+                        size: 30,
+                        color: Colors.black,
+                      )),
                 ),
-                getVerSpace(30.h)
-              ],
-            ),
+              ),
+              onTap: (){
+                pickImage();
+              },
+          ),
+
+    getDivider(
+                dividerColor,
+                1.h,
+              ),
+              Expanded(
+                  flex: 1,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 20.h),
+                    primary: true,
+                    shrinkWrap: true,
+                    children: [
+                      getVerSpace(10.h),
+                    
+                      // getAssetImage("profile_image.png",
+                          // width: 110.h, height: 110.h),
+                      getVerSpace(30.h),
+                      getCustomFont(('Full Name').tr(), 16.sp, Colors.black, 1,
+                          fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                      getVerSpace(4.h),
+                      getDefaultTextFiledWithLabel(
+                        context,
+                        sb.name??"",
+                        nameCtrl,
+                        isEnable: false,
+                        height: 60.h,
+                         validator: (value){
+                if (value!.length == 0) return ("Name can't be empty").tr();
+                return null;
+              },
+                      ),
+                      getVerSpace(20.h),
+                    
+                      getCustomFont(('Phone Number').tr(), 16.sp, Colors.black, 1,
+                          fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                      getVerSpace(4.h),
+                      getDefaultTextFiledWithLabel2(context,
+                          sb.phone??"", 
+                          phoneCtrl,
+                          isEnable: false,
+                          
+                          height: 60.h, validator: (value){
+                if (value!.length == 0) return ("Phone can't be empty").tr();
+                return null;
+              },
+                        ),
+                    ],
+                  )),
+              getPaddingWidget(
+                EdgeInsets.symmetric(horizontal: 20.h),
+               loading == true 
+                ? Center(child: CircularProgressIndicator(backgroundColor: Colors.white,),)
+                :   getButton(context, accentColor, ("Save").tr(), Colors.white, () {
+                handleUpdateData();
+                
+      sb.saveDataToSP();
+                }, 18.sp,
+                    weight: FontWeight.w700,
+                    buttonHeight: 60.h,
+                    borderRadius: BorderRadius.circular(22.h)),
+              ),
+              getVerSpace(30.h)
+            ],
           ),
         ),
       ),

@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evente/evente.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/featured_event/payment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:evente/evente.dart';
@@ -20,22 +20,18 @@ import '../../dialog/ticket_confirm_dialog.dart';
 import '../bloc/sign_in_bloc.dart';
 import '../ticket/ticket_detail.dart';
 import 'package:http/http.dart' as http;
+import 'package:easy_localization/easy_localization.dart';
 
 class BuyTicket extends StatefulWidget {
- Event? event;
-  BuyTicket({
-    Key? key,
-   this.event
-  }) : super(key: key);
+  EventBaru? event;
+  BuyTicket({Key? key, this.event}) : super(key: key);
 
   @override
   State<BuyTicket> createState() => _BuyTicketState();
 }
 
 class _BuyTicketState extends State<BuyTicket> {
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
   int _itemCount = 1;
 
@@ -52,28 +48,76 @@ class _BuyTicketState extends State<BuyTicket> {
 
   @override
   Widget build(BuildContext context) {
-
-     final Event event = widget.event!;
+    final EventBaru event = widget.event!;
     final sb = context.watch<SignInBloc>();
-      void addData() {
+    void addData() {
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
         FirebaseFirestore.instance
             .collection("JoinEvent")
             .doc("user")
-            .collection(widget.event?.title??'')
+            .collection(widget.event?.title ?? '')
             .doc(sb.uid)
-            .set({
-          "name": sb.name,
-          "uid": sb.uid,
-          "photoProfile": sb.imageUrl
-        });
+            .set({"name": sb.name, "uid": sb.uid, "photoProfile": sb.imageUrl});
       });
     }
 
+    void addEvent() {
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        final eventDocRef = FirebaseFirestore.instance
+            .collection("event")
+            .doc(widget.event?.id ?? '');
+        final snapshot = await transaction.get(eventDocRef);
 
+        if (snapshot.exists) {
+          final existingData = snapshot.data();
+          final newData = {
+            "name": sb.name,
+            "uid": sb.uid,
+            "photoProfile": sb.imageUrl,
+          };
 
-     void userSaved() {
+          if (existingData != null && existingData.containsKey("joinEvent")) {
+            final joinEventData =
+                Map<String, dynamic>.from(existingData["joinEvent"]);
+            FirebaseFirestore.instance
+                .collection('event')
+                .doc(widget.event?.id)
+                .update({'join': FieldValue.increment(1)});
+            if (!joinEventData.containsKey(sb.uid)) {
+              joinEventData[sb.uid ?? ''] = newData;
+            } else {
+              // Jika user sudah ada, update field yang sesuai
+              joinEventData[sb.uid]["name"] = sb.name;
+              joinEventData[sb.uid]["uid"] = sb.uid;
+              joinEventData[sb.uid]["photoProfile"] = sb.imageUrl;
+            }
+
+            transaction.update(eventDocRef, {"joinEvent": joinEventData});
+            FirebaseFirestore.instance
+                .collection('event')
+                .doc(widget.event?.id)
+                .update({'join': FieldValue.increment(1)});
+            // transaction.update(eventDocRef, {"paymentType": "COD"});
+          } else {
+            transaction.update(eventDocRef, {
+              "joinEvent": {sb.uid: newData}
+            });
+            FirebaseFirestore.instance
+                .collection('event')
+                .doc(widget.event?.id)
+                .update({'join': FieldValue.increment(1)});
+            // transaction.update(eventDocRef, {"paymentType": "COD"});
+          }
+        }
+      }).then((value) {
+        print('Data map dengan array berhasil ditambahkan ke joinEvent.');
+      }).catchError((error) {
+        print('Error: $error');
+      });
+    }
+
+    void userSaved() {
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
         SharedPreferences prefs;
@@ -85,360 +129,365 @@ class _BuyTicketState extends State<BuyTicket> {
             .add({
           "uid": sb.uid,
           "user": sb.name,
-          "category":event.category,
-          "date":event.date,
-          "description":event.description,
-          "id":event.id,
-          "image":event.image,
-          "location":event.location,
-          "mapsLangLink":event.mapsLangLink,
-          "mapsLatLink":event.mapsLatLink,
-          "price":totalPrice,
-          "title":event.title,
-          "type":event.type,
-          "userDesc":event.userDesc,
-          "userName":event.userName,
-          "userProfile":event.userProfile,
-          "ticket":_itemCount
+          "category": event.category,
+          "date": event.date,
+          "description": event.description,
+          "id": event.id,
+          "image": event.image,
+          "location": event.location,
+          "mapsLangLink": event.mapsLangLink,
+          "mapsLatLink": event.mapsLatLink,
+          "price": totalPrice,
+          "title": event.title,
+          "type": event.type,
+          "userDesc": event.userDesc,
+          "userName": event.userName,
+          "userProfile": event.userProfile,
+          "ticket": _itemCount
         });
       });
       Navigator.pop(context);
     }
 
-
     setStatusBarColor(Colors.white);
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getCustomFont("Buy Ticket", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-              Expanded(
-                  flex: 1,
-                  child: ListView(
-                    children: [
-                      getVerSpace(30.h),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: getCustomFont(
-                                "Price", 16.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                          ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: getToolBar(
+        () {
+          Navigator.of(context).pop();
+        },
+        title: getCustomFont(("buyTicket").tr(), 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Divider(color: dividerColor, thickness: 1.h, height: 1.h),
+            Expanded(
+                flex: 1,
+                child: ListView(
+                  children: [
+                    getVerSpace(30.h),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: getCustomFont(
+                              ("price").tr(), 16.sp, Colors.black, 1,
+                              fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                        ),
 
-                          getVerSpace(10.h),
-                          GestureDetector(
-                            onTap: () {
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 20.h),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(22.h),
-                                  border: Border.all(
-                                      color: borderColor, width: 1.h)),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 18.h, vertical: 18.h),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // GetX<BuyTicketController>(
-                                      //   builder: (controller) => getSvgImage(
-                                      //       controller.select.value == 0
-                                      //           ? "checkRadio.svg"
-                                      //           : "uncheckRadio.svg",
-                                      //       width: 24.h,
-                                      //       height: 24.h),
-                                      //   init: BuyTicketController(),
-                                      // ),
-                                      getHorSpace(10.h),
-                                      getCustomFont("Ticket Price", 16.sp,
-                                          Colors.black, 1,
-                                          fontWeight: FontWeight.w500,
-                                          txtHeight: 1.5.h)
-                                    ],
-                                  ),
-                                  getCustomFont("\$ " + event.price.toString(),
-                                      18.sp, Colors.black, 1,
-                                      fontWeight: FontWeight.w600,
-                                      txtHeight: 1.5.h)
-                                ],
-                              ),
-                            ),
-                          ),
-                          getVerSpace(20.h),
-                          // GestureDetector(
-                          //   onTap: () {
-                          //     controller.onChange(1.obs);
-                          //   },
-                          //   child: Container(
-                          //     margin: EdgeInsets.symmetric(horizontal: 20.h),
-                          //     decoration: BoxDecoration(
-                          //         color: Colors.white,
-                          //         borderRadius: BorderRadius.circular(22.h),
-                          //         border: Border.all(color: borderColor, width: 1.h)),
-                          //     padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //       children: [
-                          //         Row(
-                          //           children: [
-                          //             GetX<BuyTicketController>(
-                          //               builder: (controller) => getSvgImage(
-                          //                   controller.select.value == 1
-                          //                       ? "checkRadio.svg"
-                          //                       : "uncheckRadio.svg",
-                          //                   width: 24.h,
-                          //                   height: 24.h),
-                          //               init: BuyTicketController(),
-                          //             ),
-                          //             getHorSpace(10.h),
-                          //             getCustomFont("Economy", 16.sp, Colors.black, 1,
-                          //                 fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-                          //           ],
-                          //         ),
-                          //         getCustomFont("\$21.00", 18.sp, Colors.black, 1,
-                          //             fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                      getVerSpace(30.h),
-                    
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: getCustomFont(
-                                "Quantity Seat", 16.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                          ),
-                          // getPaddingWidget(
-                          //   EdgeInsets.symmetric(horizontal: 20.h),
-                          //   Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       getCustomFont("64", 16.sp, Colors.black, 1,
-                          //           fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                          //       getCustomFont("People joined", 15.sp, greyColor, 1,
-                          //           fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-                          //     ],
-                          //   ),
-                          // ),
-                          getVerSpace(10.h),
-                          Container(
+                        getVerSpace(10.h),
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 20.h),
                             decoration: BoxDecoration(
                                 color: Colors.white,
-                                border:
-                                    Border.all(color: borderColor, width: 1.h),
-                                borderRadius: BorderRadius.circular(22.h)),
+                                borderRadius: BorderRadius.circular(22.h),
+                                border: Border.all(
+                                    color: borderColor, width: 1.h)),
                             padding: EdgeInsets.symmetric(
-                                horizontal: 6.h, vertical: 6.h),
+                                horizontal: 18.h, vertical: 18.h),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
                               children: [
-                                GestureDetector(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: accentColor,
-                                        borderRadius:
-                                            BorderRadius.circular(18.h)),
-                                    height: 68.h,
-                                    width: 68.h,
-                                    padding: EdgeInsets.all(22.h),
-                                    child: getSvgImage("minus.svg",
-                                    color: Colors.white,
-                                        width: 24.h, height: 24.h),
-                                  ),
-                                  onTap: () {
-                                    if (_itemCount == 1) {
-                                    } else {
-                                      _itemCount--;
-                                      setState(() {
-                                        // totalPrice = controller.count.value * widget.price;
-                                        var prices = event.price ?? 0;
-                                        totalPrice = _itemCount * prices;
-                                      });
-                                      //  controller.countChange(controller.count.obs.value--);
-                                    }
-                                  },
+                                Row(
+                                  children: [
+                                    // GetX<BuyTicketController>(
+                                    //   builder: (controller) => getSvgImage(
+                                    //       controller.select.value == 0
+                                    //           ? "checkRadio.svg"
+                                    //           : "uncheckRadio.svg",
+                                    //       width: 24.h,
+                                    //       height: 24.h),
+                                    //   init: BuyTicketController(),
+                                    // ),
+                                    getHorSpace(10.h),
+                                    getCustomFont(("ticketPrice").tr(), 16.sp,
+                                        Colors.black, 1,
+                                        fontWeight: FontWeight.w500,
+                                        txtHeight: 1.5.h)
+                                  ],
                                 ),
-                                getCustomFont(_itemCount.toString(), 22.sp,
-                                    Colors.black, 1,
-                                    fontWeight: FontWeight.w700,
-                                    txtHeight: 1.5.h),
-                                GestureDetector(
-                                  onTap: () {
-                                    _itemCount++;
-                                    // controller.countChange(controller.count.obs.value++);
-                                    setState(() {
-                                      var prices = event.price ?? 0;
-                                      // totalPrice = controller.count.value * widget.price;
-                                      totalPrice = _itemCount * prices;
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: accentColor,
-                                        borderRadius:
-                                            BorderRadius.circular(18.h)),
-                                    height: 68.h,
-                                    width: 68.h,
-                                    padding: EdgeInsets.all(22.h),
-                                    child: getSvgImage("add.svg",
-                                        width: 24.h,
-                                        height: 24.h,
-                                        color: Colors.white),
-                                  ),
-                                )
+                                getCustomFont("\$ " + event.price.toString(),
+                                    18.sp, Colors.black, 1,
+                                    fontWeight: FontWeight.w600,
+                                    txtHeight: 1.5.h)
                               ],
                             ),
                           ),
-
-
- Padding(
-                            padding: const EdgeInsets.only(left: 20.0,top: 40.0),
-                            child: getCustomFont(
-                                "Who Joins event " + (event.title ??"") , 16.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                        ),
+                        getVerSpace(20.h),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     controller.onChange(1.obs);
+                        //   },
+                        //   child: Container(
+                        //     margin: EdgeInsets.symmetric(horizontal: 20.h),
+                        //     decoration: BoxDecoration(
+                        //         color: Colors.white,
+                        //         borderRadius: BorderRadius.circular(22.h),
+                        //         border: Border.all(color: borderColor, width: 1.h)),
+                        //     padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
+                        //     child: Row(
+                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //       children: [
+                        //         Row(
+                        //           children: [
+                        //             GetX<BuyTicketController>(
+                        //               builder: (controller) => getSvgImage(
+                        //                   controller.select.value == 1
+                        //                       ? "checkRadio.svg"
+                        //                       : "uncheckRadio.svg",
+                        //                   width: 24.h,
+                        //                   height: 24.h),
+                        //               init: BuyTicketController(),
+                        //             ),
+                        //             getHorSpace(10.h),
+                        //             getCustomFont("Economy", 16.sp, Colors.black, 1,
+                        //                 fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+                        //           ],
+                        //         ),
+                        //         getCustomFont("\$21.00", 18.sp, Colors.black, 1,
+                        //             fontWeight: FontWeight.w600, txtHeight: 1.5.h)
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                    getVerSpace(30.h),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: getCustomFont(
+                              ("quantitySeat").tr(), 16.sp, Colors.black, 1,
+                              fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                        ),
+                        // getPaddingWidget(
+                        //   EdgeInsets.symmetric(horizontal: 20.h),
+                        //   Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     children: [
+                        //       getCustomFont("64", 16.sp, Colors.black, 1,
+                        //           fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                        //       getCustomFont("People joined", 15.sp, greyColor, 1,
+                        //           fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+                        //     ],
+                        //   ),
+                        // ),
+                        getVerSpace(10.h),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 20.h),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border:
+                                  Border.all(color: borderColor, width: 1.h),
+                              borderRadius: BorderRadius.circular(22.h)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 6.h, vertical: 6.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: accentColor,
+                                      borderRadius:
+                                          BorderRadius.circular(18.h)),
+                                  height: 68.h,
+                                  width: 68.h,
+                                  padding: EdgeInsets.all(22.h),
+                                  child: getSvgImage("minus.svg",
+                                      color: Colors.white,
+                                      width: 24.h,
+                                      height: 24.h),
+                                ),
+                                onTap: () {
+                                  if (_itemCount == 1) {
+                                  } else {
+                                    _itemCount--;
+                                    setState(() {
+                                      // totalPrice = controller.count.value * widget.price;
+                                      var prices = event.price ?? 0;
+                                      totalPrice = _itemCount * prices;
+                                    });
+                                    //  controller.countChange(controller.count.obs.value--);
+                                  }
+                                },
+                              ),
+                              getCustomFont(_itemCount.toString(), 22.sp,
+                                  Colors.black, 1,
+                                  fontWeight: FontWeight.w700,
+                                  txtHeight: 1.5.h),
+                              GestureDetector(
+                                onTap: () {
+                                  _itemCount++;
+                                  // controller.countChange(controller.count.obs.value++);
+                                  setState(() {
+                                    var prices = event.price ?? 0;
+                                    // totalPrice = controller.count.value * widget.price;
+                                    totalPrice = _itemCount * prices;
+                                  });
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: accentColor,
+                                      borderRadius:
+                                          BorderRadius.circular(18.h)),
+                                  height: 68.h,
+                                  width: 68.h,
+                                  padding: EdgeInsets.all(22.h),
+                                  child: getSvgImage("add.svg",
+                                      width: 24.h,
+                                      height: 24.h,
+                                      color: Colors.white),
+                                ),
+                              )
+                            ],
                           ),
-                             StreamBuilder(
-                               stream: FirebaseFirestore.instance
-                                   .collection("JoinEvent")
-                                   .doc("user")
-                                   .collection(event.title ?? '')
-                                   .snapshots(),
-                               builder: (BuildContext ctx,
-                                   AsyncSnapshot<QuerySnapshot> snapshot) {
-                                 return snapshot.hasData
-                                     ? new joinEvent(
-                                         list: snapshot.data?.docs,
-                                       )
-                                     : Container();
-                               },
-                             ),
-                        ],
-                      ),
-                    ],
-                  )),
-              getPaddingWidget(
-                EdgeInsets.symmetric(horizontal: 20.h),
-                Column(
-                  children: [
-                   if(event.price!>0)   Row(
+                        ),
+
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 20.0, top: 40.0),
+                          child: getCustomFont(
+                              ("WhoJoinsevent").tr() + (event.title ?? ""),
+                              16.sp,
+                              Colors.black,
+                              1,
+                              fontWeight: FontWeight.w600,
+                              txtHeight: 1.5.h),
+                        ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 20.0, top: 10.0),
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("JoinEvent")
+                                .doc("user")
+                                .collection(event.title ?? '')
+                                .snapshots(),
+                            builder: (BuildContext ctx,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              return snapshot.hasData
+                                  ? new joinEvents(
+                                      list: snapshot.data?.docs,
+                                    )
+                                  : Container();
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )),
+            getPaddingWidget(
+              EdgeInsets.symmetric(horizontal: 20.h),
+              Column(
+                children: [
+                  if (event.price! > 0)
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        getCustomFont("Total", 22.sp, Colors.black, 1,
+                        getCustomFont(("total").tr(), 22.sp, Colors.black, 1,
                             fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                         getCustomFont("\$ " + totalPrice.toString() ?? '',
                             22.sp, accentColor, 1,
                             fontWeight: FontWeight.w700, txtHeight: 1.5.h)
                       ],
                     ),
-                    getVerSpace(30.h),
-                               Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        getButton(
-                            context, accentColor, "Checkout COD", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
-                           
-                           
-                            () async {
-                          Constant.sendToNext(context, Routes.paymentRoute);
-                          showDialog(
-                              builder: (context) {
-                                return const TicketConfirmDialog();
-                              },
-                              context: context);
-                          userSaved();
-                          addData();
+                  getVerSpace(30.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      getButton(
+                          context, accentColor, ("Checkout COD").tr(), Colors.white,
+                          buttonWidth: MediaQuery.of(context).size.width /
+                              2.5, () async {
+                                   Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => PaymentScreen()));
+               
+                        // Constant.sendToNext(context, Routes.paymentRoute);
+                        showDialog(
+                            builder: (context) {
+                              return const TicketConfirmDialog();
+                            },
+                            context: context);
+                        userSaved();
+                        addEvent();
+                        addData();
 
-                          Navigator.of(context).pushReplacement(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => TicketDetail(
-                                    event: widget.event,
+                        Navigator.of(context)
+                            .pushReplacement(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => TicketDetail(
+                                      event: widget.event,
+                                    )));
+                      }, 18.sp,
+                          weight: FontWeight.w700,
+                          buttonHeight: 60.h,
+                          borderRadius: BorderRadius.circular(22.h)),
+                      getVerSpace(30.h),
+                      if (event.price! > 0)
+                        getButton(context, accentColor, ("Checkout Payment").tr(),
+                            Colors.white,
+                            buttonWidth: MediaQuery.of(context).size.width /
+                                2.5, () async {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => PaymentScreen(
+                                    event: event,
                                   )));
-                        }, 18.sp,
-                            weight: FontWeight.w700,
-                            buttonHeight: 60.h,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        getVerSpace(30.h),
-                                  if(event.price!>0)
-                 getButton(
-                            context, accentColor, "Checkout Payment", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
-                            () async {
-                                Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => PaymentScreen(
-                               event: event,
-                              )));
                           // await makePayment();
                         }, 18.sp,
                             weight: FontWeight.w700,
                             buttonHeight: 60.h,
                             borderRadius: BorderRadius.circular(22.h)),
-                        getVerSpace(30.h),
-
-                         if(event.price==0)   getButton(context, accentColor, "Booking", Colors.white,buttonWidth: MediaQuery.of(context).size.width/2.5,
-                        () async {
-                          
-                          
-                        userSaved();
-                        addData();
-                      Constant.sendToNext(context, Routes.paymentRoute);
-                      showDialog(
-                          builder: (context) {
-                            return const TicketConfirmDialog();
-                          },
-                          context: context);
-                        Navigator.of(context).pushReplacement(PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => TicketDetail(
-                               event: event,
-                              )));
-
-                    }, 18.sp,
-                        weight: FontWeight.w700,
-                        buttonHeight: 60.h,
-                        borderRadius: BorderRadius.circular(22.h)),
-           
-       
-                      ],
-                    ),
-        
-                     
+                      getVerSpace(30.h),
+                      if (event.price == 0)
+                        getButton(
+                            context, accentColor, ("Booking").tr(), Colors.white,
+                            buttonWidth: MediaQuery.of(context).size.width /
+                                2.5, () async {
+                          userSaved();
+                          addData();
+                             Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => PaymentScreen()));
                
-                    getVerSpace(30.h), 
-                  ],
-                ),
-              )
-            ],
-          ),
+                          // Constant.sendToNext(context, Routes.paymentRoute);
+                          showDialog(
+                              builder: (context) {
+                                return const TicketConfirmDialog();
+                              },
+                              context: context);
+                          Navigator.of(context)
+                              .pushReplacement(PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) => TicketDetail(
+                                        event: event,
+                                      )));
+                        }, 18.sp,
+                            weight: FontWeight.w700,
+                            buttonHeight: 60.h,
+                            borderRadius: BorderRadius.circular(22.h)),
+                    ],
+                  ),
+                  getVerSpace(30.h),
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );
   }
- Future<void> makePayment() async {
+
+  Future<void> makePayment() async {
     try {
       paymentIntent = await createPaymentIntent(totalPrice.toString(), 'USD');
 
@@ -460,8 +509,6 @@ class _BuyTicketState extends State<BuyTicket> {
     }
   }
 
-
-  
   displayPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
@@ -477,7 +524,7 @@ class _BuyTicketState extends State<BuyTicket> {
                         size: 100.0,
                       ),
                       SizedBox(height: 10.0),
-                      Text("Payment Successful!"),
+                      Text(("Payment Successful!").tr()),
                     ],
                   ),
                 ));
@@ -493,12 +540,12 @@ class _BuyTicketState extends State<BuyTicket> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children: const [
+              children:  [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
                 ),
-                Text("Payment Failed"),
+                Text(("Payment Failed").tr()),
               ],
             ),
           ],
@@ -536,109 +583,106 @@ class _BuyTicketState extends State<BuyTicket> {
     final calculatedAmout = (int.parse(amount)) * 100;
     return calculatedAmout.toString();
   }
-
 }
-  // Column buildTicketTypeWidget() {
-  //   return Column(
-  //     children: [
-  //       getPaddingWidget(
-  //         EdgeInsets.symmetric(horizontal: 20.h),
-  //         getCustomFont("Ticket Type", 16.sp, Colors.black, 1,
-  //             fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-  //       ),
-  //       getVerSpace(10.h),
-  //       GestureDetector(
-  //         onTap: () {
-  //           controller.onChange(0.obs);
-  //         },
-  //         child: Container(
-  //           margin: EdgeInsets.symmetric(horizontal: 20.h),
-  //           decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               borderRadius: BorderRadius.circular(22.h),
-  //               border: Border.all(color: borderColor, width: 1.h)),
-  //           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //             children: [
-  //               Row(
-  //                 children: [
-  //                   GetX<BuyTicketController>(
-  //                     builder: (controller) => getSvgImage(
-  //                         controller.select.value == 0
-  //                             ? "checkRadio.svg"
-  //                             : "uncheckRadio.svg",
-  //                         width: 24.h,
-  //                         height: 24.h),
-  //                     init: BuyTicketController(),
-  //                   ),
-  //                   getHorSpace(10.h),
-  //                   getCustomFont("VIP", 16.sp, Colors.black, 1,
-  //                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-  //                 ],
-  //               ),
-  //               getCustomFont("\$28.00", 18.sp, Colors.black, 1,
-  //                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       getVerSpace(20.h),
-  //       GestureDetector(
-  //         onTap: () {
-  //           controller.onChange(1.obs);
-  //         },
-  //         child: Container(
-  //           margin: EdgeInsets.symmetric(horizontal: 20.h),
-  //           decoration: BoxDecoration(
-  //               color: Colors.white,
-  //               borderRadius: BorderRadius.circular(22.h),
-  //               border: Border.all(color: borderColor, width: 1.h)),
-  //           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //             children: [
-  //               Row(
-  //                 children: [
-  //                   GetX<BuyTicketController>(
-  //                     builder: (controller) => getSvgImage(
-  //                         controller.select.value == 1
-  //                             ? "checkRadio.svg"
-  //                             : "uncheckRadio.svg",
-  //                         width: 24.h,
-  //                         height: 24.h),
-  //                     init: BuyTicketController(),
-  //                   ),
-  //                   getHorSpace(10.h),
-  //                   getCustomFont("Economy", 16.sp, Colors.black, 1,
-  //                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-  //                 ],
-  //               ),
-  //               getCustomFont("\$21.00", 18.sp, Colors.black, 1,
-  //                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+// Column buildTicketTypeWidget() {
+//   return Column(
+//     children: [
+//       getPaddingWidget(
+//         EdgeInsets.symmetric(horizontal: 20.h),
+//         getCustomFont("Ticket Type", 16.sp, Colors.black, 1,
+//             fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+//       ),
+//       getVerSpace(10.h),
+//       GestureDetector(
+//         onTap: () {
+//           controller.onChange(0.obs);
+//         },
+//         child: Container(
+//           margin: EdgeInsets.symmetric(horizontal: 20.h),
+//           decoration: BoxDecoration(
+//               color: Colors.white,
+//               borderRadius: BorderRadius.circular(22.h),
+//               border: Border.all(color: borderColor, width: 1.h)),
+//           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Row(
+//                 children: [
+//                   GetX<BuyTicketController>(
+//                     builder: (controller) => getSvgImage(
+//                         controller.select.value == 0
+//                             ? "checkRadio.svg"
+//                             : "uncheckRadio.svg",
+//                         width: 24.h,
+//                         height: 24.h),
+//                     init: BuyTicketController(),
+//                   ),
+//                   getHorSpace(10.h),
+//                   getCustomFont("VIP", 16.sp, Colors.black, 1,
+//                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+//                 ],
+//               ),
+//               getCustomFont("\$28.00", 18.sp, Colors.black, 1,
+//                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
+//             ],
+//           ),
+//         ),
+//       ),
+//       getVerSpace(20.h),
+//       GestureDetector(
+//         onTap: () {
+//           controller.onChange(1.obs);
+//         },
+//         child: Container(
+//           margin: EdgeInsets.symmetric(horizontal: 20.h),
+//           decoration: BoxDecoration(
+//               color: Colors.white,
+//               borderRadius: BorderRadius.circular(22.h),
+//               border: Border.all(color: borderColor, width: 1.h)),
+//           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Row(
+//                 children: [
+//                   GetX<BuyTicketController>(
+//                     builder: (controller) => getSvgImage(
+//                         controller.select.value == 1
+//                             ? "checkRadio.svg"
+//                             : "uncheckRadio.svg",
+//                         width: 24.h,
+//                         height: 24.h),
+//                     init: BuyTicketController(),
+//                   ),
+//                   getHorSpace(10.h),
+//                   getCustomFont("Economy", 16.sp, Colors.black, 1,
+//                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+//                 ],
+//               ),
+//               getCustomFont("\$21.00", 18.sp, Colors.black, 1,
+//                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
+//             ],
+//           ),
+//         ),
+//       ),
+//     ],
+//   );
+// }
 
-
-
-
-class joinEvent extends StatelessWidget {
-  joinEvent({this.list});
+class joinEvents extends StatelessWidget {
+  joinEvents({this.list});
   final List<DocumentSnapshot>? list;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Row(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(left: 15.0,top: 10.0),
+          padding: const EdgeInsets.only(left: 0.0),
           child: Container(
-              height: 100.0,
+              height: 25.0,
+              width: 54.0,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
@@ -648,71 +692,51 @@ class joinEvent extends StatelessWidget {
                   String? _uid = list?[i]['uid'].toString();
                   String? _img = list?[i]['photoProfile'].toString();
 
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 0.0,bottom: 5.0),
-                        child: Container(
-                          height: 35.0,
-                          width: 35.0,
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(70.0)),
-                              image: DecorationImage(
-                                  image: NetworkImage(_img ?? ''),
-                                  fit: BoxFit.cover)),
-                        ),
-                      ),
-                      Text((list?.length.toString()??'')+ " people joined",style: TextStyle(fontFamily: "Gilroy"),),
-                    ],
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 0.0),
+                    child: Container(
+                      height: 24.0,
+                      width: 24.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
+                          image: DecorationImage(
+                              image: NetworkImage(_img ?? ''),
+                              fit: BoxFit.cover)),
+                    ),
                   );
                 },
               )),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(
-        //     top: 0.0,
-        //     left: 130.0,
-        //   ),
-        //   child: Row(
-        //     children: [
-        //       Positioned(
-        //           left: 22.h,
-        //           child: Container(
-        //             height: 36.h,
-        //             width: 36.h,
-        //             decoration: BoxDecoration(
-        //                 color: accentColor,
-        //                 borderRadius: BorderRadius.circular(30.h),
-        //                 border: Border.all(color: Colors.white, width: 1.5.h)),
-        //             alignment: Alignment.center,
-        //             child: Row(
-        //               mainAxisAlignment: MainAxisAlignment.center,
-        //               crossAxisAlignment: CrossAxisAlignment.center,
-        //               children: [
-        //                 getCustomFont(list?.length.toString() ?? '', 12.sp,
-        //                     Colors.white, 1,
-        //                     fontWeight: FontWeight.w600),
-        //                 getCustomFont(" +", 12.sp, Colors.white, 1,
-        //                     fontWeight: FontWeight.w600),
-        //               ],
-        //             ),
-        //           )),
-
-        //       // Text(
-        //       //   list?.length.toString()??'',
-        //       //   style: TextStyle(fontFamily: "Popins"),
-        //       // ),
-        //       //  Text(
-        //       //   " People Join",
-        //       //   style: TextStyle(fontFamily: "Popins"),
-        //       // ),
-        //     ],
-        //   ),
-        // )
-    
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 3.0,
+            left: 0.0,
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 32.h,
+                width: 32.h,
+                decoration: BoxDecoration(
+                    color: accentColor,
+                    borderRadius: BorderRadius.circular(30.h),
+                    border: Border.all(color: Colors.white, width: 1.5.h)),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                    getCustomFont(" +", 12.sp, Colors.white, 1,
+                        fontWeight: FontWeight.w600),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }

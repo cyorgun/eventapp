@@ -3,14 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:evente/evente.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 
 class EventBloc extends ChangeNotifier{
   
-  List<Event> _dataPopular = [];
-  List<Event> get data => _dataPopular;
+  List<EventBaru> _dataPopular = [];
+  List<EventBaru> get data => _dataPopular;
   
-  List<Event> _dataTrending = [];
-  List<Event> get data2 => _dataTrending;
+  List<EventBaru> _dataTrending = [];
+  List<EventBaru> get data2 => _dataTrending;
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<DocumentSnapshot> _snap = [];
@@ -25,7 +26,7 @@ class EventBloc extends ChangeNotifier{
   bool? get hasData => _hasData;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-// Future<List<Event>> getAllData() async {
+// Future<List<EventBaru>> getAllData() async {
 //     print("Active Users");
 //     var val = await firestore
 //         .collection("event")
@@ -48,7 +49,7 @@ class EventBloc extends ChangeNotifier{
 //     return [];
 //   }
 
-//    Future<List<Event>> retrieveEmployees() async {
+//    Future<List<EventBaru>> retrieveEmployees() async {
 //     QuerySnapshot<Map<String, dynamic>> snapshot =
 //         await _db.collection("Event").get();
 //     return snapshot.docs
@@ -75,7 +76,7 @@ class EventBloc extends ChangeNotifier{
       if (mounted) {
         _isLoading = false;
         _snap.addAll(rawData.docs);
-        _dataPopular = _snap.map((e) => Event.fromFirestore(e)).toList();
+        _dataPopular = _snap.map((e) => EventBaru.fromFirestore(e,1)).toList();
         notifyListeners();
       }
     } else {
@@ -115,7 +116,7 @@ class EventBloc extends ChangeNotifier{
       if (mounted2) {
         _isLoading = false;
         _snap.addAll(rawData.docs);
-        _dataTrending = _snap.map((e) => Event.fromFirestore(e)).toList();
+        _dataTrending = _snap.map((e) => EventBaru.fromFirestore(e,1)).toList();
         notifyListeners();
       }
     } else {

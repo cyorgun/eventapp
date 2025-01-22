@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evente/evente.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/base/constant.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
@@ -87,11 +89,11 @@ class _PastScreenState extends State<PastScreen> {
             // padding: ,
           ),
           getVerSpace(28.h),
-          getCustomFont("No Upcoming Ticket Yet!", 20.sp, Colors.black, 1,
+          getCustomFont(("No Upcoming Ticket Yet!").tr(), 20.sp, Colors.black, 1,
               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
           getVerSpace(8.h),
           getMultilineCustomFont(
-              "Explore more and shortlist events.", 16.sp, Colors.black,
+              ("Explore more and shortlist events.").tr(), 16.sp, Colors.black,
               fontWeight: FontWeight.w500, txtHeight: 1.5.h)
         ],
       ),
@@ -187,7 +189,7 @@ class itemData extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return Event.fromFirestore(e);
+            return EventBaru.fromFirestore(e,1);
           }).toList();
           // String? category = list?[i]['category'].toString();
           // String? date = list?[i]['date'].toString();
@@ -263,7 +265,7 @@ class itemData extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     getCustomFont(
-                                        "Ticket : ${events?[i].ticket}",
+                                        ("Ticket :").tr()  +"${events?[i].ticket}",
                                         15.sp,
                                         Colors.black,
                                         1,

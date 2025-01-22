@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:evente/evente.dart';
@@ -59,7 +60,7 @@ class SearchBloc with ChangeNotifier {
 
   Future<List> getData() async {
 
-    List<Event> data = [];
+    List<EventBaru> data = [];
     QuerySnapshot rawData = await firestore
         .collection('event')
         .get();
@@ -73,7 +74,7 @@ class SearchBloc with ChangeNotifier {
       u['description'].toLowerCase().contains(_searchText.toLowerCase())
       
       )));
-    data = _snap.map((e) => Event.fromFirestore(e)).toList();
+    data = _snap.map((e) => EventBaru.fromFirestore(e,1)).toList();
     return data;
 
 

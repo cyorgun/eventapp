@@ -1,4 +1,5 @@
 abstract class Routes {
+  static const splashScreen = Paths.splashScreen;
   static const homeRoute = Paths.homePath;
   static const introRoute = Paths.introPath;
   static const loginRoute = Paths.loginPath;
@@ -28,6 +29,7 @@ abstract class Routes {
 }
 
 abstract class Paths {
+  static const splashScreen = "/SplashScreen";
   static const homePath = "/";
   static const welcomePage = "/WelcomePage";
   static const introPath = "/IntroScreen";

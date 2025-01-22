@@ -97,11 +97,11 @@ class ChatPageState extends State<ChatPage> {
 
   Future getImage() async {
     ImagePicker imagePicker = ImagePicker();
-    PickedFile? pickedFile;
+    
 
-    pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      imageFile = File(pickedFile.path);
+      imageFile = File(pickedFile.path) ;
       if (imageFile != null) {
         setState(() {
           isLoading = true;
@@ -839,27 +839,24 @@ class ChatPageState extends State<ChatPage> {
         iconTheme: IconThemeData(color: accentColor),
       ),
       body: SafeArea(
-        child: WillPopScope(
-          child: Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  // List of messages
-                  buildListMessage(),
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                // List of messages
+                buildListMessage(),
 
-                  // Sticker
-                  isShowSticker ? buildSticker() : SizedBox.shrink(),
+                // Sticker
+                isShowSticker ? buildSticker() : SizedBox.shrink(),
 
-                  // Input content
-                  buildInput(),
-                ],
-              ),
+                // Input content
+                buildInput(),
+              ],
+            ),
 
-              // Loading
-              buildLoading()
-            ],
-          ),
-          onWillPop: onBackPress,
+            // Loading
+            buildLoading()
+          ],
         ),
       ),
     );

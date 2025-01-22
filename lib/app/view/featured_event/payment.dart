@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:event_app/app/dialog/ticket_confirm_dialog.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import 'package:nb_utils/nb_utils.dart';
@@ -28,7 +30,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import '../ticket/ticket_detail.dart';
 
 class PaymentScreen extends StatefulWidget {
- Event? event;
+ EventBaru? event;
    PaymentScreen({this.event,Key? key}) : super(key: key);
 
   @override
@@ -39,9 +41,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   
 
   late Client client;
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
   @override
   void setState(fn) {
@@ -101,7 +101,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           pageBuilder: (_, __, ___) => TicketDetail(
                                event: widget.event,
                               )));
-      final Event event = widget.event!;
+      final EventBaru event = widget.event!;
     final sb = context.watch<SignInBloc>();     
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
@@ -167,7 +167,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     final sb = context.watch<SignInBloc>();
-     final Event event = widget.event!;
+     final EventBaru event = widget.event!;
          void addData() {
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
@@ -183,6 +183,55 @@ class _PaymentScreenState extends State<PaymentScreen> {
         });
       });
     }
+
+
+void addEvent() {
+  FirebaseFirestore.instance.runTransaction((transaction) async {
+    final eventDocRef = FirebaseFirestore.instance.collection("event").doc(widget.event?.id ?? '');
+    final snapshot = await transaction.get(eventDocRef);
+
+    if (snapshot.exists) {
+      final existingData = snapshot.data();
+      final newData = {
+        "name": sb.name,
+        "uid": sb.uid,
+        "photoProfile": sb.imageUrl,
+      };
+
+      if (existingData != null && existingData.containsKey("joinEvent")) {
+        final joinEventData = Map<String, dynamic>.from(existingData["joinEvent"]);
+
+        if (!joinEventData.containsKey(sb.uid)) {
+          joinEventData[sb.uid??''] = newData;
+        } else {
+          // Jika user sudah ada, update field yang sesuai
+          joinEventData[sb.uid]["name"] = sb.name;
+          joinEventData[sb.uid]["uid"] = sb.uid;
+          joinEventData[sb.uid]["photoProfile"] = sb.imageUrl;
+        }
+   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+        transaction.update(eventDocRef, {"joinEvent": joinEventData});
+        transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});
+      } else {   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+        transaction.update(eventDocRef, {"joinEvent": {sb.uid: newData}});
+        transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});
+      }
+    }
+  }).then((value) {
+    print('Data map dengan array berhasil ditambahkan ke joinEvent.');
+  }).catchError((error) {
+    print('Error: $error');
+  });
+}
+
+
+
 
 
 
@@ -219,50 +268,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
 
 
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getCustomFont("Payment", 24.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-              Expanded(
-                  flex: 1,
-                  child: ListView(
-                    children: [
-                      getVerSpace(30.h),
-                      buildPaymentMethod(),
-                      getVerSpace(40.h),
-                    ],
-                  )),
-              // getPaddingWidget(
-              //   EdgeInsets.symmetric(horizontal: 20.h),
-              //   getButton(context, accentColor, "Continue", Colors.white, () {
-              //     showDialog(
-              //         builder: (context) {
-              //           return const TicketConfirmDialog();
-              //         },
-              //         context: context);
-              //   }, 18.sp,
-              //       weight: FontWeight.w700,
-              //       buttonHeight: 60.h,
-              //       borderRadius: BorderRadius.circular(22.h)),
-              // ),
-            
-              getVerSpace(30.h),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: getToolBar(
+        () {
+          
+        Navigator.of(context).pop();
+        },
+        title: getCustomFont(("Payment").tr(), 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Divider(color: dividerColor, thickness: 1.h, height: 1.h),
+            Expanded(
+                flex: 1,
+                child: ListView(
+                  children: [
+                    getVerSpace(30.h),
+                    buildPaymentMethod(),
+                    getVerSpace(40.h),
+                  ],
+                )),
+            // getPaddingWidget(
+            //   EdgeInsets.symmetric(horizontal: 20.h),
+            //   getButton(context, accentColor, "Continue", Colors.white, () {
+            //     showDialog(
+            //         builder: (context) {
+            //           return const TicketConfirmDialog();
+            //         },
+            //         context: context);
+            //   }, 18.sp,
+            //       weight: FontWeight.w700,
+            //       buttonHeight: 60.h,
+            //       borderRadius: BorderRadius.circular(22.h)),
+            // ),
+          
+            getVerSpace(30.h),
+          ],
         ),
       ),
     );
@@ -276,7 +320,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       children: [
         getPaddingWidget(
           EdgeInsets.symmetric(horizontal: 20.h),
-          getCustomFont("Payment Method", 16.sp, Colors.black, 1,
+          getCustomFont(("Payment Method").tr(), 16.sp, Colors.black, 1,
               fontWeight: FontWeight.w600, txtHeight: 1.5.h),
         ),
         getVerSpace(10.h),
@@ -298,7 +342,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   children: [
                     getAssetImage("stripe.png", width: 60.h, height: 50.h),
                     getHorSpace(10.h),
-                    getCustomFont("Stripe", 16.sp, Colors.black, 1,
+                    getCustomFont(("Stripe").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w500, txtHeight: 1.5.h)
                   ],
                 ),
@@ -308,8 +352,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         getVerSpace(20.h),
         InkWell(
-          onTap: (){
-            
+          onTap: (){      
           openCheckout();
           },
           child: Container(
@@ -326,7 +369,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   children: [
                     getAssetImage("razor.png", width: 50.h, height: 50.h),
                     getHorSpace(10.h),
-                    getCustomFont("Razor Pay", 16.sp, Colors.black, 1,
+                    getCustomFont(("Razor Pay").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w500, txtHeight: 1.5.h)
                   ],
                 ),
@@ -341,7 +384,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   onTap: (){
                   Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (BuildContext context) => UsePaypal(
+                        builder: (BuildContext context) => 
+                        UsePaypal(
                             sandboxMode: true,
                             clientId:
                                 "AW1TdvpSGbIM5iP4HJNI5TyTmwpY9Gv9dYw8_8yW5lYIbCqf326vrkrp0ce9TAqjEGMHiV3OqJM_aRT0",
@@ -390,7 +434,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 }
                               }
                             ],
-                            note: "Contact us for any questions on your order.",
+                            note: ("Contact us for any questions on your order.").tr(),
                             onSuccess: (Map params) async {
                                  showDialog(
                           builder: (context) {
@@ -401,7 +445,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           pageBuilder: (_, __, ___) => TicketDetail(
                                event: widget.event,
                               )));
-                                final Event event = widget.event!;
+                                final EventBaru event = widget.event!;
     final sb = context.watch<SignInBloc>();     
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
@@ -416,6 +460,51 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "photoProfile": sb.imageUrl
         });
       });
+
+       FirebaseFirestore.instance.runTransaction((transaction) async {
+    final eventDocRef = FirebaseFirestore.instance.collection("event").doc(widget.event?.id ?? '');
+    final snapshot = await transaction.get(eventDocRef);
+
+    if (snapshot.exists) {
+      final existingData = snapshot.data();
+      final newData = {
+        "name": sb.name,
+        "uid": sb.uid,
+        "photoProfile": sb.imageUrl,
+      };
+
+      if (existingData != null && existingData.containsKey("joinEvent")) {
+        final joinEventData = Map<String, dynamic>.from(existingData["joinEvent"]);
+
+        if (!joinEventData.containsKey(sb.uid)) {
+          joinEventData[sb.uid??''] = newData;
+        } else {
+          // Jika user sudah ada, update field yang sesuai
+          joinEventData[sb.uid]["name"] = sb.name;
+          joinEventData[sb.uid]["uid"] = sb.uid;
+          joinEventData[sb.uid]["photoProfile"] = sb.imageUrl;
+        }
+   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+        transaction.update(eventDocRef, {"joinEvent": joinEventData});
+        transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});
+      } else {
+        transaction.update(eventDocRef, {"joinEvent": {sb.uid: newData}});
+        transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+      }
+    }
+  }).then((value) {
+    print('Data map dengan array berhasil ditambahkan ke joinEvent.');
+  }).catchError((error) {
+    print('Error: $error');
+  });
+
+
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
         SharedPreferences prefs;
@@ -469,7 +558,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   children: [
                     getAssetImage("paypal.png", width: 40.h, height: 40.h),
                     getHorSpace(10.h),
-                    getCustomFont("Paypal", 16.sp, Colors.black, 1,
+                    getCustomFont(("Paypal").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w500, txtHeight: 1.5.h)
                   ],
                 ),
@@ -591,19 +680,65 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         size: 100.0,
                       ),
                       SizedBox(height: 10.0),
-                      Text("Payment Successful!"),
+                      Text(("Payment Successful!").tr()),
                     ],
                   ),
                 ));
-  Constant.sendToNext(context, Routes.paymentRoute);
+                   Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => PaymentScreen()));
+               
+  // Constant.sendToNext(context, Routes.paymentRoute);
                           showDialog(
                               builder: (context) {
                                 return const TicketConfirmDialog();
                               },
                               context: context);
                        
-     final Event event = widget.event!;
-    final sb = context.watch<SignInBloc>();     
+     final EventBaru event = widget.event!;
+    final sb = context.watch<SignInBloc>();    
+
+     FirebaseFirestore.instance.runTransaction((transaction) async {
+    final eventDocRef = FirebaseFirestore.instance.collection("event").doc(widget.event?.id ?? '');
+    final snapshot = await transaction.get(eventDocRef);
+
+    if (snapshot.exists) {
+      final existingData = snapshot.data();
+      final newData = {
+        "name": sb.name,
+        "uid": sb.uid,
+        "photoProfile": sb.imageUrl,
+      };
+
+      if (existingData != null && existingData.containsKey("joinEvent")) {
+        final joinEventData = Map<String, dynamic>.from(existingData["joinEvent"]);
+
+        if (!joinEventData.containsKey(sb.uid)) {
+          joinEventData[sb.uid??''] = newData;
+        } else {
+          // Jika user sudah ada, update field yang sesuai
+          joinEventData[sb.uid]["name"] = sb.name;
+          joinEventData[sb.uid]["uid"] = sb.uid;
+          joinEventData[sb.uid]["photoProfile"] = sb.imageUrl;
+        }
+   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+        transaction.update(eventDocRef, {"joinEvent": joinEventData});
+        // transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});
+      } else {   FirebaseFirestore.instance
+                  .collection('event')
+                  .doc(widget.event?.id)
+                  .update({'join': FieldValue.increment(1)});
+        transaction.update(eventDocRef, {"joinEvent": {sb.uid: newData}});
+        // transaction.update(eventDocRef, {"paymentType": "Transfer Bank"});
+      }
+    }
+  }).then((value) {
+    print('Data map dengan array berhasil ditambahkan ke joinEvent.');
+  }).catchError((error) {
+    print('Error: $error');
+  }); 
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
         FirebaseFirestore.instance
@@ -617,6 +752,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           "photoProfile": sb.imageUrl
         });
       });
+      
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
         SharedPreferences prefs;
@@ -664,12 +800,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children: const [
+              children:  [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
                 ),
-                Text("Payment Failed"),
+                Text(("Payment Failed").tr()),
               ],
             ),
           ],

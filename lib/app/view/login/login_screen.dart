@@ -23,7 +23,7 @@
 // }
 
 // class _LoginScreenState extends State<LoginScreen> {
-//   void backClick() {
+//   void  {
 //     Constant.closeApp();
 //   }
 
@@ -117,7 +117,7 @@
 //           backgroundColor: Colors.white,
 //           appBar: getToolBar(
 //             () {
-//               backClick();
+//               ;
 //             },
 //             title: getSvgImage("event_logo.svg", width: 72.h, height: 35.h),
 //           ),
@@ -380,7 +380,7 @@
 //           ),
 //         ),
 //         onWillPop: () async {
-//           backClick();
+//           ;
 //           return false;
 //         });
 //   }

@@ -15,7 +15,7 @@
 // }
 
 // class _SelectCountryScreenState extends State<SelectCountryScreen> {
-//   void backClick() {
+//   void  {
 //     Constant.backToPrev(context);
 //   }
 
@@ -25,14 +25,14 @@
 //     setStatusBarColor(Colors.white);
 //     return WillPopScope(
 //       onWillPop: () async {
-//         backClick();
+//         ;
 //         return false;
 //       },
 //       child: Scaffold(
 //         resizeToAvoidBottomInset: false,
 //         backgroundColor: Colors.white,
 //         appBar: getToolBar(() {
-//           backClick();
+//           ;
 //         },
 //             title: getCustomFont(
 //               "Select Country",
@@ -71,7 +71,7 @@
 //                           onTap: () {
 //                             controller.getImage(modelCountry.image ?? "",
 //                                 modelCountry.code ?? "");
-//                             backClick();
+//                             ;
 //                           },
 //                           child: Container(
 //                             margin: EdgeInsets.only(bottom: 20.h),

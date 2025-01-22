@@ -2,7 +2,7 @@ import 'package:event_app/app/dialog/account_create_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
@@ -15,9 +15,7 @@ class VerifyScreen extends StatefulWidget {
 }
 
 class _VerifyScreenState extends State<VerifyScreen> {
-  void backClick() {
-    Constant.backToPrev(context);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -37,108 +35,103 @@ class _VerifyScreenState extends State<VerifyScreen> {
     // );
 
     setStatusBarColor(Colors.white);
-    return WillPopScope(
-      onWillPop: () async {
-        backClick();
-        return false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: getToolBar(
-          () {
-            backClick();
-          },
-          title: getSvgImage("event_logo.svg", width: 72.h, height: 35.h),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              getDivider(
-                dividerColor,
-                1.h,
-              ),
-              getVerSpace(60.h),
-              getCustomFont("Verify", 24.sp, Colors.black, 1,
-                  fontWeight: FontWeight.w700,
-                  textAlign: TextAlign.center,
-                  txtHeight: 1.5.h),
-              getVerSpace(8.h),
-              getMultilineCustomFont(
-                  "Enter code sent to your phone number!", 16.sp, Colors.black,
-                  txtHeight: 1.5.h,
-                  textAlign: TextAlign.center,
-                  fontWeight: FontWeight.w500),
-              getVerSpace(30.h),
-              Expanded(
-                  flex: 1,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(34.h)),
-                        boxShadow: [
-                          BoxShadow(
-                              color: "#2B9CC3C6".toColor(),
-                              blurRadius: 24,
-                              offset: const Offset(0, -2))
-                        ]),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        getVerSpace(50.h),
-                        // Pinput(
-                        //   defaultPinTheme: defaultPinTheme,
-                        //   inputFormatters: [
-                        //     FilteringTextInputFormatter.digitsOnly,
-                        //   ],
-                        //   pinputAutovalidateMode:
-                        //       PinputAutovalidateMode.onSubmit,
-                        //   showCursor: true,
-                        //   onCompleted: (pin) {},
-                        //   length: 4,
-                        //   mainAxisAlignment: MainAxisAlignment.center,
-                        // ),
-                        getVerSpace(50.h),
-                        getButton(context, accentColor, "Verify", Colors.white,
-                            () {
-                          showDialog(
-                              builder: (context) {
-                                return const AccountCreateDialog();
-                              },
-                              context: context);
-                        }, 18.sp,
-                            weight: FontWeight.w700,
-                            buttonHeight: 60.h,
-                            borderRadius: BorderRadius.circular(22.h)),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              GestureDetector(
-                                child: getRichText(
-                                    "Don’t recieve code? / ",
-                                    Colors.black,
-                                    FontWeight.w500,
-                                    15.sp,
-                                    "Resend",
-                                    Colors.black,
-                                    FontWeight.w700,
-                                    14.sp),
-                                onTap: () {},
-                              ),
-                              getVerSpace(30.h)
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ))
-            ],
-          ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      appBar: getToolBar(
+        () {
+          
+        Navigator.of(context).pop();
+        },
+        title: getSvgImage("event_logo.svg", width: 72.h, height: 35.h),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            getDivider(
+              dividerColor,
+              1.h,
+            ),
+            getVerSpace(60.h),
+            getCustomFont(("Verify").tr(), 24.sp, Colors.black, 1,
+                fontWeight: FontWeight.w700,
+                textAlign: TextAlign.center,
+                txtHeight: 1.5.h),
+            getVerSpace(8.h),
+            getMultilineCustomFont(
+                ("Enter code sent to your phone number!").tr(), 16.sp, Colors.black,
+                txtHeight: 1.5.h,
+                textAlign: TextAlign.center,
+                fontWeight: FontWeight.w500),
+            getVerSpace(30.h),
+            Expanded(
+                flex: 1,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20.h),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(34.h)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: "#2B9CC3C6".toColor(),
+                            blurRadius: 24,
+                            offset: const Offset(0, -2))
+                      ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      getVerSpace(50.h),
+                      // Pinput(
+                      //   defaultPinTheme: defaultPinTheme,
+                      //   inputFormatters: [
+                      //     FilteringTextInputFormatter.digitsOnly,
+                      //   ],
+                      //   pinputAutovalidateMode:
+                      //       PinputAutovalidateMode.onSubmit,
+                      //   showCursor: true,
+                      //   onCompleted: (pin) {},
+                      //   length: 4,
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      // ),
+                      getVerSpace(50.h),
+                      getButton(context, accentColor, "Verify", Colors.white,
+                          () {
+                        showDialog(
+                            builder: (context) {
+                              return const AccountCreateDialog();
+                            },
+                            context: context);
+                      }, 18.sp,
+                          weight: FontWeight.w700,
+                          buttonHeight: 60.h,
+                          borderRadius: BorderRadius.circular(22.h)),
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            GestureDetector(
+                              child: getRichText(
+                                  "Don’t recieve code? / ",
+                                  Colors.black,
+                                  FontWeight.w500,
+                                  15.sp,
+                                  "Resend",
+                                  Colors.black,
+                                  FontWeight.w700,
+                                  14.sp),
+                              onTap: () {},
+                            ),
+                            getVerSpace(30.h)
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ))
+          ],
         ),
       ),
     );
