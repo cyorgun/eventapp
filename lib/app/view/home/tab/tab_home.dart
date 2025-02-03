@@ -3419,34 +3419,32 @@ class TrendingEventCard2 extends StatelessWidget {
                               ],
                             ),
                             getVerSpace(10.h),
-                            Expanded(
-                              child: StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("JoinEvent")
-                                    .doc("user")
-                                    .collection(events[i].title ?? '')
-                                    .snapshots(),
-                                builder: (BuildContext ctx,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Center(
-                                        child: CircularProgressIndicator());
-                                  }
-                            
-                                  if (snapshot.data!.docs.isEmpty) {
-                                    return Center(child: Container());
-                                  }
-                                  if (snapshot.hasError) {
-                                    return Center(child: Text('Error'));
-                                  }
-                                  return snapshot.hasData
-                                      ? new joinEvents(
-                                          list: snapshot.data?.docs,
-                                        )
-                                      : Container();
-                                },
-                              ),
+                            StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("JoinEvent")
+                                  .doc("user")
+                                  .collection(events[i].title ?? '')
+                                  .snapshots(),
+                              builder: (BuildContext ctx,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                }
+
+                                if (snapshot.data!.docs.isEmpty) {
+                                  return Center(child: Container());
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(child: Text('Error'));
+                                }
+                                return snapshot.hasData
+                                    ? new joinEvents(
+                                        list: snapshot.data?.docs,
+                                      )
+                                    : Container();
+                              },
                             ),
                               if(events[i].price!>0)
                                  Align(

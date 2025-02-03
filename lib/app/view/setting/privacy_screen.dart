@@ -49,7 +49,6 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     getMultilineCustomFont(
                         ("lorem2").tr(),
                         16.sp,
-                        // https://gitlab.com/JipauDev/event_baru
                         Colors.black,
                         fontWeight: FontWeight.w500,
                         txtHeight: 1.46.h,

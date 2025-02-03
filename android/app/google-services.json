@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "531047962965",
-    "project_id": "evente-pro",
-    "storage_bucket": "evente-pro.appspot.com"
+    "project_number": "420151056289",
+    "project_id": "eventapp-221be",
+    "storage_bucket": "eventapp-221be.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:531047962965:android:3db54903a7796a3b70b7dc",
+        "mobilesdk_app_id": "1:420151056289:android:0be8cbff926e16b5ee9de0",
         "android_client_info": {
-          "package_name": "com.evente.proevent"
+          "package_name": "com.cyorgun.eventapp"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "531047962965-on7lojdfsqbi8frjucklog75ftalk2at.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.evente.proevent",
-            "certificate_hash": "74392d785abd2b267bd68dabe56bd64d0fb26fac"
-          }
-        },
-        {
-          "client_id": "531047962965-sgld6dmvsch2a684ck1e2n34m3dkq3bt.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAMYgrPjke0te2s402LdhuKz9FFXedHqQ8"
+          "current_key": "AIzaSyAbbpnf9pJgoOYjS5aA2tUyWlSd9LpMmY8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "531047962965-6ibg2hu6br9ncnsgrso7s6l67uh1cjhb.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

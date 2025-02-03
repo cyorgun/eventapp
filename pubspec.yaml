@@ -52,7 +52,7 @@ dependencies:
   screenshot: ^3.0.0
   win32: ^5.5.4
   intl: 
-  change_app_package_name: ^1.1.0
+  change_app_package_name: ^1.4.0
   shimmer: ^3.0.0
   cross_file:
   cached_network_image: ^3.2.0
