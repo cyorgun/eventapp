@@ -1,6 +1,5 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,9 +10,9 @@ class HelperNotifications {
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
     var androidInitialize =
         const AndroidInitializationSettings('@mipmap/ic_launcher');
-   var initializationSettings =
-        InitializationSettings(android: androidInitialize, );
-   
+    var initializationSettings = InitializationSettings(
+      android: androidInitialize,
+    );
 
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
@@ -31,9 +30,8 @@ class HelperNotifications {
   }
 }
 
-
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'custom_notification_channel_id',
@@ -47,14 +45,15 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void setupFcm() {
-  var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+  var initializationSettingsAndroid =
+      const AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
-   );
+  );
 
   //when the app is in foreground state and you click on notification.
-  flutterLocalNotificationsPlugin.initialize(initializationSettings,
-   
+  flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
   );
 
   //When the app is terminated, i.e., app is neither in foreground or background.
@@ -66,7 +65,8 @@ void setupFcm() {
   });
 
   //When the app is in the background, but not terminated.
-  FirebaseMessaging.onMessageOpenedApp.listen((event) {
+  FirebaseMessaging.onMessageOpenedApp.listen(
+    (event) {
       goToNextScreen(event.data);
     },
     cancelOnError: false,
@@ -74,68 +74,66 @@ void setupFcm() {
   );
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        if (android.imageUrl != null && android.imageUrl!.trim().isNotEmpty) {
-          final String largeIcon = await _base64encodedImage(
-            android.imageUrl!,
-          );
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+    if (notification != null && android != null) {
+      if (android.imageUrl != null && android.imageUrl!.trim().isNotEmpty) {
+        final String largeIcon = await _base64encodedImage(
+          android.imageUrl!,
+        );
 
-          final BigPictureStyleInformation bigPictureStyleInformation =
-          BigPictureStyleInformation(
-            ByteArrayAndroidBitmap.fromBase64String(largeIcon),
-            largeIcon: ByteArrayAndroidBitmap.fromBase64String(largeIcon),
-            contentTitle: notification.title,
-            htmlFormatContentTitle: true,
-            summaryText: notification.body,
-            htmlFormatSummaryText: true,
-            hideExpandedLargeIcon: true,
-          );
+        final BigPictureStyleInformation bigPictureStyleInformation =
+            BigPictureStyleInformation(
+          ByteArrayAndroidBitmap.fromBase64String(largeIcon),
+          largeIcon: ByteArrayAndroidBitmap.fromBase64String(largeIcon),
+          contentTitle: notification.title,
+          htmlFormatContentTitle: true,
+          summaryText: notification.body,
+          htmlFormatSummaryText: true,
+          hideExpandedLargeIcon: true,
+        );
 
-          flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channelDescription: channel.description,
-                icon: "app_icon",
-                // icon: 'custom_notification_icon',
-                // color: primaryColor,
-                importance: Importance.max,
-                priority: Priority.high,
-                largeIcon: ByteArrayAndroidBitmap.fromBase64String(largeIcon),
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              icon: "app_icon",
+              // icon: 'custom_notification_icon',
+              // color: primaryColor,
+              importance: Importance.max,
+              priority: Priority.high,
+              largeIcon: ByteArrayAndroidBitmap.fromBase64String(largeIcon),
               styleInformation: bigPictureStyleInformation,
-              ),
             ),
-            payload: json.encode(message.data),
-          );
-        }
-        else {
-          flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channelDescription: channel.description,
-                // icon: 'custom_notification_icon',
-                // color: primaryColor,
-                importance: Importance.max,
-                priority: Priority.high,
-              ),
+          ),
+          payload: json.encode(message.data),
+        );
+      } else {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              // icon: 'custom_notification_icon',
+              // color: primaryColor,
+              importance: Importance.max,
+              priority: Priority.high,
             ),
-            payload: json.encode(message.data),
-          );
-        }
+          ),
+          payload: json.encode(message.data),
+        );
       }
-    });
-
+    }
+  });
 }
 
 Future<void> deleteFcmToken() async {

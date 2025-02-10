@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/chat_logic/models/message_chat.dart';
 import 'package:event_app/app/chat_logic/pages/full_photo_page.dart';
-import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -14,11 +13,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../provider/sign_in_provider.dart';
 import '../constants/color_constants.dart';
 import '../constants/firestore_constants.dart';
-import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/widgets.dart';
+
 class ChatPage extends StatefulWidget {
   ChatPage({Key? key, required this.arguments}) : super(key: key);
 
@@ -46,13 +46,13 @@ class ChatPageState extends State<ChatPage> {
   final FocusNode focusNode = FocusNode();
 
   late ChatProvider chatProvider;
-  late SignInBloc sb;
+  late SignInProvider sb;
 
   @override
   void initState() {
     super.initState();
     chatProvider = context.read<ChatProvider>();
-    sb = context.read<SignInBloc>();
+    sb = context.read<SignInProvider>();
 
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
@@ -97,11 +97,10 @@ class ChatPageState extends State<ChatPage> {
 
   Future getImage() async {
     ImagePicker imagePicker = ImagePicker();
-    
 
     final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      imageFile = File(pickedFile.path) ;
+      imageFile = File(pickedFile.path);
       if (imageFile != null) {
         setState(() {
           isLoading = true;
@@ -177,10 +176,9 @@ class ChatPageState extends State<ChatPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                           
                               SizedBox(
                                 width: 10.0,
                               ),
@@ -189,7 +187,7 @@ class ChatPageState extends State<ChatPage> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(right:10.0),
+                                    padding: const EdgeInsets.only(right: 10.0),
                                     child: Text(
                                       widget.arguments.peerNickname,
                                       style: TextStyle(
@@ -206,7 +204,7 @@ class ChatPageState extends State<ChatPage> {
                                     child: Text(
                                       messageChat.content,
                                       style: TextStyle(
-                                        fontSize: 15.0,
+                                          fontSize: 15.0,
                                           color: Colors.white,
                                           fontFamily: "Gilroy",
                                           fontWeight: FontWeight.w500),
@@ -216,7 +214,7 @@ class ChatPageState extends State<ChatPage> {
                                     width: 200,
                                     decoration: BoxDecoration(
                                         color: accentColor,
-                                        borderRadius: BorderRadius.only( 
+                                        borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(20),
                                           topRight: Radius.circular(2),
                                           bottomLeft: Radius.circular(20),
@@ -227,22 +225,23 @@ class ChatPageState extends State<ChatPage> {
                                             isLastMessageRight(index) ? 10 : 10,
                                         right: 10),
                                   ),
-                                   Container(
-                      child: Text(
-                        DateFormat('dd MMM kk:mm').format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(messageChat.timestamp))),
-                        style: TextStyle(
-                            color: ColorConstants.greyColor,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic),
-                      ),
-                      margin: EdgeInsets.only(left: 50, top: 0, bottom: 15),
-                    ),
-                    
+                                  Container(
+                                    child: Text(
+                                      DateFormat('dd MMM kk:mm').format(
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              int.parse(
+                                                  messageChat.timestamp))),
+                                      style: TextStyle(
+                                          color: ColorConstants.greyColor,
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                    margin: EdgeInsets.only(
+                                        left: 50, top: 0, bottom: 15),
+                                  ),
                                 ],
                               ),
-                                 Material(
+                              Material(
                                 // ignore: sort_child_properties_last
                                 child: Image.network(
                                   widget.arguments.peerAvatar ?? '',
@@ -387,8 +386,8 @@ class ChatPageState extends State<ChatPage> {
             // ignore: sort_child_properties_last
             children: <Widget>[
               Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   // isLastMessageLeft(index)
                   //     ? Material(
@@ -428,178 +427,192 @@ class ChatPageState extends State<ChatPage> {
                   //     : Container(width: 35),
                   messageChat.type == TypeMessage.text
                       ? Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                           Material(
-                                // ignore: sort_child_properties_last
-                                child: Image.network(
-                                 messageChat.profile ?? '',
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: ColorConstants.themeColor,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, object, stackTrace) {
-                                    return Icon(
-                                      Icons.account_circle,
-                                      size: 35,
-                                      color: ColorConstants.greyColor,
-                                    );
-                                  },
-                                  width: 35,
-                                  height: 35,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(18),
-                                ),
-                                clipBehavior: Clip.hardEdge,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Material(
+                              // ignore: sort_child_properties_last
+                              child: Image.network(
+                                messageChat.profile ?? '',
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      color: ColorConstants.themeColor,
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, object, stackTrace) {
+                                  return Icon(
+                                    Icons.account_circle,
+                                    size: 35,
+                                    color: ColorConstants.greyColor,
+                                  );
+                                },
+                                width: 35,
+                                height: 35,
+                                fit: BoxFit.cover,
                               ),
-                          Column(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(18),
+                              ),
+                              clipBehavior: Clip.hardEdge,
+                            ),
+                            Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(left:11.0),
+                                  padding: const EdgeInsets.only(left: 11.0),
                                   child: Text(
                                     messageChat.name ?? '',
                                     style: TextStyle(
-                                         color: Colors.black,
-                                              fontFamily: "Gilroy",
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 17.5),
+                                        color: Colors.black,
+                                        fontFamily: "Gilroy",
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 17.5),
                                   ),
-                                ),  SizedBox(
-                                        height: 5.0,
-                                      ),
+                                ),
+                                SizedBox(
+                                  height: 5.0,
+                                ),
                                 Container(
                                   child: Text(
                                     messageChat.content,
-                                    style: TextStyle(color: Colors.black, fontFamily: "Gilroy"),
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: "Gilroy"),
                                   ),
                                   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                                   width: 200,
                                   decoration: BoxDecoration(
                                       color: Colors.black12.withOpacity(0.1),
-                                      borderRadius: BorderRadius.only( 
-                                              topLeft: Radius.circular(2),
-                                              topRight: Radius.circular(20),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight: Radius.circular(20),
-                                            )),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(2),
+                                        topRight: Radius.circular(20),
+                                        bottomLeft: Radius.circular(20),
+                                        bottomRight: Radius.circular(20),
+                                      )),
                                   margin: EdgeInsets.only(left: 10),
                                 ),
                                 Container(
-                      child: Text(
-                        DateFormat('dd MMM kk:mm').format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(messageChat.timestamp))),
-                        style: TextStyle(
-                            color: ColorConstants.greyColor,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic),
-                      ),
-                      margin: EdgeInsets.only(left: 15, top: 10, bottom: 5),
-                    )
+                                  child: Text(
+                                    DateFormat('dd MMM kk:mm').format(
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            int.parse(messageChat.timestamp))),
+                                    style: TextStyle(
+                                        color: ColorConstants.greyColor,
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic),
+                                  ),
+                                  margin: EdgeInsets.only(
+                                      left: 15, top: 10, bottom: 5),
+                                )
                               ],
                             ),
-                        ],
-                      )
+                          ],
+                        )
                       : messageChat.type == TypeMessage.image
                           ? Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                               Material(
-                                // ignore: sort_child_properties_last
-                                child: Image.network(
-                                 messageChat.profile ?? '',
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: ColorConstants.themeColor,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    );
-                                  },
-                                  errorBuilder: (context, object, stackTrace) {
-                                    return Icon(
-                                      Icons.account_circle,
-                                      size: 35,
-                                      color: ColorConstants.greyColor,
-                                    );
-                                  },
-                                  width: 35,
-                                  height: 35,
-                                  fit: BoxFit.cover,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Material(
+                                  // ignore: sort_child_properties_last
+                                  child: Image.network(
+                                    messageChat.profile ?? '',
+                                    loadingBuilder: (BuildContext context,
+                                        Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: ColorConstants.themeColor,
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder:
+                                        (context, object, stackTrace) {
+                                      return Icon(
+                                        Icons.account_circle,
+                                        size: 35,
+                                        color: ColorConstants.greyColor,
+                                      );
+                                    },
+                                    width: 35,
+                                    height: 35,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(18),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
                                 ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(18),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              Column(   mainAxisAlignment: MainAxisAlignment.start,
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                
-                                children: [ 
-                                  Padding(
-                                      padding: const EdgeInsets.only(left:11.0),
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 11.0),
                                       child: Text(
                                         messageChat.name ?? '',
                                         style: TextStyle(
-                                             color: Colors.black,
-                                                  fontFamily: "Gilroy",
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 17.5),
+                                            color: Colors.black,
+                                            fontFamily: "Gilroy",
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 17.5),
                                       ),
-                                    ),  SizedBox(
-                                            height: 10.0,
-                                          ),
-                                  Container(
+                                    ),
+                                    SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    Container(
                                       child: TextButton(
                                         child: Material(
                                           child: Image.network(
                                             messageChat.content,
-                                            loadingBuilder: (BuildContext context,
-                                                Widget child,
-                                                ImageChunkEvent? loadingProgress) {
-                                              if (loadingProgress == null) return child;
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null)
+                                                return child;
                                               return Container(
                                                 decoration: BoxDecoration(
-                                                  color: ColorConstants.greyColor2,
-                                                  borderRadius: BorderRadius.all(
+                                                  color:
+                                                      ColorConstants.greyColor2,
+                                                  borderRadius:
+                                                      BorderRadius.all(
                                                     Radius.circular(8),
                                                   ),
                                                 ),
                                                 width: 200,
                                                 height: 200,
                                                 child: Center(
-                                                  child: CircularProgressIndicator(
-                                                    color: ColorConstants.themeColor,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: ColorConstants
+                                                        .themeColor,
                                                     value: loadingProgress
                                                                 .expectedTotalBytes !=
                                                             null
@@ -630,102 +643,107 @@ class ChatPageState extends State<ChatPage> {
                                             height: 200,
                                             fit: BoxFit.cover,
                                           ),
-                                          borderRadius:
-                                              BorderRadius.all(Radius.circular(8)),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8)),
                                           clipBehavior: Clip.hardEdge,
                                         ),
                                         onPressed: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => FullPhotoPage(
-                                                  url: messageChat.content),
+                                              builder: (context) =>
+                                                  FullPhotoPage(
+                                                      url: messageChat.content),
                                             ),
                                           );
                                         },
                                         style: ButtonStyle(
-                                            padding:
-                                                MaterialStateProperty.all<EdgeInsets>(
-                                                    EdgeInsets.all(0))),
+                                            padding: MaterialStateProperty.all<
+                                                EdgeInsets>(EdgeInsets.all(0))),
                                       ),
                                       margin: EdgeInsets.only(left: 10),
                                     ),
-                                            Container(
-                      child: Text(
-                        DateFormat('dd MMM kk:mm').format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(messageChat.timestamp))),
-                        style: TextStyle(
-                            color: ColorConstants.greyColor,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic),
-                      ),
-                      margin: EdgeInsets.only(left: 15, top: 10, bottom: 5),
-                    )
-                                ],
-                              ),
-                            ],
-                          )
-                          : Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                               Material(
-                                // ignore: sort_child_properties_last
-                                child: Image.network(
-                                 messageChat.profile ?? '',
-                                  loadingBuilder: (BuildContext context,
-                                      Widget child,
-                                      ImageChunkEvent? loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: ColorConstants.themeColor,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
+                                    Container(
+                                      child: Text(
+                                        DateFormat('dd MMM kk:mm').format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                int.parse(
+                                                    messageChat.timestamp))),
+                                        style: TextStyle(
+                                            color: ColorConstants.greyColor,
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic),
                                       ),
-                                    );
-                                  },
-                                  errorBuilder: (context, object, stackTrace) {
-                                    return Icon(
-                                      Icons.account_circle,
-                                      size: 35,
-                                      color: ColorConstants.greyColor,
-                                    );
-                                  },
-                                  width: 35,
-                                  height: 35,
-                                  fit: BoxFit.cover,
+                                      margin: EdgeInsets.only(
+                                          left: 15, top: 10, bottom: 5),
+                                    )
+                                  ],
                                 ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(18),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              Column(
+                              ],
+                            )
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              
-                                children: [ Padding(
-                                      padding: const EdgeInsets.only(left:11.0),
+                              children: [
+                                Material(
+                                  // ignore: sort_child_properties_last
+                                  child: Image.network(
+                                    messageChat.profile ?? '',
+                                    loadingBuilder: (BuildContext context,
+                                        Widget child,
+                                        ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: ColorConstants.themeColor,
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder:
+                                        (context, object, stackTrace) {
+                                      return Icon(
+                                        Icons.account_circle,
+                                        size: 35,
+                                        color: ColorConstants.greyColor,
+                                      );
+                                    },
+                                    width: 35,
+                                    height: 35,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(18),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 11.0),
                                       child: Text(
                                         messageChat.name ?? '',
                                         style: TextStyle(
-                                             color: Colors.black,
-                                                  fontFamily: "Gilroy",
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 17.5),
+                                            color: Colors.black,
+                                            fontFamily: "Gilroy",
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 17.5),
                                       ),
-                                    ),  SizedBox(
-                                            height: 5.0,
-                                          ),
-                                  Container(
+                                    ),
+                                    SizedBox(
+                                      height: 5.0,
+                                    ),
+                                    Container(
                                       child: Image.asset(
                                         'assets/images/${messageChat.content}.gif',
                                         width: 100,
@@ -733,25 +751,29 @@ class ChatPageState extends State<ChatPage> {
                                         fit: BoxFit.cover,
                                       ),
                                       margin: EdgeInsets.only(
-                                          bottom: isLastMessageRight(index) ? 20 : 10,
+                                          bottom: isLastMessageRight(index)
+                                              ? 20
+                                              : 10,
                                           right: 10),
                                     ),
-                                     Container(
-                      child: Text(
-                        DateFormat('dd MMM kk:mm').format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                    int.parse(messageChat.timestamp))),
-                        style: TextStyle(
-                                color: ColorConstants.greyColor,
-                                fontSize: 12,
-                                fontStyle: FontStyle.italic),
-                      ),
-                      margin: EdgeInsets.only(left: 15, top: 10, bottom: 5),
-                    )
-                                ],
-                              ),
-                            ],
-                          ),
+                                    Container(
+                                      child: Text(
+                                        DateFormat('dd MMM kk:mm').format(
+                                            DateTime.fromMillisecondsSinceEpoch(
+                                                int.parse(
+                                                    messageChat.timestamp))),
+                                        style: TextStyle(
+                                            color: ColorConstants.greyColor,
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                      margin: EdgeInsets.only(
+                                          left: 15, top: 10, bottom: 5),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
                 ],
               ),
 
@@ -1022,7 +1044,11 @@ class ChatPageState extends State<ChatPage> {
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type your message...',
-                  hintStyle: TextStyle(color: ColorConstants.greyColor,fontFamily: "Gilroy",fontWeight: FontWeight.w600,fontSize: 16.0),
+                  hintStyle: TextStyle(
+                      color: ColorConstants.greyColor,
+                      fontFamily: "Gilroy",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.0),
                 ),
                 focusNode: focusNode,
                 autofocus: true,
@@ -1073,13 +1099,26 @@ class ChatPageState extends State<ChatPage> {
                       controller: listScrollController,
                     );
                   } else {
-                    return Center(child: Column(
+                    return Center(
+                        child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        getSvg("noMessage.svg", height: 250, width: 250,),
-                        SizedBox(height: 10.0,),
-                        Text("No message here yet...",style: TextStyle(fontFamily: "Gilroy",fontWeight: FontWeight.w600,fontSize: 16.0),),
+                        getSvg(
+                          "noMessage.svg",
+                          height: 250,
+                          width: 250,
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          "No message here yet...",
+                          style: TextStyle(
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0),
+                        ),
                       ],
                     ));
                   }

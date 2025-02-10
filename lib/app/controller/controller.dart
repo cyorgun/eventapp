@@ -31,7 +31,6 @@ class IntroController extends GetxController {
     pageController = PageController();
   }
 
-
   @override
   void onClose() {
     // TODO: implement onClose
@@ -53,7 +52,6 @@ class LoginController extends GetxController {
     emailController = TextEditingController();
     passwordController = TextEditingController();
   }
-
 
   @override
   void onClose() {
@@ -89,7 +87,6 @@ class ForgotController extends GetxController {
     emailController = TextEditingController();
   }
 
-
   @override
   void onClose() {
     // TODO: implement onClose
@@ -112,7 +109,6 @@ class ResetController extends GetxController {
     newPassController = TextEditingController();
     confPassController = TextEditingController();
   }
-
 
   @override
   void onClose() {
@@ -194,7 +190,6 @@ class SignUpController extends GetxController {
     searchController = TextEditingController();
   }
 
-
   @override
   void onClose() {
     // TODO: implement onClose
@@ -215,7 +210,6 @@ class HomeController extends GetxController {
     update();
   }
 }
-
 
 class HomeController2 extends GetxController {
   RxInt index = 0.obs;
@@ -251,8 +245,6 @@ class HomeScreenController extends GetxController {
     select.value = value.value;
     update();
   }
-
-
 
   @override
   void onInit() {
@@ -403,17 +395,17 @@ class CreateEventController extends GetxController {
   //   update();
   // }
 
-  onDateChange(RxString value){
+  onDateChange(RxString value) {
     dateController.text = value.value;
     update();
   }
 
-  onStartTimeChange(RxString value){
+  onStartTimeChange(RxString value) {
     startTimeController.text = value.value;
     update();
   }
 
-  onEndTimeChange(RxString value){
+  onEndTimeChange(RxString value) {
     endTimeController.text = value.value;
     update();
   }

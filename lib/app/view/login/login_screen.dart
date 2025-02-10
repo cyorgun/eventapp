@@ -12,8 +12,8 @@
 // import '../../../base/widget_utils.dart';
 // import '../../dialog/snacbar.dart';
 // import '../../service/app_service.dart';
-// import '../bloc/sign_in_bloc.dart';
-// import '../select_interset/select_interest_screen.dart';
+// import '../provider/sign_in_provider.dart';
+// import '../select_interest/select_interest_screen.dart';
 
 // class LoginScreen extends StatefulWidget {
 //   const LoginScreen({Key? key}) : super(key: key);
@@ -115,7 +115,7 @@
 //           key: _scaffoldKey,
 //           resizeToAvoidBottomInset: false,
 //           backgroundColor: Colors.white,
-//           appBar: getToolBar(
+//           app_bar: getToolBar(
 //             () {
 //               ;
 //             },

@@ -1,29 +1,26 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:evente/evente.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/featured_event/payment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:evente/evente.dart';
 
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/ticket_confirm_dialog.dart';
-import '../bloc/sign_in_bloc.dart';
+import '../../provider/sign_in_provider.dart';
 import '../ticket/ticket_detail.dart';
-import 'package:http/http.dart' as http;
-import 'package:easy_localization/easy_localization.dart';
 
 class BuyTicket extends StatefulWidget {
   EventBaru? event;
+
   BuyTicket({Key? key, this.event}) : super(key: key);
 
   @override
@@ -31,11 +28,10 @@ class BuyTicket extends StatefulWidget {
 }
 
 class _BuyTicketState extends State<BuyTicket> {
- 
-
   int _itemCount = 1;
 
   Map<String, dynamic>? paymentIntent;
+
   //  var prices = price?? 0
   int? prices;
   int? totalPrice;
@@ -49,7 +45,7 @@ class _BuyTicketState extends State<BuyTicket> {
   @override
   Widget build(BuildContext context) {
     final EventBaru event = widget.event!;
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     void addData() {
       FirebaseFirestore.instance
           .runTransaction((Transaction transaction) async {
@@ -187,13 +183,12 @@ class _BuyTicketState extends State<BuyTicket> {
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(22.h),
-                                border: Border.all(
-                                    color: borderColor, width: 1.h)),
+                                border:
+                                    Border.all(color: borderColor, width: 1.h)),
                             padding: EdgeInsets.symmetric(
                                 horizontal: 18.h, vertical: 18.h),
                             child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
@@ -323,8 +318,8 @@ class _BuyTicketState extends State<BuyTicket> {
                                   }
                                 },
                               ),
-                              getCustomFont(_itemCount.toString(), 22.sp,
-                                  Colors.black, 1,
+                              getCustomFont(
+                                  _itemCount.toString(), 22.sp, Colors.black, 1,
                                   fontWeight: FontWeight.w700,
                                   txtHeight: 1.5.h),
                               GestureDetector(
@@ -356,8 +351,7 @@ class _BuyTicketState extends State<BuyTicket> {
                         ),
 
                         Padding(
-                          padding:
-                              const EdgeInsets.only(left: 20.0, top: 40.0),
+                          padding: const EdgeInsets.only(left: 20.0, top: 40.0),
                           child: getCustomFont(
                               ("WhoJoinsevent").tr() + (event.title ?? ""),
                               16.sp,
@@ -367,8 +361,7 @@ class _BuyTicketState extends State<BuyTicket> {
                               txtHeight: 1.5.h),
                         ),
                         Padding(
-                          padding:
-                              const EdgeInsets.only(left: 20.0, top: 10.0),
+                          padding: const EdgeInsets.only(left: 20.0, top: 10.0),
                           child: StreamBuilder(
                             stream: FirebaseFirestore.instance
                                 .collection("JoinEvent")
@@ -408,13 +401,13 @@ class _BuyTicketState extends State<BuyTicket> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      getButton(
-                          context, accentColor, ("Checkout COD").tr(), Colors.white,
-                          buttonWidth: MediaQuery.of(context).size.width /
-                              2.5, () async {
-                                   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => PaymentScreen()));
-               
+                      getButton(context, accentColor, ("Checkout COD").tr(),
+                          Colors.white,
+                          buttonWidth: MediaQuery.of(context).size.width / 2.5,
+                          () async {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => PaymentScreen()));
+
                         // Constant.sendToNext(context, Routes.paymentRoute);
                         showDialog(
                             builder: (context) {
@@ -425,19 +418,18 @@ class _BuyTicketState extends State<BuyTicket> {
                         addEvent();
                         addData();
 
-                        Navigator.of(context)
-                            .pushReplacement(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => TicketDetail(
-                                      event: widget.event,
-                                    )));
+                        Navigator.of(context).pushReplacement(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => TicketDetail(
+                                  event: widget.event,
+                                )));
                       }, 18.sp,
                           weight: FontWeight.w700,
                           buttonHeight: 60.h,
                           borderRadius: BorderRadius.circular(22.h)),
                       getVerSpace(30.h),
                       if (event.price! > 0)
-                        getButton(context, accentColor, ("Checkout Payment").tr(),
-                            Colors.white,
+                        getButton(context, accentColor,
+                            ("Checkout Payment").tr(), Colors.white,
                             buttonWidth: MediaQuery.of(context).size.width /
                                 2.5, () async {
                           Navigator.of(context).push(PageRouteBuilder(
@@ -451,15 +443,15 @@ class _BuyTicketState extends State<BuyTicket> {
                             borderRadius: BorderRadius.circular(22.h)),
                       getVerSpace(30.h),
                       if (event.price == 0)
-                        getButton(
-                            context, accentColor, ("Booking").tr(), Colors.white,
+                        getButton(context, accentColor, ("Booking").tr(),
+                            Colors.white,
                             buttonWidth: MediaQuery.of(context).size.width /
                                 2.5, () async {
                           userSaved();
                           addData();
-                             Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => PaymentScreen()));
-               
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => PaymentScreen()));
+
                           // Constant.sendToNext(context, Routes.paymentRoute);
                           showDialog(
                               builder: (context) {
@@ -540,7 +532,7 @@ class _BuyTicketState extends State<BuyTicket> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
-              children:  [
+              children: [
                 Icon(
                   Icons.cancel,
                   color: Colors.red,
@@ -672,6 +664,7 @@ class _BuyTicketState extends State<BuyTicket> {
 
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override

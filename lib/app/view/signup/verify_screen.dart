@@ -1,10 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/dialog/account_create_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:easy_localization/easy_localization.dart';
+
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 
 class VerifyScreen extends StatefulWidget {
@@ -15,8 +14,6 @@ class VerifyScreen extends StatefulWidget {
 }
 
 class _VerifyScreenState extends State<VerifyScreen> {
- 
-
   @override
   Widget build(BuildContext context) {
     // final defaultPinTheme = PinTheme(
@@ -40,8 +37,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
       backgroundColor: Colors.white,
       appBar: getToolBar(
         () {
-          
-        Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         title: getSvgImage("event_logo.svg", width: 72.h, height: 35.h),
       ),
@@ -59,7 +55,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 txtHeight: 1.5.h),
             getVerSpace(8.h),
             getMultilineCustomFont(
-                ("Enter code sent to your phone number!").tr(), 16.sp, Colors.black,
+                ("Enter code sent to your phone number!").tr(),
+                16.sp,
+                Colors.black,
                 txtHeight: 1.5.h,
                 textAlign: TextAlign.center,
                 fontWeight: FontWeight.w500),

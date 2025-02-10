@@ -1,16 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../dialog/loading_cards.dart';
 import '../../dialog/snacbar.dart';
+import '../../provider/search_provider.dart';
 import '../../widget/card4.dart';
 import '../../widget/empty_screen.dart';
-import '../bloc/search_bloc.dart';
-
-import 'package:easy_localization/easy_localization.dart';
-
 
 class SearchPage extends StatefulWidget {
   SearchPage({Key? key}) : super(key: key);
@@ -24,21 +22,18 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     Future.delayed(Duration(milliseconds: 0))
-    .then((value) => context.read<SearchBloc>().saerchInitialize());
+        .then((value) => context.read<SearchProvider>().saerchInitialize());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.0,
-        iconTheme: IconThemeData(
-          color: Colors.black
-        ),
+        iconTheme: IconThemeData(color: Colors.black),
         title: _searchBar(),
       ),
       key: scaffoldKey,
@@ -52,16 +47,14 @@ class _SearchPageState extends State<SearchPage> {
               padding: const EdgeInsets.only(
                   top: 15, left: 15, bottom: 5, right: 15),
               child: Text(
-                context.watch<SearchBloc>().searchStarted == false
+                context.watch<SearchProvider>().searchStarted == false
                     ? ('Recent searchs').tr()
                     : ('We have found').tr(),
                 textAlign: TextAlign.left,
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
             ),
-            context.watch<SearchBloc>().searchStarted == false
+            context.watch<SearchProvider>().searchStarted == false
                 ? SuggestionsUI()
                 : AfterSearchUI()
           ],
@@ -73,19 +66,16 @@ class _SearchPageState extends State<SearchPage> {
   Widget _searchBar() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(color:Colors.white),
+      decoration: BoxDecoration(color: Colors.white),
       child: TextFormField(
         autofocus: true,
-        controller: context.watch<SearchBloc>().textfieldCtrl,
-        style: TextStyle(
-            fontSize: 16, fontWeight: FontWeight.w500),
+        controller: context.watch<SearchProvider>().textfieldCtrl,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: ("Search item").tr() ,
+          hintText: ("Search item").tr(),
           hintStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color:Colors.black54),
+              fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black54),
           suffixIcon: IconButton(
             icon: Icon(
               Icons.close,
@@ -93,7 +83,7 @@ class _SearchPageState extends State<SearchPage> {
               color: Theme.of(context).iconTheme.color,
             ),
             onPressed: () {
-              context.read<SearchBloc>().saerchInitialize();
+              context.read<SearchProvider>().saerchInitialize();
             },
           ),
         ),
@@ -102,8 +92,8 @@ class _SearchPageState extends State<SearchPage> {
           if (value == '') {
             openSnacbar(scaffoldKey, ('Type something!').tr());
           } else {
-            context.read<SearchBloc>().setSearchText(value);
-            context.read<SearchBloc>().addToSearchList(value);
+            context.read<SearchProvider>().setSearchText(value);
+            context.read<SearchProvider>().addToSearchList(value);
           }
         },
       ),
@@ -116,10 +106,10 @@ class SuggestionsUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SearchBloc>();
+    final sb = context.watch<SearchProvider>();
     return Expanded(
       child: sb.recentSearchData.isEmpty
-          ?EmptyScreen()
+          ? EmptyScreen()
           : ListView.separated(
               padding: EdgeInsets.all(15),
               itemCount: sb.recentSearchData.length,
@@ -144,13 +134,13 @@ class SuggestionsUI extends StatelessWidget {
                       icon: Icon(Icons.delete),
                       onPressed: () {
                         context
-                            .read<SearchBloc>()
+                            .read<SearchProvider>()
                             .removeFromSearchList(sb.recentSearchData[index]);
                       },
                     ),
                     onTap: () {
                       context
-                          .read<SearchBloc>()
+                          .read<SearchProvider>()
                           .setSearchText(sb.recentSearchData[index]);
                     },
                   ),
@@ -168,7 +158,7 @@ class AfterSearchUI extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder(
-        future: context.watch<SearchBloc>().getData(),
+        future: context.watch<SearchProvider>().getData(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.length == 0)
@@ -182,12 +172,11 @@ class AfterSearchUI extends StatelessWidget {
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
-                    onTap: (){
-                        FirebaseFirestore.instance
-                  .collection('event')
-                  .doc( snapshot.data?.id)
-                  .update({'count': FieldValue.increment(1)});
-             
+                    onTap: () {
+                      FirebaseFirestore.instance
+                          .collection('event')
+                          .doc(snapshot.data?.id)
+                          .update({'count': FieldValue.increment(1)});
                     },
                     child: Card4(
                         events: snapshot.data[index], heroTag: 'search$index'),

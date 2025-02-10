@@ -1,8 +1,7 @@
-
-import 'package:event_app/app/view/profile/edit_profile.dart';
-import 'package:evente/evente.dart';
 import 'package:event_app/app/dialog/delete_dialog.dart';
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:event_app/app/view/profile/edit_profile.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -19,8 +18,6 @@ class MyCardScreen extends StatefulWidget {
 }
 
 class _MyCardScreenState extends State<MyCardScreen> {
- 
-
   CardController controller = Get.put(CardController());
 
   @override
@@ -31,8 +28,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
       backgroundColor: Colors.white,
       appBar: getToolBar(
         () {
-          
-        Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         title: getCustomFont("My Cards", 24.sp, Colors.black, 1,
             fontWeight: FontWeight.w700, textAlign: TextAlign.center),
@@ -63,8 +59,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
                                 height: 114.h, width: 114.h),
                           ),
                           getVerSpace(28.h),
-                          getCustomFont(
-                              "No Cards Yet!", 20.sp, Colors.black, 1,
+                          getCustomFont("No Cards Yet!", 20.sp, Colors.black, 1,
                               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                           getVerSpace(8.h),
                           getMultilineCustomFont(
@@ -107,8 +102,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
                                       bottom: 3.h),
                                   decoration: BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       boxShadow: [
                                         BoxShadow(
                                             color: shadowColor,
@@ -169,8 +163,7 @@ class _MyCardScreenState extends State<MyCardScreen> {
                                           offset: const Offset(0, 0),
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      22.h)),
+                                                  BorderRadius.circular(22.h)),
                                           padding: EdgeInsets.zero,
                                           itemBuilder: (context) => [
                                             PopupMenuItem(
@@ -193,9 +186,12 @@ class _MyCardScreenState extends State<MyCardScreen> {
                                           ],
                                           onSelected: (value) {
                                             if (value == 0) {
-                                                 Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => EditProfile()));
-               
+                                              Navigator.of(context).push(
+                                                  PageRouteBuilder(
+                                                      pageBuilder:
+                                                          (_, __, ___) =>
+                                                              EditProfile()));
+
                                               // Constant.sendToNext(context,
                                               //     Routes.editCardScreenRoute);
                                             } else if (value == 1) {
@@ -229,8 +225,9 @@ class _MyCardScreenState extends State<MyCardScreen> {
                     children: [
                       getPaddingWidget(
                         EdgeInsets.symmetric(horizontal: 20.h),
-                        getButton(context, accentColor, "Add New Card",
-                            Colors.white, () {
+                        getButton(
+                            context, accentColor, "Add New Card", Colors.white,
+                            () {
                           Constant.sendToNext(
                               context, Routes.editCardScreenRoute);
                         }, 18.sp,

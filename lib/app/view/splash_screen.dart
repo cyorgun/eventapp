@@ -2,20 +2,14 @@
 
 import 'dart:async';
 
-import 'package:event_app/app/routes/app_routes.dart';
-import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
 import 'package:event_app/app/view/home/home_screen.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
-import '../../base/color_data.dart';
-import '../../base/pref_data.dart';
-import 'intro/welcome.dart';
-import 'bloc/sign_in_bloc.dart';
+import '../provider/bookmark_provider.dart';
+import '../provider/sign_in_provider.dart';
 import 'intro/OnBoarding.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -32,54 +26,53 @@ class _SplashScreenState extends State<SplashScreen> {
     afterSplash();
     // _getIsFirst();
   }
-afterSplash(){
-    final SignInBloc sb = context.read<SignInBloc>();
-    Future.delayed(Duration(milliseconds: 2500)).then((value){
-      sb.isSignedIn == true 
-      ? gotoHomePage()
-      : gotoSignInPage();
+
+  afterSplash() {
+    final SignInProvider sb = context.read<SignInProvider>();
+    Future.delayed(Duration(milliseconds: 2500)).then((value) {
+      sb.isSignedIn == true ? gotoHomePage() : gotoSignInPage();
       // : WelcomePage();
     });
   }
 
-
-  gotoHomePage () {
-    final SignInBloc sb = context.read<SignInBloc>();
-    final BookmarkBloc b = context.read<BookmarkBloc>();
-    if(sb.isSignedIn == true){ 
+  gotoHomePage() {
+    final SignInProvider sb = context.read<SignInProvider>();
+    final BookmarkProvider b = context.read<BookmarkProvider>();
+    if (sb.isSignedIn == true) {
       sb.getDataFromSp();
       b.getDataToSP();
     }
-    Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>new HomeScreen()));
-        // Constant.sendToNext(context, Routes.homeScreenRoute);
+    Navigator.of(context).pushReplacement(
+        PageRouteBuilder(pageBuilder: (_, __, ___) => new HomeScreen()));
+    // Constant.sendToNext(context, Routes.homeScreenRoute);
   }
-
 
   Future<PackageInfo> _getPackageInfo() {
     return PackageInfo.fromPlatform();
   }
 
-  gotoSignInPage (){
+  gotoSignInPage() {
     //  Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
-     Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>new OnBoarding()));
+    Navigator.of(context).pushReplacement(
+        PageRouteBuilder(pageBuilder: (_, __, ___) => new OnBoarding()));
   }
 
-  // _getIsFirst() async {
-  //   bool isSignIn = await PrefData.getIsSignIn();
-  //   bool isIntro = await PrefData.getIsIntro();
-  //   bool isSelect = await PrefData.getSelectInterest();
-  //   if (isIntro) {
-  //     Constant.sendToNext(context, Routes.introRoute);
-  //   } else if (!isSignIn) {
-  //     Constant.sendToNext(context, Routes.loginRoute);
-  //   } else if (!isSelect) {
-  //     Constant.sendToNext(context, Routes.selectInterestRoute);
-  //   } else {
-  //     Timer(const Duration(seconds: 3), () {
-  //       Constant.sendToNext(context, Routes.homeScreenRoute);
-  //     });
-  //   }
-  // }
+/*  _getIsFirst() async {
+    bool isSignIn = await PrefData.getIsSignIn();
+    bool isIntro = await PrefData.getIsIntro();
+    bool isSelect = await PrefData.getSelectInterest();
+    if (isIntro) {
+      Constant.sendToNext(context, Routes.introRoute);
+    } else if (!isSignIn) {
+      Constant.sendToNext(context, Routes.loginRoute);
+    } else if (!isSelect) {
+      Constant.sendToNext(context, Routes.selectInterestRoute);
+    } else {
+      Timer(const Duration(seconds: 3), () {
+        Constant.sendToNext(context, Routes.homeScreenRoute);
+      });
+    }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +100,7 @@ afterSplash(){
             right: 0,
             child: Container(
               width: double.maxFinite,
-              height:300.0,
+              height: 300.0,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('assets/images/background.png'),

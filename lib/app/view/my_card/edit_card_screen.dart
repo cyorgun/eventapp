@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 
 class EditCardScreen extends StatefulWidget {
@@ -19,8 +18,6 @@ class EditCardScreen extends StatefulWidget {
 
 class _EditCardScreenState extends State<EditCardScreen> {
   EditCardController controller = Get.put(EditCardController());
-
- 
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +31,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
       backgroundColor: Colors.white,
       appBar: getToolBar(
         () {
-          
-        Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         title: getCustomFont("Edit Card", 24.sp, Colors.black, 1,
             fontWeight: FontWeight.w700, textAlign: TextAlign.center),
@@ -107,40 +103,35 @@ class _EditCardScreenState extends State<EditCardScreen> {
                                           value.replaceAll(RegExp(r"\D"), "");
                                       switch (value.length) {
                                         case 0:
-                                          controller
-                                                  .dateController.selection =
+                                          controller.dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 0);
                                           break;
                                         case 1:
                                           controller.dateController.text =
                                               "$value/";
-                                          controller
-                                                  .dateController.selection =
+                                          controller.dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 1);
                                           break;
                                         case 2:
                                           controller.dateController.text =
                                               "$value/";
-                                          controller
-                                                  .dateController.selection =
+                                          controller.dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 2);
                                           break;
                                         case 3:
                                           controller.dateController.text =
                                               "${value.substring(0, 2)}/${value.substring(2)}";
-                                          controller
-                                                  .dateController.selection =
+                                          controller.dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 4);
                                           break;
                                         case 4:
                                           controller.dateController.text =
                                               "${value.substring(0, 2)}/${value.substring(2, 4)}";
-                                          controller
-                                                  .dateController.selection =
+                                          controller.dateController.selection =
                                               const TextSelection.collapsed(
                                                   offset: 5);
                                           break;
@@ -217,8 +208,7 @@ class CardNumberFormatter extends TextInputFormatter {
       return nextValue;
     }
 
-    var bufferString =
-    StringBuffer();
+    var bufferString = StringBuffer();
     for (int i = 0; i < inputText.length; i++) {
       bufferString.write(inputText[i]);
       var nonZeroIndexValue = i + 1;

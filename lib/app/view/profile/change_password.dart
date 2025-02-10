@@ -1,15 +1,14 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/dialog/pass_change_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../bloc/sign_in_bloc.dart';
+import '../../provider/sign_in_provider.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({Key? key}) : super(key: key);
@@ -19,9 +18,6 @@ class ChangePassword extends StatefulWidget {
 }
 
 class _ChangePasswordState extends State<ChangePassword> {
- 
-
-
   late String passold;
 
   var formKey = GlobalKey<FormState>();
@@ -31,6 +27,7 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   bool offsecureText = true;
   bool offsecureText2 = true;
+
   void lockPressed() {
     if (offsecureText == true) {
       setState(() {
@@ -61,15 +58,14 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     setStatusBarColor(Colors.white);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: getToolBar(
         () {
-          
-        Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         title: getCustomFont(("Change Password").tr(), 20.sp, Colors.black, 1,
             fontWeight: FontWeight.w700,
@@ -81,7 +77,6 @@ class _ChangePasswordState extends State<ChangePassword> {
         child: SafeArea(
           child: Column(
             children: [
-            
               Expanded(
                   flex: 1,
                   child: Container(
@@ -100,7 +95,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         getVerSpace(30.h),
-                        getCustomFont(("Old Password").tr(), 16.sp, Colors.black, 1,
+                        getCustomFont(
+                            ("Old Password").tr(), 16.sp, Colors.black, 1,
                             fontWeight: FontWeight.w600),
                         getVerSpace(7.h),
                         TextFormField(
@@ -118,24 +114,24 @@ class _ChangePasswordState extends State<ChangePassword> {
                             fillColor: Colors.white,
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             disabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: accentColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: accentColor, width: 1.h)),
                             errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: errorColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: errorColor, width: 1.h)),
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: errorColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: errorColor, width: 1.h)),
                             errorStyle: TextStyle(
                                 color: Colors.red,
                                 fontSize: 13.sp,
@@ -144,8 +140,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 fontFamily: Constant.fontsFamily),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             suffixIconConstraints: BoxConstraints(
                               maxHeight: 24.h,
                             ),
@@ -178,7 +174,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                         ),
 
                         getVerSpace(24.h),
-                        getCustomFont(("New Password").tr(), 16.sp, Colors.black, 1,
+                        getCustomFont(
+                            ("New Password").tr(), 16.sp, Colors.black, 1,
                             fontWeight: FontWeight.w600),
                         getVerSpace(7.h),
                         TextFormField(
@@ -196,24 +193,24 @@ class _ChangePasswordState extends State<ChangePassword> {
                             fillColor: Colors.white,
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             disabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: accentColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: accentColor, width: 1.h)),
                             errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: errorColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: errorColor, width: 1.h)),
                             focusedErrorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: errorColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: errorColor, width: 1.h)),
                             errorStyle: TextStyle(
                                 color: Colors.red,
                                 fontSize: 13.sp,
@@ -222,8 +219,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 fontFamily: Constant.fontsFamily),
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(22.h),
-                                borderSide: BorderSide(
-                                    color: borderColor, width: 1.h)),
+                                borderSide:
+                                    BorderSide(color: borderColor, width: 1.h)),
                             suffixIconConstraints: BoxConstraints(
                               maxHeight: 24.h,
                             ),
@@ -314,7 +311,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                                   SnackBar(
                                     backgroundColor: Colors.redAccent,
                                     content: Text(
-                                      ('Failed  Please Check Your Password!').tr(),
+                                      ('Failed  Please Check Your Password!')
+                                          .tr(),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -326,7 +324,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 SnackBar(
                                   backgroundColor: Colors.redAccent,
                                   content: Text(
-                                    ('Failed  Please Check Your Password!').tr(),
+                                    ('Failed  Please Check Your Password!')
+                                        .tr(),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),

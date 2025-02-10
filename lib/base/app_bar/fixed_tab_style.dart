@@ -16,55 +16,46 @@
 
 // ignore: unnecessary_import
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-
-
 import 'blend_image_icon.dart';
 import 'inner_builder.dart';
 import 'item.dart';
 
-/// Convex shape is fixed center with circle.
-class FixedCircleTabStyle extends InnerBuilder {
-  /// Color used as background of appbar and circle icon.
-  final Color backgroundColor;
-
+/// Convex shape is fixed center.
+class FixedTabStyle extends InnerBuilder {
   /// Index of the centered convex shape.
   final int convexIndex;
 
-  /// Create style builder
-  FixedCircleTabStyle(
-      {required List<TabItem> items,
-      required Color activeColor,
-      required Color color,
-      required this.backgroundColor,
-      required this.convexIndex})
-      : super(items: items, activeColor: activeColor, color: color);
+  /// Create style builder.
+  FixedTabStyle({
+    required List<TabItem> items,
+    required Color activeColor,
+    required Color color,
+    required this.convexIndex,
+  }) : super(items: items, activeColor: activeColor, color: color);
 
   @override
   Widget build(BuildContext context, int index, bool active) {
     var c = active ? activeColor : color;
-    var item = items[index];
     var style = ofStyle(context);
+    var item = items[index];
     var textStyle = style!.textStyle(c, item.fontFamily);
-    var margin = style.activeIconMargin;
 
     if (index == convexIndex) {
-      final item = items[index];
+      var item = items[convexIndex];
       return Container(
-        width: 54.h,
-        height: 54.h,
-        padding: EdgeInsets.all(15.h),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: c,
-        ),
-        margin: EdgeInsets.all(margin),
-        child: BlendImageIcon(
-          active ? item.activeIcon ?? item.icon : item.icon,
-          size: 55.h,
-          color: item.blend ? backgroundColor : null,
+        padding: const EdgeInsets.only(bottom: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            BlendImageIcon(
+              active ? item.activeIcon ?? item.icon : item.icon,
+              color: item.blend ? (c) : null,
+              size: style.activeIconSize,
+            ),
+            Text(item.title ?? '', style: textStyle)
+          ],
         ),
       );
     }
@@ -72,8 +63,8 @@ class FixedCircleTabStyle extends InnerBuilder {
     var noLabel = style.hideEmptyLabel && hasNoText(item);
     var icon = BlendImageIcon(
       active ? item.activeIcon ?? item.icon : item.icon,
-      color: item.blend ? (c) : null,
       size: style.iconSize,
+      color: item.blend ? (c) : null,
     );
     var children = noLabel
         ? <Widget>[icon]
@@ -81,7 +72,7 @@ class FixedCircleTabStyle extends InnerBuilder {
     return Container(
       padding: const EdgeInsets.only(bottom: 2),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: children,
       ),
     );

@@ -1,15 +1,12 @@
-import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:event_app/app/modal/modal_event_baru.dart';
 
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
 import '../home/search_screen.dart';
 import '../home/tab/tab_home.dart';
@@ -23,8 +20,6 @@ class FeatureEventList extends StatefulWidget {
 }
 
 class _FeatureEventListState extends State<FeatureEventList> {
-
-
   FeatureEventController controller = Get.put(FeatureEventController());
 
   @override
@@ -37,69 +32,64 @@ class _FeatureEventListState extends State<FeatureEventList> {
         return false;
       },
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.white,
-            elevation: 0.0,
-            iconTheme: IconThemeData(color: Colors.black),
-            title: getCustomFont(
-              "Upcoming Event",
-              22.sp,
-              Colors.black,
-              1,
-              fontWeight: FontWeight.w700,
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 15.0),
-                child: InkWell(
-                    onTap: (() {
-                      Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => new SearchPage()));
-                    }),
-                    child: getSvg('search.svg', color: accentColor,height: 20.0,width: 20.0)),
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.white,
+              elevation: 0.0,
+              iconTheme: IconThemeData(color: Colors.black),
+              title: getCustomFont(
+                "Upcoming Event",
+                22.sp,
+                Colors.black,
+                1,
+                fontWeight: FontWeight.w700,
               ),
-            ]),
-        body:  Container(
-          
-          child: Padding(
-            padding: const EdgeInsets.only(top:20.0),
-            child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("event")
-                                .where('date',
-                                    isGreaterThanOrEqualTo:
-                                        Timestamp.fromDate(now))
-                                .orderBy('date', descending: false)
-                                .snapshots(),
-                            builder: (BuildContext ctx,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              }
-                    
-                              if (!snapshot.hasData ||
-                                  snapshot.data!.docs.isEmpty) {
-                                return Center(child: EmptyScreen());
-                              }
-                              if (snapshot.hasError) {
-                                return Center(child: Text('Error'));
-                              }
-                    
-                              return snapshot.hasData
-                                  ? TrendingEventCard(
-                                      list: snapshot.data?.docs,
-                                    )
-                                  : Container();
-                            },
-                          ),
-          ),
-        )
-      ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 15.0),
+                  child: InkWell(
+                      onTap: (() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => new SearchPage()));
+                      }),
+                      child: getSvg('search.svg',
+                          color: accentColor, height: 20.0, width: 20.0)),
+                ),
+              ]),
+          body: Container(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("event")
+                    .where('date',
+                        isGreaterThanOrEqualTo: Timestamp.fromDate(now))
+                    .orderBy('date', descending: false)
+                    .snapshots(),
+                builder:
+                    (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: EmptyScreen());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error'));
+                  }
+
+                  return snapshot.hasData
+                      ? TrendingEventCard(
+                          list: snapshot.data?.docs,
+                        )
+                      : Container();
+                },
+              ),
+            ),
+          )),
     );
   }
 
@@ -128,6 +118,7 @@ class _FeatureEventListState extends State<FeatureEventList> {
 
 class buildFeatureEventList2 extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const buildFeatureEventList2({this.list});
 
   @override
@@ -139,7 +130,7 @@ class buildFeatureEventList2 extends StatelessWidget {
       itemCount: list?.length,
       itemBuilder: (context, i) {
         final events = list?.map((e) {
-          return EventBaru.fromFirestore(e,1);
+          return EventBaru.fromFirestore(e, 1);
         }).toList();
         //  String? category = list?[i]['category'].toString();
         // String? date = list?[i]['date'].toString();

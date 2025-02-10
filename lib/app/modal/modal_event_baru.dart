@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class EventBaru {
@@ -27,12 +26,11 @@ class EventBaru {
   String? typePayment;
   double? distance;
 
-
   EventBaru(
       {this.category,
       this.date,
       this.description,
-    this.joinEvent,
+      this.joinEvent,
       this.id,
       this.location,
       this.time,
@@ -45,7 +43,8 @@ class EventBaru {
       this.type,
       this.userDesc,
       this.ticket,
-      this.userName,this.join,
+      this.userName,
+      this.join,
       this.image,
       this.count,
       this.latLng,
@@ -54,34 +53,31 @@ class EventBaru {
 
   factory EventBaru.fromFirestore(DocumentSnapshot snapshot, double distance) {
     Map data = snapshot.data() as Map<dynamic, dynamic>;
-    
-    
-  LatLng latLng = LatLng(data['mapsLatLink'], data['mapsLangLink']);
+
+    LatLng latLng = LatLng(data['mapsLatLink'], data['mapsLangLink']);
     return EventBaru(
-       category : data['category'],
-    date  : data['date'],
-    image: data['image'],
-    description  : data['description'],
-    id  : snapshot.id,
-    latLng: latLng,
-    count: data['count'],
-    location  : data['location'],
-    typePayment: data['typePayment'],
-    time: data['time'],
-    mapsLangLink  : data['mapsLangLink'],
-    mapsLatLink  : data['mapsLatLink'],
-    price  : data['price'],
-    title  : data['title'],
-    type  : data['type'],
-    ticket: data['ticket'],
-    joined: data['joined'],
-    join: data['join'],
-    userDesc  : data['userDesc'],
-    userName  : data['userName'],
-    userProfile  : data['userProfile'],
-      joinEvent: data['joinEvent'] ?? {},
-      distance: distance
-    );
+        category: data['category'],
+        date: data['date'],
+        image: data['image'],
+        description: data['description'],
+        id: snapshot.id,
+        latLng: latLng,
+        count: data['count'],
+        location: data['location'],
+        typePayment: data['typePayment'],
+        time: data['time'],
+        mapsLangLink: data['mapsLangLink'],
+        mapsLatLink: data['mapsLatLink'],
+        price: data['price'],
+        title: data['title'],
+        type: data['type'],
+        ticket: data['ticket'],
+        joined: data['joined'],
+        join: data['join'],
+        userDesc: data['userDesc'],
+        userName: data['userName'],
+        userProfile: data['userProfile'],
+        joinEvent: data['joinEvent'] ?? {},
+        distance: distance);
   }
 }
-

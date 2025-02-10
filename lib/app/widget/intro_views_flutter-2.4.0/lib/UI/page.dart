@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../Models/page_view_model.dart';
+
 /// This is the class which contains the Page UI.
 class PageIntro extends StatelessWidget {
   ///page details

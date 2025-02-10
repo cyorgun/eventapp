@@ -1,16 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/view/home/tab/tab_home.dart';
-import 'package:evente/evente.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:easy_localization/easy_localization.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
@@ -27,6 +21,7 @@ class _GuestMapsScreenT1State extends State<GuestMapsScreenT1> {
   late GoogleMapController _controller;
   BitmapDescriptor? customIcon;
   bool isMapCreated = false;
+
   // List<Marker> allMarkers = [];
 
   List<Marker> allMarkers = [];
@@ -36,6 +31,7 @@ class _GuestMapsScreenT1State extends State<GuestMapsScreenT1> {
   List<Map<dynamic, dynamic>> dataList2 = [];
 
   final firestoreInstance = FirebaseFirestore.instance;
+
   // List<DocumentSnapshot> dataList = [];
 
   int? prevPage;
@@ -240,31 +236,28 @@ class _GuestMapsScreenT1State extends State<GuestMapsScreenT1> {
   }
 
   moveCamera() {
-      firestoreInstance.collection("event").get().then((querySnapshot) {
-          final events = querySnapshot.docs.map((e) {
-              return EventBaru.fromFirestore(e,1);
-            }).toList();
-            
-   
+    firestoreInstance.collection("event").get().then((querySnapshot) {
+      final events = querySnapshot.docs.map((e) {
+        return EventBaru.fromFirestore(e, 1);
+      }).toList();
+
       _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: events[_pageController!.page!.toInt()].latLng!,
-        zoom: 15.0,
-        bearing: 45.0,
-        tilt: 45.0)));
+          target: events[_pageController!.page!.toInt()].latLng!,
+          zoom: 15.0,
+          bearing: 45.0,
+          tilt: 45.0)));
     });
-    
   }
 
   Widget cardMaps(index) {
     return StreamBuilder<QuerySnapshot>(
-      
         stream: FirebaseFirestore.instance.collection('event').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();
           final List<EventBaru> lokasiList = snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final events = snapshot.data?.docs.map((e) {
-              return EventBaru.fromFirestore(e,1);
+              return EventBaru.fromFirestore(e, 1);
             }).toList();
 
             return EventBaru(
@@ -502,6 +495,7 @@ class _GuestMapsScreenT1State extends State<GuestMapsScreenT1> {
 
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override
@@ -528,8 +522,7 @@ class joinEvents extends StatelessWidget {
                       height: 24.0,
                       width: 24.0,
                       decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(70.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
                           image: DecorationImage(
                               image: NetworkImage(_img ?? ''),
                               fit: BoxFit.cover)),
@@ -549,7 +542,7 @@ class joinEvents extends StatelessWidget {
                 height: 32.h,
                 width: 32.h,
                 decoration: BoxDecoration(
-                                color: accentColor,
+                    color: accentColor,
                     borderRadius: BorderRadius.circular(30.h),
                     border: Border.all(color: Colors.white, width: 1.5.h)),
                 alignment: Alignment.center,
@@ -557,15 +550,14 @@ class joinEvents extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    getCustomFont(list?.length.toString() ?? '', 12.sp,
-                        Colors.white, 1,
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                     getCustomFont(" +", 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                   ],
                 ),
               ),
-
             ],
           ),
         )
@@ -573,5 +565,3 @@ class joinEvents extends StatelessWidget {
     );
   }
 }
-
-

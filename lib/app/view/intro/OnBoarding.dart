@@ -1,14 +1,10 @@
 import 'package:event_app/app/widget/intro_views_flutter-2.4.0/lib/intro_views_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
-import 'welcome.dart';
-import '../../routes/app_routes.dart';
 import '../../widget/intro_views_flutter-2.4.0/lib/Models/page_view_model.dart';
-
+import 'welcome.dart';
 
 class OnBoarding extends StatefulWidget {
   @override
@@ -112,7 +108,7 @@ class _OnBoardingState extends State<OnBoarding> {
         style: _fontDescriptionStyle.copyWith(
             color: accentColor,
             fontWeight: FontWeight.w800,
-    fontFamily: Constant.fontsFamily,
+            fontFamily: Constant.fontsFamily,
             letterSpacing: 1.0),
       ),
       doneText: Text(
@@ -120,12 +116,13 @@ class _OnBoardingState extends State<OnBoarding> {
         style: _fontDescriptionStyle.copyWith(
             color: accentColor,
             fontWeight: FontWeight.w800,
-    fontFamily: Constant.fontsFamily,
+            fontFamily: Constant.fontsFamily,
             letterSpacing: 1.0),
       ),
       onTapDoneButton: () async {
-     Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
-                                // Get.toNamed(Routes.loginRoute);
+        Navigator.of(context).push(
+            PageRouteBuilder(pageBuilder: (_, __, ___) => new WelcomePage()));
+        // Get.toNamed(Routes.loginRoute);
       },
     );
   }

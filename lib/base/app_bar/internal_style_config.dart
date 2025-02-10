@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'bar.dart';
 import 'interface.dart';
 
-
 /// Internal style configuration.
 class InternalStyle extends StyleHook {
   @override

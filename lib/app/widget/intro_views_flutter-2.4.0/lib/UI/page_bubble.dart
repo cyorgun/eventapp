@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:event_app/base/color_data.dart';
 import 'package:flutter/material.dart';
 
 import '../Models/page_bubble_view_model.dart';
+
 /// This class contains the UI for page bubble.
 class PageBubble extends StatelessWidget {
   //view model
@@ -25,13 +24,15 @@ class PageBubble extends StatelessWidget {
         child: new Padding(
           padding: const EdgeInsets.all(0.5),
           child: new Container(
-            width:
-                60.0, //This method return in between values according to active percent.
+            width: 60.0,
+            //This method return in between values according to active percent.
             height: 4.0,
             decoration: new BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(0.0)),
               //Alpha is used to create fade effect for background color
-              color: viewModel!.isHollow! ? accentColor.withOpacity(0.1) : accentColor,
+              color: viewModel!.isHollow!
+                  ? accentColor.withOpacity(0.1)
+                  : accentColor,
               border: new Border.all(
                 color: viewModel!.isHollow!
                     ? viewModel!.bubbleBackgroundColor.withAlpha(
@@ -39,7 +40,8 @@ class PageBubble extends StatelessWidget {
                     : Colors.white10,
                 width: 2.0,
               ), //Border
-            ), //BoxDecoration
+            ),
+            //BoxDecoration
             child: new Opacity(
               opacity: viewModel!.activePercent!,
               child: (viewModel!.iconAssetPath != null &&

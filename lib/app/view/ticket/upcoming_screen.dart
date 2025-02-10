@@ -1,20 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:evente/evente.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:event_app/base/color_data.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'dart:math' as math;
 
-import '../bloc/sign_in_bloc.dart';
-import 'package:easy_localization/easy_localization.dart';
+import '../../provider/sign_in_provider.dart';
 
 class UpComingScreen extends StatefulWidget {
   const UpComingScreen({Key? key}) : super(key: key);
@@ -24,10 +21,9 @@ class UpComingScreen extends StatefulWidget {
 }
 
 class _UpComingScreenState extends State<UpComingScreen> {
-
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
 
     return Container(
       child: ListView(
@@ -179,8 +175,11 @@ class _UpComingScreenState extends State<UpComingScreen> {
               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
           getVerSpace(8.h),
           getMultilineCustomFont(
-              ("Explore more event and join get the ticket").tr(), 16.sp, Colors.black,
-              fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+              ("Explore more event and join get the ticket").tr(),
+              16.sp,
+              Colors.black,
+              fontWeight: FontWeight.w500,
+              txtHeight: 1.5.h)
         ],
       ),
     );
@@ -259,11 +258,12 @@ class DashedLineVerticalPainter extends CustomPainter {
 
 class itemData extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const itemData({this.list});
 
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
@@ -271,7 +271,7 @@ class itemData extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return EventBaru.fromFirestore(e,1);
+            return EventBaru.fromFirestore(e, 1);
           }).toList();
 
           DateTime? dateTime = events![i].date?.toDate();
@@ -303,11 +303,11 @@ class itemData extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                 QrImageView(
-                                    data:  '${events?[i].title!}',
-                                 version: QrVersions.auto,
-                                    size:80.0,
-                                  ),
+                                QrImageView(
+                                  data: '${events?[i].title!}',
+                                  version: QrVersions.auto,
+                                  size: 80.0,
+                                ),
                                 CustomPaint(
                                     size: Size(2.h, 105.h),
                                     painter: DashedLineVerticalPainter())
@@ -337,46 +337,46 @@ class itemData extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     getCustomFont(
-                                        ("Ticket :").tr() + "${events?[i].ticket.toString()}" ??
+                                        ("Ticket :").tr() +
+                                                "${events?[i].ticket.toString()}" ??
                                             '',
                                         15.sp,
                                         Colors.black,
                                         1,
                                         fontWeight: FontWeight.w500,
                                         txtHeight: 1.46.h),
-                                if(events[i].price!>0)      Container(
-                                      decoration: BoxDecoration(
-                                        color: lightAccent,
-                                        borderRadius:
-                                            BorderRadius.circular(12.h),
+                                    if (events[i].price! > 0)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: lightAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(12.h),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12.h, vertical: 6.h),
+                                        child: getCustomFont(
+                                            "\$ ${events?[i].price.toString()}" ??
+                                                '',
+                                            15.sp,
+                                            accentColor,
+                                            1,
+                                            fontWeight: FontWeight.w600,
+                                            txtHeight: 1.46.h),
                                       ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 12.h, vertical: 6.h),
-                                      child: getCustomFont(
-                                          "\$ ${events?[i].price.toString()}" ??
-                                              '',
-                                          15.sp,
-                                          accentColor,
-                                          1,
-                                          fontWeight: FontWeight.w600,
-                                          txtHeight: 1.46.h),
-                                    ),
-                                     if(events[i].price==0)      Container(
-                                      decoration: BoxDecoration(
-                                        color: lightAccent,
-                                        borderRadius:
-                                            BorderRadius.circular(12.h),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 12.h, vertical: 6.h),
-                                      child: getCustomFont(
-                                          ("Free").tr(),
-                                          15.sp,
-                                          accentColor,
-                                          1,
-                                          fontWeight: FontWeight.w600,
-                                          txtHeight: 1.46.h),
-                                    )
+                                    if (events[i].price == 0)
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: lightAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(12.h),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 12.h, vertical: 6.h),
+                                        child: getCustomFont(("Free").tr(),
+                                            15.sp, accentColor, 1,
+                                            fontWeight: FontWeight.w600,
+                                            txtHeight: 1.46.h),
+                                      )
                                   ],
                                 )
                               ],

@@ -19,10 +19,8 @@ import 'package:flutter/cupertino.dart';
 
 import 'bar.dart';
 import 'interface.dart';
-import 'item.dart';
-
-
 import 'internal_style_config.dart';
+import 'item.dart';
 
 /// Simple builder which extend [DelegateBuilder] to provide some necessary config.
 abstract class InnerBuilder extends DelegateBuilder {

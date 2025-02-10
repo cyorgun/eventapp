@@ -1,25 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/view/home/tab/tab_home.dart';
-import 'package:evente/evente.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:easy_localization/easy_localization.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
 import '../../featured_event/featured_event_detail2.dart';
-import '../cardSlider/cardSlider.dart';
-import '../cardSlider/lokasimodel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:showcaseview/showcaseview.dart';
 
 class showCaseMaps extends StatefulWidget {
   const showCaseMaps({super.key});
@@ -32,12 +24,8 @@ class _showCaseMapsState extends State<showCaseMaps> {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-      builder:Builder(
-    builder : (context)=> MapsScreenT1()
-  ),
-      
+      builder: Builder(builder: (context) => MapsScreenT1()),
     );
-    
   }
 }
 
@@ -52,6 +40,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   late GoogleMapController _controller;
   BitmapDescriptor? customIcon;
   bool isMapCreated = false;
+
   // List<Marker> allMarkers = [];
 
   List<Marker> allMarkers = [];
@@ -61,11 +50,13 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   List<Map<dynamic, dynamic>> dataList2 = [];
 
   final firestoreInstance = FirebaseFirestore.instance;
+
   // List<DocumentSnapshot> dataList = [];
- LatLng? currentPosition;
+  LatLng? currentPosition;
   int? prevPage;
 
   GlobalKey _one = GlobalKey();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -113,7 +104,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
     getDataFromFirestore();
     _pageController = PageController(initialPage: 1, viewportFraction: 0.8)
       ..addListener(_onScroll);
-  Geolocator.getCurrentPosition().then((value) {
+    Geolocator.getCurrentPosition().then((value) {
       setState(() {
         currentPosition = LatLng(value.latitude, value.longitude);
       });
@@ -122,12 +113,12 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
     super.initState();
   }
 
-
   CameraPosition initialCameraPosition = CameraPosition(
     target: LatLng(40.7078523, -74.008981),
     zoom: 10.0,
   );
- Future<void> _getCurrentLocation() async {
+
+  Future<void> _getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
@@ -139,8 +130,6 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
       );
     });
   }
-
-
 
   Set<Marker> markers = Set<Marker>();
 
@@ -184,8 +173,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
   @override
   Widget build(BuildContext context) {
-
-      SharedPreferences preferences;
+    SharedPreferences preferences;
 
     displayShowcase() async {
       preferences = await SharedPreferences.getInstance();
@@ -222,48 +210,49 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
       child: Scaffold(
           body: Stack(
         children: <Widget>[
-        if (currentPosition == null) CircularProgressIndicator(),
-          if (currentPosition != null)   Showcase(
-                              key: _one,
-                              description:
-                                  "Here to set maps location.",
-                          
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                mapType: MapType.normal,
-               initialCameraPosition: CameraPosition(
-                  target: currentPosition!,
-                  zoom: 15,
+          if (currentPosition == null) CircularProgressIndicator(),
+          if (currentPosition != null)
+            Showcase(
+              key: _one,
+              description: "Here to set maps location.",
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: GoogleMap(
+                  mapType: MapType.normal,
+                  initialCameraPosition: CameraPosition(
+                    target: currentPosition!,
+                    zoom: 15,
+                  ),
+                  // markers: markers,
+                  onTap: (pos) {
+                    print(pos);
+                    Marker m = Marker(
+                        markerId: MarkerId('1'),
+                        icon: customIcon!,
+                        position: pos);
+                    setState(() {
+                      markers.add(m);
+                    });
+                  },
+                  markers: Set.from(markers),
+                  //                {
+                  // Marker(
+                  //   markerId: const MarkerId("marker1"),
+                  //   position:  LatLng(40.7078523, -74.008981),
+                  //   draggable: true,
+                  //   onDragEnd: (value) {
+                  //     // value is the new position
+                  //   },
+                  //   // To do: custom marker icon
+                  // ),},
+
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller = controller;
+                  },
                 ),
-                // markers: markers,
-                onTap: (pos) {
-                  print(pos);
-                  Marker m = Marker(
-                      markerId: MarkerId('1'), icon: customIcon!, position: pos);
-                  setState(() {
-                    markers.add(m);
-                  });
-                },
-                markers: Set.from(markers),
-                //                {
-                // Marker(
-                //   markerId: const MarkerId("marker1"),
-                //   position:  LatLng(40.7078523, -74.008981),
-                //   draggable: true,
-                //   onDragEnd: (value) {
-                //     // value is the new position
-                //   },
-                //   // To do: custom marker icon
-                // ),},
-                  
-                onMapCreated: (GoogleMapController controller) {
-                  _controller = controller;
-                },
               ),
             ),
-          ),
           dataList.length == 0
               ? Center(
                   child: CircularProgressIndicator(),
@@ -297,8 +286,8 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                     children: [
                       SizedBox(),
                       Padding(
-                        padding:
-                            const EdgeInsets.only(left: 20.0, right: 20.0, top: 0.0),
+                        padding: const EdgeInsets.only(
+                            left: 20.0, right: 20.0, top: 0.0),
                         child: Center(
                           child: Text(
                             ("Locations").tr(),
@@ -311,8 +300,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                           ),
                         ),
                       ),
-
-                       Padding(
+                      Padding(
                         padding: const EdgeInsets.only(right: 15.0),
                         child: InkWell(
                             onTap: () {
@@ -355,31 +343,28 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   }
 
   moveCamera() {
-      firestoreInstance.collection("event").get().then((querySnapshot) {
-          final events = querySnapshot.docs.map((e) {
-              return EventBaru.fromFirestore(e,1);
-            }).toList();
-            
-   
+    firestoreInstance.collection("event").get().then((querySnapshot) {
+      final events = querySnapshot.docs.map((e) {
+        return EventBaru.fromFirestore(e, 1);
+      }).toList();
+
       _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        target: events[_pageController!.page!.toInt()].latLng!,
-        zoom: 15.0,
-        bearing: 45.0,
-        tilt: 45.0)));
+          target: events[_pageController!.page!.toInt()].latLng!,
+          zoom: 15.0,
+          bearing: 45.0,
+          tilt: 45.0)));
     });
-    
   }
 
   Widget cardMaps(index) {
     return StreamBuilder<QuerySnapshot>(
-      
         stream: FirebaseFirestore.instance.collection('event').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return CircularProgressIndicator();
           final List<EventBaru> lokasiList = snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final events = snapshot.data?.docs.map((e) {
-              return EventBaru.fromFirestore(e,1);
+              return EventBaru.fromFirestore(e, 1);
             }).toList();
 
             return EventBaru(
@@ -617,6 +602,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override
@@ -643,8 +629,7 @@ class joinEvents extends StatelessWidget {
                       height: 24.0,
                       width: 24.0,
                       decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(70.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
                           image: DecorationImage(
                               image: NetworkImage(_img ?? ''),
                               fit: BoxFit.cover)),
@@ -664,7 +649,7 @@ class joinEvents extends StatelessWidget {
                 height: 32.h,
                 width: 32.h,
                 decoration: BoxDecoration(
-                                color: accentColor,
+                    color: accentColor,
                     borderRadius: BorderRadius.circular(30.h),
                     border: Border.all(color: Colors.white, width: 1.5.h)),
                 alignment: Alignment.center,
@@ -672,15 +657,14 @@ class joinEvents extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    getCustomFont(list?.length.toString() ?? '', 12.sp,
-                        Colors.white, 1,
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                     getCustomFont(" +", 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                   ],
                 ),
               ),
-
             ],
           ),
         )
@@ -688,8 +672,6 @@ class joinEvents extends StatelessWidget {
     );
   }
 }
-
-
 
 class KeysToBeInherited extends InheritedWidget {
   final GlobalKey notification;

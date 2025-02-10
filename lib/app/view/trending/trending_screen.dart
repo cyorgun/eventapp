@@ -1,18 +1,18 @@
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:event_app/app/modal/modal_event_baru.dart';
+
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
 import '../featured_event/featured_event_detail2.dart';
 import '../home/search_screen.dart';
 import '../home/tab/tab_home.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class TrendingScreen extends StatefulWidget {
   const TrendingScreen({Key? key}) : super(key: key);
@@ -22,8 +22,6 @@ class TrendingScreen extends StatefulWidget {
 }
 
 class _TrendingScreenState extends State<TrendingScreen> {
- 
-
   TrendingController controller = TrendingController();
 
   @override
@@ -53,7 +51,8 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     Navigator.of(context).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => new SearchPage()));
                   }),
-                  child: getSvg('search.svg', color: accentColor,height: 20.0,width: 20.0)),
+                  child: getSvg('search.svg',
+                      color: accentColor, height: 20.0, width: 20.0)),
             ),
           ]),
       body: SafeArea(
@@ -62,8 +61,8 @@ class _TrendingScreenState extends State<TrendingScreen> {
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(
-                  45.0), // here the desired height
+              preferredSize:
+                  const Size.fromHeight(45.0), // here the desired height
               // ignore: unnecessary_new
               child: new AppBar(
                   backgroundColor: Colors.transparent,
@@ -89,10 +88,9 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               Text(
+                              Text(
                                 ("All").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -108,8 +106,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -122,21 +119,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_7_swimming.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_7_swimming.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Swimming").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -152,8 +145,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -166,21 +158,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_8_game.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_8_game.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Game").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -196,8 +184,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -210,21 +197,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_9_fotball.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_9_fotball.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Football").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -240,8 +223,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -254,21 +236,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_10_comedy.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_10_comedy.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Comedy").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -285,8 +263,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -299,21 +276,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_11_konser.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_11_konser.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Konser").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -330,8 +303,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -344,21 +316,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_12_trophy.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_12_trophy.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Trophy").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -375,8 +343,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -389,21 +356,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_1_tour.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_1_tour.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Tour").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -419,8 +382,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -433,21 +395,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_2_festival.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_2_festival.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Festival").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -463,8 +421,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -477,21 +434,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_3_study.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_3_study.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Study").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -507,8 +460,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -521,21 +473,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_4_party.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_4_party.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Party").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -552,8 +500,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -566,21 +513,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_5_olympic.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_5_olympic.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Olympic").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -596,8 +539,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
                         child: Container(
                           height: 47.h,
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
@@ -610,21 +552,17 @@ class _TrendingScreenState extends State<TrendingScreen> {
                                       decoration: BoxDecoration(
                                           color: lightAccent,
                                           borderRadius:
-                                              BorderRadius.circular(
-                                                  20.h)),
+                                              BorderRadius.circular(20.h)),
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 9.h,
-                                          vertical: 9.h),
-                                      child: getAssetImage(
-                                          "i_6_culture.png",
-                                          height: 26.h,
-                                          width: 26.h),
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: getAssetImage("i_6_culture.png",
+                                          height: 26.h, width: 26.h),
                                     ),
                                   ),
                                   getHorSpace(6.h),
                                 ],
                               ),
-                               Text(
+                              Text(
                                 ("Culture").tr(),
                                 style: TextStyle(
                                     fontFamily: Constant.fontsFamily,
@@ -646,24 +584,20 @@ class _TrendingScreenState extends State<TrendingScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                       
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
                         return Center(child: Text('Error'));
                       }
-                            
+
                       return snapshot.hasData
                           ? TrendingEventCard(
                               list: snapshot.data?.docs,
@@ -674,29 +608,25 @@ class _TrendingScreenState extends State<TrendingScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        
                         .where('category', isEqualTo: 'swimming')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
+
                       // if (snapshot.hasError) {
                       //   return Center(child: Text('Error'));
                       // }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         // return Center(child: EmptyScreen());
                         return TrendingEventCard(
-                              list: snapshot.data?.docs,
-                            );
+                          list: snapshot.data?.docs,
+                        );
                       }
-                            
+
                       return snapshot.hasData
                           ? TrendingEventCard(
                               list: snapshot.data?.docs,
@@ -708,18 +638,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'game')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -736,18 +662,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'football')
-                       
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -764,18 +686,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'comedy')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -792,18 +710,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'konser')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -820,18 +734,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'trophy')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -848,18 +758,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'tour')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -876,18 +782,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'festival')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -904,18 +806,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'study')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -932,18 +830,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'party')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -960,18 +854,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'olympic')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -988,18 +878,14 @@ class _TrendingScreenState extends State<TrendingScreen> {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('category', isEqualTo: 'culture')
-                         
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator());
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
                       }
-                            
-                      if (!snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return Center(child: EmptyScreen());
                       }
                       if (snapshot.hasError) {
@@ -1046,6 +932,7 @@ class _TrendingScreenState extends State<TrendingScreen> {
 
 class buildFeatureEventList2 extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const buildFeatureEventList2({this.list});
 
   @override
@@ -1057,7 +944,7 @@ class buildFeatureEventList2 extends StatelessWidget {
       itemCount: list?.length,
       itemBuilder: (context, i) {
         final events = list?.map((e) {
-          return EventBaru.fromFirestore(e,1);
+          return EventBaru.fromFirestore(e, 1);
         }).toList();
         //  String? category = list?[i]['category'].toString();
         // String? date = list?[i]['date'].toString();
@@ -1129,8 +1016,8 @@ class buildFeatureEventList2 extends StatelessWidget {
                         ],
                       ),
                       getVerSpace(22.h),
-                      getButton(context, accentColor, ("Book Now").tr(), Colors.white,
-                          () {}, 14.sp,
+                      getButton(context, accentColor, ("Book Now").tr(),
+                          Colors.white, () {}, 14.sp,
                           weight: FontWeight.w700,
                           buttonHeight: 40.h,
                           borderRadius: BorderRadius.circular(14.h),

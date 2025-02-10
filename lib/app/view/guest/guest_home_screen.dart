@@ -1,18 +1,13 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:event_app/app/view/create_event/create_event_screen.dart';
 import 'package:event_app/app/view/guest/tab/tab_maps.dart';
-import 'package:event_app/app/view/home/tab/tab_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// import '../../../base/appBar/bar.dart';
-// import '../../../base/appBar/item.dart';
+// import '../../../base/app_bar/bar.dart';
+// import '../../../base/app_bar/item.dart';
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'tab/tab_favourite.dart';
 import 'tab/tab_home.dart';
 import 'tab/tab_profile.dart';
@@ -26,8 +21,6 @@ class GuestHomeScreen extends StatefulWidget {
 }
 
 class _GuestHomeScreenState extends State<GuestHomeScreen> {
-
-
   @override
   void initState() {
     // TODO: implement initState

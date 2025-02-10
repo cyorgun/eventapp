@@ -1,7 +1,8 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/view/home/cardSlider/lokasimodel.dart';
 import 'package:flutter/material.dart';
-import 'package:card_swiper/card_swiper.dart';
+
 import 'googlemaps.dart';
 
 class CardSlider extends StatelessWidget {
@@ -20,7 +21,8 @@ class CardSlider extends StatelessWidget {
         itemBuilder: (context, index) {
           return Card(
             elevation: 5,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -81,4 +83,3 @@ class MyApps extends StatelessWidget {
     );
   }
 }
-

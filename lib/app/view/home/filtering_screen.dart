@@ -1,16 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/view/home/tab/tab_home.dart';
 import 'package:event_app/base/color_data.dart';
-import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:intl/intl.dart';
-import 'package:easy_localization/easy_localization.dart';
-
 import '../../../base/widget_utils.dart';
-
 import '../../widget/empty_screen.dart';
 import '../featured_event/featured_event_detail2.dart';
 
@@ -34,6 +29,7 @@ class _FilterScreenState extends State<FilterScreen> {
   bool _isCategoryLSelected = false;
   bool _isCategoryMSelected = false;
   bool _isCategoryNSelected = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -499,7 +495,7 @@ class _FilterScreenState extends State<FilterScreen> {
                       itemCount: snapshot.data?.docs.length,
                       itemBuilder: (context, i) {
                         final events = snapshot.data?.docs.map((e) {
-                          return EventBaru.fromFirestore(e,1);
+                          return EventBaru.fromFirestore(e, 1);
                         }).toList();
                         DateTime? dateTime = events![i].date?.toDate();
                         String date =
@@ -607,7 +603,8 @@ class _FilterScreenState extends State<FilterScreen> {
                                                       15.sp,
                                                       greyColor,
                                                       1,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       txtHeight: 1.5.h),
                                                 ),
                                               ],
@@ -616,72 +613,107 @@ class _FilterScreenState extends State<FilterScreen> {
                                             Row(
                                               children: [
                                                 StreamBuilder(
-                                                  stream: FirebaseFirestore.instance
+                                                  stream: FirebaseFirestore
+                                                      .instance
                                                       .collection("JoinEvent")
                                                       .doc("user")
                                                       .collection(
                                                           events[i].title ?? '')
                                                       .snapshots(),
                                                   builder: (BuildContext ctx,
-                                                      AsyncSnapshot<QuerySnapshot>
+                                                      AsyncSnapshot<
+                                                              QuerySnapshot>
                                                           snapshot) {
                                                     return snapshot.hasData
                                                         ? new joinEvents(
-                                                            list:
-                                                                snapshot.data?.docs,
+                                                            list: snapshot
+                                                                .data?.docs,
                                                           )
                                                         : Container();
                                                   },
                                                 ),
-                                                 if(events[i].price!>0)
-                                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                "\$ " + (events?[i].price.toString() ?? ""),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                       if(events[i].price==0)  
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                              
+                                                if (events[i].price! > 0)
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 0.0,
+                                                                bottom: 0.0),
+                                                        child: Container(
+                                                          height: 35.h,
+                                                          width: 80.0,
+                                                          decoration: BoxDecoration(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.051),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50.h)),
+                                                          child: Center(
+                                                              child: Text(
+                                                            "\$ " +
+                                                                (events?[i]
+                                                                        .price
+                                                                        .toString() ??
+                                                                    ""),
+                                                            style: TextStyle(
+                                                                color:
+                                                                    accentColor,
+                                                                fontSize: 15.sp,
+                                                                fontFamily:
+                                                                    'Gilroy',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          )),
+                                                        )),
+                                                  ),
+                                                if (events[i].price == 0)
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 0.0,
+                                                                bottom: 0.0),
+                                                        child: Container(
+                                                          height: 35.h,
+                                                          width: 80.0,
+                                                          decoration: BoxDecoration(
+                                                              color: Colors
+                                                                  .black
+                                                                  .withOpacity(
+                                                                      0.051),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50.h)),
+                                                          child: Center(
+                                                              child: Text(
+                                                            ("Free").tr(),
+                                                            style: TextStyle(
+                                                                color:
+                                                                    accentColor,
+                                                                fontSize: 15.sp,
+                                                                fontFamily:
+                                                                    'Gilroy',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          )),
+                                                        )),
+                                                  ),
                                               ],
                                             ),
                                           ],
@@ -690,7 +722,6 @@ class _FilterScreenState extends State<FilterScreen> {
                                     ],
                                   ),
                                 ),
-                               
                               ],
                             ),
                           ),
@@ -706,10 +737,9 @@ class _FilterScreenState extends State<FilterScreen> {
   }
 }
 
-
-
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override
@@ -736,8 +766,7 @@ class joinEvents extends StatelessWidget {
                       height: 24.0,
                       width: 24.0,
                       decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(70.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
                           image: DecorationImage(
                               image: NetworkImage(_img ?? ''),
                               fit: BoxFit.cover)),
@@ -757,7 +786,7 @@ class joinEvents extends StatelessWidget {
                 height: 32.h,
                 width: 32.h,
                 decoration: BoxDecoration(
-                                color: accentColor,
+                    color: accentColor,
                     borderRadius: BorderRadius.circular(30.h),
                     border: Border.all(color: Colors.white, width: 1.5.h)),
                 alignment: Alignment.center,
@@ -765,15 +794,14 @@ class joinEvents extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    getCustomFont(list?.length.toString() ?? '', 12.sp,
-                        Colors.white, 1,
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                     getCustomFont(" +", 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                   ],
                 ),
               ),
-
             ],
           ),
         )
@@ -781,5 +809,3 @@ class joinEvents extends StatelessWidget {
     );
   }
 }
-
-

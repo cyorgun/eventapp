@@ -1,4 +1,3 @@
-
 //view model for page indicator
 
 import 'package:event_app/app/widget/intro_views_flutter-2.4.0/lib/Models/page_view_model.dart';

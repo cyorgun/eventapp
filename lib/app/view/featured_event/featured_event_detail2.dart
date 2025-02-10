@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/intro/welcome.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
@@ -8,26 +8,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
-import 'package:easy_localization/easy_localization.dart';
 
-import 'package:evente/evente.dart';
-import '../../../base/constant.dart';
 import '../../chat_logic/pages/chat_page.dart';
+import '../../provider/bookmark_provider.dart';
+import '../../provider/sign_in_provider.dart';
 import '../../widget/empty_screen.dart';
 import '../../widget/love_icon.dart';
-import 'package:evente/evente.dart';
 import '../../widget/map_sheet.dart';
-import '../bloc/bookmark_bloc.dart';
-import '../bloc/sign_in_bloc.dart';
 import '../home/tab/tab_home.dart';
 import 'buy_ticket.dart';
 
 class FeaturedEvent2Detail extends StatefulWidget {
   EventBaru? event;
+
   FeaturedEvent2Detail({
     Key? key,
     this.event,
@@ -38,8 +34,6 @@ class FeaturedEvent2Detail extends StatefulWidget {
 }
 
 class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
-
-
   late GoogleMapController mapController;
 
   final LatLng _center = const LatLng(45.521563, -122.677433);
@@ -50,7 +44,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     final EventBaru event = widget.event!;
 // event.joinEvent!.forEach((id, data) {
 //     String name = data['name'];
@@ -70,100 +64,96 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
             color: Colors.white,
             child: buildImageWidget(),
           ),
-         
-         if(sb.name == null )
-         Align(
-            alignment: Alignment.bottomCenter,
-           child: Padding(
-             padding: const EdgeInsets.only(left:20.0,right: 20.0),
-             child: InkWell(
-              onTap: (){
-                Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>WelcomePage()));
-              },
-               child: Container(
-                height: 55.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: BorderRadius.all(Radius.circular(50.0))
-                ),
-                child: Center(
-                  child: Text(
-                    "Login to buy ticket",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600
+          if (sb.name == null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => WelcomePage()));
+                  },
+                  child: Container(
+                    height: 55.0,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.all(Radius.circular(50.0))),
+                    child: Center(
+                      child: Text(
+                        "Login to buy ticket",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ),
-               ),
-             ),
-           ),
-         )
-         else         
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: getPaddingWidget(
-              EdgeInsets.symmetric(horizontal: 0.h),
-              Container(
-                color: Colors.white,
-                height: 60.0,
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    Center(
-                      child: Container(
-                        height: 55.h,
-                        width: 55.h,
-                        margin: EdgeInsets.only(top: 0.h, right: 20.h),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 13.h, horizontal: 13.h),
-                        decoration: BoxDecoration(
-                            color: accentColor.withOpacity(0.09),
-                            borderRadius: BorderRadius.circular(22.h)),
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChatPage(
-                                    arguments: ChatPageArguments(
-                                      peerId: event.title ?? '',
-                                      peerAvatar: sb.imageUrl ?? '',
-                                      peerNickname: sb.name ?? '',
+              ),
+            )
+          else
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: getPaddingWidget(
+                EdgeInsets.symmetric(horizontal: 0.h),
+                Container(
+                  color: Colors.white,
+                  height: 60.0,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 20.0,
+                      ),
+                      Center(
+                        child: Container(
+                          height: 55.h,
+                          width: 55.h,
+                          margin: EdgeInsets.only(top: 0.h, right: 20.h),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 13.h, horizontal: 13.h),
+                          decoration: BoxDecoration(
+                              color: accentColor.withOpacity(0.09),
+                              borderRadius: BorderRadius.circular(22.h)),
+                          child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                      arguments: ChatPageArguments(
+                                        peerId: event.title ?? '',
+                                        peerAvatar: sb.imageUrl ?? '',
+                                        peerNickname: sb.name ?? '',
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                            child: getSvg("message.svg",
-                                color: accentColor,
-                                height: 24.h,
-                                width: 24.h)),
+                                );
+                              },
+                              child: getSvg("message.svg",
+                                  color: accentColor,
+                                  height: 24.h,
+                                  width: 24.h)),
+                        ),
                       ),
-                    ),
-                    getButton(
-                        context, accentColor, ("Buy Ticket").tr(), Colors.white,
-                        () {
-                      Navigator.of(context).push(PageRouteBuilder(
-                          pageBuilder: (_, __, ___) => new BuyTicket(
-                                event: event,
-                              )));
-                    }, 18.sp,
-                        weight: FontWeight.w700,
-                        buttonHeight: 60.h,
-                        buttonWidth:
-                            MediaQuery.of(context).size.width - 148.h,
-                        borderRadius: BorderRadius.circular(22.h)),
-                  ],
+                      getButton(context, accentColor, ("Buy Ticket").tr(),
+                          Colors.white, () {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => new BuyTicket(
+                                  event: event,
+                                )));
+                      }, 18.sp,
+                          weight: FontWeight.w700,
+                          buttonHeight: 60.h,
+                          buttonWidth:
+                              MediaQuery.of(context).size.width - 148.h,
+                          borderRadius: BorderRadius.circular(22.h)),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-       
         ],
       ),
     );
@@ -171,7 +161,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 
   handleLoveClick() {
     final EventBaru event = widget.event!;
-    context.read<BookmarkBloc>().onBookmarkIconClick(event.title);
+    context.read<BookmarkProvider>().onBookmarkIconClick(event.title);
   }
 
   Widget buildFollowWidget(BuildContext context) {
@@ -233,46 +223,46 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
             children: [
               // getSvgImage("ticket.svg",
               //     width: 24.h, height: 24.h, color: Colors.black),
-          
+
               getAssetImage("tiket.png", width: 28.h, height: 28.h),
               getHorSpace(5.h),
-              getRichText(("Ticket Price ").tr(), Colors.black, FontWeight.w600, 15.sp,
-                  "", greyColor, FontWeight.w500, 13.sp),
+              getRichText(("Ticket Price ").tr(), Colors.black, FontWeight.w600,
+                  15.sp, "", greyColor, FontWeight.w500, 13.sp),
             ],
           ),
-               event.price==0?
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ): getCustomFont(
-              "\$" + event.price.toString() ?? "", 20.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700),
+          event.price == 0
+              ? Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                      padding: const EdgeInsets.only(left: 0.0, bottom: 0.0),
+                      child: Container(
+                        height: 35.h,
+                        width: 80.0,
+                        decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.051),
+                            borderRadius: BorderRadius.circular(50.h)),
+                        child: Center(
+                            child: Text(
+                          ("Free").tr(),
+                          style: TextStyle(
+                              color: accentColor,
+                              fontSize: 15.sp,
+                              fontFamily: 'Gilroy',
+                              fontWeight: FontWeight.w700),
+                          textAlign: TextAlign.center,
+                        )),
+                      )),
+                )
+              : getCustomFont(
+                  "\$" + event.price.toString() ?? "", 20.sp, Colors.black, 1,
+                  fontWeight: FontWeight.w700),
         ],
       ),
     );
   }
 
   Widget buildImageWidget() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     final EventBaru event = widget.event!;
 
     DateTime? dateTime = event.date?.toDate();
@@ -319,7 +309,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                             color: Colors.white),
                         child: GestureDetector(
                           onTap: () {
-                           Navigator.of(context).pop();
+                            Navigator.of(context).pop();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(9.0),
@@ -383,8 +373,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   width: 70.0,
                   decoration: BoxDecoration(
                       color: greyColor.withOpacity(0.1),
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(30.0))),
+                      borderRadius: BorderRadius.all(Radius.circular(30.0))),
                 ),
               ),
               getVerSpace(20.h),
@@ -414,8 +403,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   )
                 ],
               ),
-             
-             
+
 //               Text(
 //   event.joinEvent != null && event.joinEvent!.isNotEmpty
 //       ? event.joinEvent!.values.first['name']
@@ -424,12 +412,13 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
               getCustomFont(event.title ?? '', 27.sp, Colors.black, 1,
                   fontWeight: FontWeight.w700, txtHeight: 1.5.h),
               getVerSpace(10.h),
-               Row(
+              Row(
                 children: [
                   CircleAvatar(
                     radius: 19.0,
                     backgroundColor: Colors.grey.withOpacity(0.11),
-                    child: getAssetImage("calendar.png", width: 22.h, height: 22.h),
+                    child: getAssetImage("calendar.png",
+                        width: 22.h, height: 22.h),
                   ),
                   SizedBox(
                     width: 10.0,
@@ -474,7 +463,8 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   CircleAvatar(
                     radius: 19.0,
                     backgroundColor: Colors.grey.withOpacity(0.11),
-                    child: getAssetImage("location.png", width: 22.h, height: 22.h),
+                    child: getAssetImage("location.png",
+                        width: 22.h, height: 22.h),
                   ),
                   getHorSpace(10.h),
                   Container(
@@ -490,7 +480,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   )
                 ],
               ),
-             
+
               // Row(
               //   children: [
               //     getSvg("Location.svg",
@@ -558,7 +548,6 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
               //   ],
               // ),
 
-
               getVerSpace(20.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -591,13 +580,10 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   ),
                 ],
               ),
-                getVerSpace(15.h),
+              getVerSpace(15.h),
 
-
-        
-        
               buildTicketPrice(),
-        
+
               getVerSpace(20.h),
               getCustomFont(('Description').tr(), 19.sp, Colors.black, 1,
                   fontWeight: FontWeight.w700, txtHeight: 1.5.h),
@@ -639,7 +625,8 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                   Container(
                     margin: EdgeInsets.symmetric(horizontal: 5.h),
                     height: 150.h,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(40.h)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40.h)),
                     child: GoogleMap(
                       trafficEnabled: true,
                       initialCameraPosition: CameraPosition(
@@ -671,7 +658,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       myLocationButtonEnabled: false,
                     ),
                   ),
-                                 InkWell(
+                  InkWell(
                     onTap: (() {
                       MapsSheet.show(
                         context: context,
@@ -685,7 +672,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       );
                     }),
                     child: Padding(
-                      padding: const EdgeInsets.only(left:5.0),
+                      padding: const EdgeInsets.only(left: 5.0),
                       child: Container(
                         height: 150.h,
                         width: 40.0,
@@ -729,7 +716,6 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       ),
                     ),
                   ),
-       
                 ],
               ),
               getVerSpace(45.h),
@@ -738,18 +724,20 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    
-                    getCustomFont(("Upcoming Events").tr(), 19.sp, Colors.black, 1,
+                    getCustomFont(
+                        ("Upcoming Events").tr(), 19.sp, Colors.black, 1,
                         fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                     GestureDetector(
                       onTap: () {
-                           Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => FeaturedEvent2Detail()));
-               
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) =>
+                                FeaturedEvent2Detail()));
+
                         // Constant.sendToNext(
                         //     context, Routes.featureEventListRoute);
                       },
-                      child: getCustomFont(("View All").tr(), 15.sp, greyColor, 1,
+                      child: getCustomFont(
+                          ("View All").tr(), 15.sp, greyColor, 1,
                           fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                     )
                   ],
@@ -770,8 +758,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       .snapshots(),
                   builder: (BuildContext ctx,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     }
 
@@ -927,12 +914,9 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 //   }
 // }
 
-
-
-
-
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override
@@ -959,8 +943,7 @@ class joinEvents extends StatelessWidget {
                       height: 24.0,
                       width: 24.0,
                       decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(70.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
                           image: DecorationImage(
                               image: NetworkImage(_img ?? ''),
                               fit: BoxFit.cover)),
@@ -980,7 +963,7 @@ class joinEvents extends StatelessWidget {
                 height: 32.h,
                 width: 32.h,
                 decoration: BoxDecoration(
-                                color: accentColor,
+                    color: accentColor,
                     borderRadius: BorderRadius.circular(30.h),
                     border: Border.all(color: Colors.white, width: 1.5.h)),
                 alignment: Alignment.center,
@@ -988,15 +971,14 @@ class joinEvents extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    getCustomFont(list?.length.toString() ?? '', 12.sp,
-                        Colors.white, 1,
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                     getCustomFont(" +", 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                   ],
                 ),
               ),
-
             ],
           ),
         )
@@ -1004,5 +986,3 @@ class joinEvents extends StatelessWidget {
     );
   }
 }
-
-

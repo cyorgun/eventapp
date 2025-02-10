@@ -1,5 +1,4 @@
 class NotificationModel {
-
   final String? timestamp;
   final DateTime? date;
   final String? title;
@@ -8,10 +7,10 @@ class NotificationModel {
   final String? thumbnailUrl;
 
   NotificationModel({
-    this.timestamp, 
-    this.date, 
-    this.title, 
-    this.body, 
+    this.timestamp,
+    this.date,
+    this.title,
+    this.body,
     this.postID,
     this.thumbnailUrl,
   });

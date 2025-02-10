@@ -15,9 +15,6 @@
  */
 
 import 'package:flutter/material.dart';
-
-
-
 import 'blend_image_icon.dart';
 import 'inner_builder.dart';
 import 'item.dart';

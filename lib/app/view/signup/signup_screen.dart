@@ -1,20 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/view/login/login_screens.dart';
 import 'package:event_app/app/widget/Rounded_Button.dart';
-import 'package:evente/evente.dart';
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/base/constant.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar.dart';
-import '../bloc/sign_in_bloc.dart';
-import '../select_interset/select_interest_screen.dart';
+import '../../provider/sign_in_provider.dart';
+import '../select_interest/select_interest_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -24,8 +22,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-
-
   GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
   var emailCtrl = TextEditingController();
   var passCtrl = TextEditingController();
@@ -57,7 +53,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future handleSignUpwithEmailPassword() async {
-    final SignInBloc sb = Provider.of<SignInBloc>(context, listen: false);
+    final SignInProvider sb =
+        Provider.of<SignInProvider>(context, listen: false);
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       FocusScope.of(context).requestFocus(new FocusNode());
@@ -79,9 +76,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             setState(() {
                               // signUpCompleted = true;
                             });
-                               Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => SelectInterestScreen()));
-               
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    SelectInterestScreen()));
+
                             // Constant.sendToNext(
                             //     context, Routes.selectInterestRoute);
                           })))));
@@ -152,7 +150,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         physics: const BouncingScrollPhysics(),
                         children: [
                           getVerSpace(30.h),
-                          getCustomFont(("Sign Up").tr(), 24.sp, Colors.black, 1,
+                          getCustomFont(
+                              ("Sign Up").tr(), 24.sp, Colors.black, 1,
                               fontWeight: FontWeight.w700,
                               textAlign: TextAlign.center,
                               txtHeight: 1.5.h),
@@ -194,20 +193,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       disabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       focusedBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: accentColor,
-                                              width: 1.h)),
+                                              color: accentColor, width: 1.h)),
                                       errorBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
@@ -228,12 +224,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       suffixIconConstraints: BoxConstraints(
                                         maxHeight: 24.h,
                                       ),
-                                      hintStyle: TextStyle(color: greyColor, fontWeight: FontWeight.w500, fontSize: 16.sp, fontFamily: Constant.fontsFamily)),
+                                      hintStyle: TextStyle(
+                                          color: greyColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16.sp,
+                                          fontFamily: Constant.fontsFamily)),
                                   validator: (String? value) {
                                     if (value!.length == 0)
                                       return ("Name can't be empty").tr();
@@ -246,7 +245,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                 ),
                                 getVerSpace(24.h),
-                                getCustomFont(("Email").tr(), 16.sp, Colors.black, 1,
+                                getCustomFont(
+                                    ("Email").tr(), 16.sp, Colors.black, 1,
                                     fontWeight: FontWeight.w600),
                                 getVerSpace(7.h),
                                 TextFormField(
@@ -263,20 +263,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       disabledBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       focusedBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: accentColor,
-                                              width: 1.h)),
+                                              color: accentColor, width: 1.h)),
                                       errorBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(22.h),
@@ -297,12 +294,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           borderRadius:
                                               BorderRadius.circular(22.h),
                                           borderSide: BorderSide(
-                                              color: borderColor,
-                                              width: 1.h)),
+                                              color: borderColor, width: 1.h)),
                                       suffixIconConstraints: BoxConstraints(
                                         maxHeight: 24.h,
                                       ),
-                                      hintStyle: TextStyle(color: greyColor, fontWeight: FontWeight.w500, fontSize: 16.sp, fontFamily: Constant.fontsFamily)),
+                                      hintStyle: TextStyle(
+                                          color: greyColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16.sp,
+                                          fontFamily: Constant.fontsFamily)),
                                   controller: emailCtrl,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: (String? value) {
@@ -317,55 +317,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                 ),
                                 getVerSpace(24.h),
-                                getCustomFont(
-                                    ("Phone Number").tr(), 16.sp, Colors.black, 1,
+                                getCustomFont(("Phone Number").tr(), 16.sp,
+                                    Colors.black, 1,
                                     fontWeight: FontWeight.w600),
                                 getVerSpace(7.h),
 
-                              getDefaultTextFiledWithLabel2(context,
-                                          ("Phone Number").tr(), phoneController,
-                                          isEnable: false,
-                                          height: 60.h,
-                                          validator: (String? value) {
-                                            if (value!.isEmpty)
-                                              return ("Phone can't be empty").tr();
-                                            return null;
-                                          },
-                                          isprefix: true,
-                                          onChanged: (String value) {
-                                            setState(() {
-                                              phone = value;
-                                            });
-                                          },
-                                          // prefix: GestureDetector(
-                                          //   onTap: () {},
-                                          //   child: Row(
-                                          //     children: [
-                                          //       getHorSpace(18.h),
-                                          //       getHorSpace(12.h),
-                                          //       getCustomFont(
-                                          //           "",
-                                          //           16.sp,
-                                          //           greyColor,
-                                          //           1,
-                                          //           fontWeight:
-                                          //               FontWeight.w500),
-                                          //       getHorSpace(5.h),
-                                          //       getSvgImage("arrow_down.svg",
-                                          //           width: 24.h,
-                                          //           height: 24.h),
-                                          //       getHorSpace(5.h),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(
-                                                RegExp('[0-9.,]')),
-                                          ],
-                                          constraint: BoxConstraints(
-                                              maxWidth: 135.h,
-                                              maxHeight: 24.h)),
-                                
+                                getDefaultTextFiledWithLabel2(context,
+                                    ("Phone Number").tr(), phoneController,
+                                    isEnable: false,
+                                    height: 60.h,
+                                    validator: (String? value) {
+                                      if (value!.isEmpty)
+                                        return ("Phone can't be empty").tr();
+                                      return null;
+                                    },
+                                    isprefix: true,
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        phone = value;
+                                      });
+                                    },
+                                    // prefix: GestureDetector(
+                                    //   onTap: () {},
+                                    //   child: Row(
+                                    //     children: [
+                                    //       getHorSpace(18.h),
+                                    //       getHorSpace(12.h),
+                                    //       getCustomFont(
+                                    //           "",
+                                    //           16.sp,
+                                    //           greyColor,
+                                    //           1,
+                                    //           fontWeight:
+                                    //               FontWeight.w500),
+                                    //       getHorSpace(5.h),
+                                    //       getSvgImage("arrow_down.svg",
+                                    //           width: 24.h,
+                                    //           height: 24.h),
+                                    //       getHorSpace(5.h),
+                                    //     ],
+                                    //   ),
+                                    // ),
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp('[0-9.,]')),
+                                    ],
+                                    constraint: BoxConstraints(
+                                        maxWidth: 135.h, maxHeight: 24.h)),
 
                                 getVerSpace(24.h),
                                 getCustomFont(
@@ -464,7 +462,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   color: accentColor,
                                   elevation: 0,
                                   child: Wrap(
-                                    children:  [
+                                    children: [
                                       Text(
                                         ('Sign Up').tr(),
                                         style: TextStyle(
@@ -495,9 +493,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       FontWeight.w700,
                                       14.sp),
                                   onTap: () {
-                                       Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => LoginScreen()));
-               
+                                    Navigator.of(context).push(PageRouteBuilder(
+                                        pageBuilder: (_, __, ___) =>
+                                            LoginScreen()));
+
                                     // Constant.sendToNext(
                                     //     context, Routes.loginRoute);
                                   },

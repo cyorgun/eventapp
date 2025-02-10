@@ -1,29 +1,30 @@
 import 'dart:io';
-import 'package:geolocator/geolocator.dart';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/signup/signup_screen.dart';
+import 'package:event_app/app/widget/Rounded_Button.dart';
+import 'package:event_app/base/color_data.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:event_app/base/color_data.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:event_app/app/widget/Rounded_Button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart';
 
-import 'package:evente/evente.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../../base/constant.dart';
 import '../../dialog/snacbar copy.dart';
+import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
 import '../Multiple_Language/Multiple_Language_Screen.dart';
-import '../bloc/sign_in_bloc.dart';
 import '../guest/guest_home_screen.dart';
-import 'package:permission_handler/permission_handler.dart';
-import '../select_interset/select_interest_screen.dart';
+import '../select_interest/select_interest_screen.dart';
 
 class WelcomePage extends StatefulWidget {
   final String? tag;
+
   const WelcomePage({Key? key, this.tag}) : super(key: key);
 
   @override
@@ -41,41 +42,41 @@ class _WelcomePageState extends State<WelcomePage> {
   final Future<bool> _isAvailableFuture = TheAppleSignIn.isAvailable();
 
   handleSkip() {
-    final sb = context.read<SignInBloc>();
+    final sb = context.read<SignInProvider>();
     sb.setGuestUser();
     // nextScreen(context, DonePage());
   }
 
-
   @override
   void initState() {
     super.initState();
-    
-      checkAndRequestLocationPermission();
+
+    checkAndRequestLocationPermission();
     getFromSharedPreferences();
-   
- 
   }
+
   handleGoogleSignIn() async {
-    final SignInBloc sb = Provider.of<SignInBloc>(context, listen: false);
-    
-  final scaffoldState = scaffoldKey.currentState;
+    final SignInProvider sb =
+        Provider.of<SignInProvider>(context, listen: false);
+
+    final scaffoldState = scaffoldKey.currentState;
     await AppService().checkInternet().then((hasInternet) async {
       if (hasInternet == false) {
         openSnacbar(scaffoldKey, ('check your internet connection!').tr());
       } else {
         await sb.signInWithGoogle().then((_) {
           if (sb.hasError == true) {
-            openSnacbar(scaffoldKey, ('something is wrong. please try again.').tr());
+            openSnacbar(
+                scaffoldKey, ('something is wrong. please try again.').tr());
             _googleController.reset();
-              ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(('something is wrong. please try again.').tr()),
-            ),
-          );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(('something is wrong. please try again.').tr()),
+              ),
+            );
           } else {
             sb.checkUserExists().then((value) {
-               print("values 1  ");
+              print("values 1  ");
               print(value);
               if (value == true) {
                 sb
@@ -87,8 +88,9 @@ class _WelcomePageState extends State<WelcomePage> {
                               _googleController.success();
                               handleAfterSignIn();
                             })));
-              } else { print("values 2  ");
-              print(value);
+              } else {
+                print("values 2  ");
+                print(value);
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
                     .then((value) => sb.increaseUserCount())
@@ -107,12 +109,9 @@ class _WelcomePageState extends State<WelcomePage> {
     });
   }
 
-
-
   Position? userPosition;
   late List<EventBaru> nearbyEvents = [];
-  
-  
+
   void getFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -122,10 +121,10 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   String? role;
-  
 
   Future<Position> getUserLocation() async {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     return position;
   }
 
@@ -172,7 +171,10 @@ class _WelcomePageState extends State<WelcomePage> {
                       ),
                       Text(
                         "Location Permission",
-                        style: TextStyle(fontSize: 16 + 1, fontWeight: FontWeight.w800, fontFamily: "RedHat"),
+                        style: TextStyle(
+                            fontSize: 16 + 1,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: "RedHat"),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(
@@ -181,7 +183,10 @@ class _WelcomePageState extends State<WelcomePage> {
                       Text(
                         "This app collects location data to enable access location to allow location for show near event, when the app is closed not in use.",
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black26, fontFamily: "RedHat"),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black26,
+                            fontFamily: "RedHat"),
                         textAlign: TextAlign.justify,
                       ),
                       SizedBox(
@@ -243,7 +248,6 @@ class _WelcomePageState extends State<WelcomePage> {
     }
   }
 
-
   // void handleFacebbokLogin() async {
   //   final SignInBloc sb = Provider.of<SignInBloc>(context, listen: false);
   //   await AppService().checkInternet().then((hasInternet) async {
@@ -285,7 +289,7 @@ class _WelcomePageState extends State<WelcomePage> {
   // }
 
   handleAppleSignIn() async {
-    final sb = context.read<SignInBloc>();
+    final sb = context.read<SignInProvider>();
     await AppService().checkInternet().then((hasInternet) async {
       if (hasInternet == false) {
         openSnacbar(scaffoldKey, 'check your internet connection!');
@@ -332,13 +336,12 @@ class _WelcomePageState extends State<WelcomePage> {
     });
   }
 
-  gotoNextScreen() {  
-       Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => SelectInterestScreen()));
-               
+  gotoNextScreen() {
+    Navigator.of(context).push(
+        PageRouteBuilder(pageBuilder: (_, __, ___) => SelectInterestScreen()));
+
     //  Constant.sendToNext(
     //                             context, Routes.selectInterestRoute);
-    
   }
 
   @override
@@ -351,7 +354,6 @@ class _WelcomePageState extends State<WelcomePage> {
         width: double.infinity,
         child: Stack(
           children: [
-          
             Positioned(
               top: 0,
               left: 0,
@@ -414,7 +416,11 @@ class _WelcomePageState extends State<WelcomePage> {
                       RoundedLoadingButton(
                         child: Wrap(
                           children: [
-                            Icon(FontAwesome.google, size: 25, color: Colors.white,),
+                            Icon(
+                              FontAwesome.google,
+                              size: 25,
+                              color: Colors.white,
+                            ),
                             SizedBox(
                               width: 15,
                             ),
@@ -441,7 +447,11 @@ class _WelcomePageState extends State<WelcomePage> {
                       RoundedLoadingButton(
                         child: Wrap(
                           children: [
-                            Icon(Icons.mail, size: 25, color: Colors.white,),
+                            Icon(
+                              Icons.mail,
+                              size: 25,
+                              color: Colors.white,
+                            ),
                             SizedBox(
                               width: 15,
                             ),
@@ -456,15 +466,15 @@ class _WelcomePageState extends State<WelcomePage> {
                           ],
                         ),
                         controller: _facebookController,
-                        onPressed: () => 
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              Routes.loginRoute, (route) => false),
+                        onPressed: () => Navigator.of(context)
+                            .pushNamedAndRemoveUntil(
+                                Routes.loginRoute, (route) => false),
                         width: MediaQuery.of(context).size.width * 0.80,
                         color: Colors.red[600],
                         elevation: 0,
                         //borderRadius: 3,
                       ),
-                         SizedBox(
+                      SizedBox(
                         height: 10,
                       ),
                       RoundedLoadingButton(
@@ -481,15 +491,16 @@ class _WelcomePageState extends State<WelcomePage> {
                           ],
                         ),
                         controller: _facebookController,
-                        onPressed: () => 
-                          Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>GuestHomeScreen())),
+                        onPressed: () => Navigator.of(context).pushReplacement(
+                            PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    GuestHomeScreen())),
                         width: MediaQuery.of(context).size.width * 0.80,
                         color: Colors.white,
                         elevation: 3,
                         borderRadius: 50,
                         animateOnTap: false,
                       ),
-                  
                       SizedBox(
                         height: 10,
                       ),
@@ -512,15 +523,14 @@ class _WelcomePageState extends State<WelcomePage> {
                         fontFamily: Constant.fontsFamily,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.blueAccent
-                    ),
+                        color: Colors.blueAccent),
                   ),
                   onPressed: () {
-   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => SignUpScreen()));
-               
-                                  // Constant.sendToNext(
-                                  //     context, Routes.signUpRoute);
+                    Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => SignUpScreen()));
+
+                    // Constant.sendToNext(
+                    //     context, Routes.signUpRoute);
                   },
                 ),
                 SizedBox(
@@ -528,30 +538,34 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
               ],
             ),
-              Padding(
-                padding: const EdgeInsets.only(top:40.0,right: 20.0),
-                child: Align(
-                alignment: Alignment.topRight,
-                child: InkWell(
-                onTap: (){
-                    Navigator.of(context).push(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => MultipleLanguageScreen()));
-                    
-                },
-                child: Container(
-                  height: 50.0,
-                  width: 50.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                    color: Colors.white,
-                    border: Border.all(color: Colors.black12,width: 1.0)
-                  ),
-                  child: Center(
-                    child: Image.asset("assets/images/worldwide.png",height: 30.0,width: 30.0,),
-                  ),
-                ),
-                          )),
-              ),
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0, right: 20.0),
+              child: Align(
+                  alignment: Alignment.topRight,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (_, __, ___) =>
+                              MultipleLanguageScreen()));
+                    },
+                    child: Container(
+                      height: 50.0,
+                      width: 50.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                          color: Colors.white,
+                          border:
+                              Border.all(color: Colors.black12, width: 1.0)),
+                      child: Center(
+                        child: Image.asset(
+                          "assets/images/worldwide.png",
+                          height: 30.0,
+                          width: 30.0,
+                        ),
+                      ),
+                    ),
+                  )),
+            ),
           ],
         ),
       ),
@@ -571,7 +585,11 @@ class _WelcomePageState extends State<WelcomePage> {
             : RoundedLoadingButton(
                 child: Wrap(
                   children: [
-                    Icon(FontAwesome.apple, size: 25, color: Colors.white,),
+                    Icon(
+                      FontAwesome.apple,
+                      size: 25,
+                      color: Colors.white,
+                    ),
                     SizedBox(
                       width: 15,
                     ),

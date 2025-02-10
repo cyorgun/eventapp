@@ -36,7 +36,6 @@ class DataFile {
   ];
 
   static List<ModalSelectInterest> selectInterestList = [
-    
     ModalSelectInterest("i_7_swimming.png", "Swimming", "#FDEEEC", false),
     ModalSelectInterest("i_8_game.png", "Game", "#FDEEEC", false),
     ModalSelectInterest("i_9_fotball.png", "Football", "#FDEEEC", false),

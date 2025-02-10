@@ -54,6 +54,7 @@ Widget getSvgImage(String image,
     fit: boxFit,
   );
 }
+
 Widget getSvg(String image,
     {double? width,
     double? height,
@@ -222,7 +223,8 @@ Widget getDefaultTextFiledWithLabel(
     double horizontal = 18,
     int? length,
     String obscuringCharacter = '•',
-    GestureTapCallback? onTap,bool isReadonly = false}) {
+    GestureTapCallback? onTap,
+    bool isReadonly = false}) {
   return StatefulBuilder(
     builder: (context, setState) {
       return TextFormField(
@@ -430,22 +432,24 @@ Widget getRichText(
 
 AppBar getToolBar(Function function, {Widget? title, bool leading = true}) {
   return AppBar(
-    toolbarHeight: 73.h,
-    title: title,
-    backgroundColor: Colors.white,
-    elevation: 0,
-    centerTitle: true,
-    leading: leading == true
-        ? getPaddingWidget(
-            EdgeInsets.only(top: 26.h, bottom: 23.h),
-            GestureDetector(
-                onTap: () {
-                  function();
-                },
-                child:
-                    getSvgImage("arrow_back.svg", height: 24.h, width: 24.h)))
-        : Icon(Icons.add,color: Colors.transparent,)
-  );
+      toolbarHeight: 73.h,
+      title: title,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      leading: leading == true
+          ? getPaddingWidget(
+              EdgeInsets.only(top: 26.h, bottom: 23.h),
+              GestureDetector(
+                  onTap: () {
+                    function();
+                  },
+                  child:
+                      getSvgImage("arrow_back.svg", height: 24.h, width: 24.h)))
+          : Icon(
+              Icons.add,
+              color: Colors.transparent,
+            ));
 }
 
 AppBar getToolBarWithIcon(Function function,
@@ -487,7 +491,8 @@ Widget settingContainer(Function function, String title, String image) {
                     color: dividerColor,
                     borderRadius: BorderRadius.circular(22.h)),
                 padding: EdgeInsets.all(15.h),
-                child: getSvgImage(image, width: 24.h, height: 24.h,color: accentColor),
+                child: getSvgImage(image,
+                    width: 24.h, height: 24.h, color: accentColor),
               ),
               getHorSpace(16.h),
               getCustomFont(title, 16.sp, Colors.black, 1,

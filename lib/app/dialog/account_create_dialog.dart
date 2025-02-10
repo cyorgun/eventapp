@@ -1,12 +1,10 @@
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../base/color_data.dart';
-import '../../base/constant.dart';
 import '../../base/pref_data.dart';
 import '../../base/widget_utils.dart';
-import '../view/select_interset/select_interest_screen.dart';
+import '../view/select_interest/select_interest_screen.dart';
 
 class AccountCreateDialog extends StatefulWidget {
   const AccountCreateDialog({Key? key}) : super(key: key);
@@ -67,7 +65,7 @@ class _AccountCreateDialogState extends State<AccountCreateDialog> {
                 getVerSpace(30.h),
                 getButton(context, accentColor, "Ok", Colors.white, () {
                   PrefData.setSelectInterest(true);
-                    Navigator.of(context).push(PageRouteBuilder(
+                  Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => SelectInterestScreen()));
                   // Constant.sendToNext(
                   //     context, Routes.selectInterestRoute);

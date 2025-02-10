@@ -1,4 +1,3 @@
-
 import '../Constants/constants.dart';
 
 /// This is view model for the skip and done buttons.

@@ -14,8 +14,6 @@ class Constant {
   static const int stepStatusDone = 2;
   static const int stepStatusWrong = 3;
 
-
-
   static double getPercentSize(double total, double percent) {
     return (percent * total) / 100;
   }
@@ -58,8 +56,6 @@ class Constant {
     });
   }
 }
-
-
 
 const flutterWavePublicKey = 'FLWPUBK_TEST-eb3edef083c890a7e22dc7eec9e0daa5-X';
 const flutterWaveSecretKey = 'FLWSECK_TEST-d2759023efce6198a853b8e2dd3beb55-X';

@@ -18,7 +18,7 @@
 
 import 'dart:math' as math;
 
-import 'package:event_app/base/appBar/styles.dart';
+import 'package:event_app/base/app_bar/styles.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
@@ -624,9 +624,11 @@ class ConvexAppBarState extends State<ConvexAppBar>
                   child: Container(
                     height: 54.h,
                     width: 54.h,
-                    decoration: active == true ? BoxDecoration(
-                        color: lightAccent,
-                        borderRadius: BorderRadius.circular(22.h)) : null,
+                    decoration: active == true
+                        ? BoxDecoration(
+                            color: lightAccent,
+                            borderRadius: BorderRadius.circular(22.h))
+                        : null,
                     child: _newTab(i, active),
                   ),
                 ),

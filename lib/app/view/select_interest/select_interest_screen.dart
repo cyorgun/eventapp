@@ -1,19 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:evente/evente.dart';
-import 'package:event_app/base/pref_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:easy_localization/easy_localization.dart';
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
-import '../bloc/bookmark_bloc.dart';
-import '../bloc/sign_in_bloc.dart';
+import '../../provider/bookmark_provider.dart';
+import '../../provider/sign_in_provider.dart';
 
 class SelectInterestScreen extends StatefulWidget {
   const SelectInterestScreen({Key? key}) : super(key: key);
@@ -23,51 +18,44 @@ class SelectInterestScreen extends StatefulWidget {
 }
 
 class _SelectInterestScreenState extends State<SelectInterestScreen> {
-
-
-   List<ModalSelectInterest> selectIntersetList = DataFile.selectInterestList;
-
-
+  List<ModalSelectInterest> selectIntersetList = DataFile.selectInterestList;
 
   final _multiSelectKey = GlobalKey<FormFieldState>();
-      
+
   List<String> _selectedInterest = [];
 
-
   Future addDataInterest(List v) async {
-    
-    final BookmarkBloc sb = Provider.of<BookmarkBloc>(context, listen: false);
-   sb.saveDataToSP(v);
+    final BookmarkProvider sb =
+        Provider.of<BookmarkProvider>(context, listen: false);
+    sb.saveDataToSP(v);
     sb.saveInterestToFirebase(v);
- Navigator.of(context).pushNamedAndRemoveUntil(Routes.homeScreenRoute, (route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(Routes.homeScreenRoute, (route) => false);
     // Constant.sendToNext(
     //                             context, Routes.homeScreenRoute);
-    
   }
 
   @override
-  Widget build(BuildContext context) { 
-    final BookmarkBloc sb = Provider.of<BookmarkBloc>(context, listen: false);
-   
+  Widget build(BuildContext context) {
+    final BookmarkProvider sb =
+        Provider.of<BookmarkProvider>(context, listen: false);
+
     setStatusBarColor(accentColor);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-     
       body: SafeArea(
         child: Stack(
           children: [
-             Positioned(
-                    top: 0,
-                    right: 0,
-                    height: 150,
-                    child: Opacity(
-                      opacity: 0.7,
-                      child: Image.asset('assets/images/login1.png'))),
-            
+            Positioned(
+                top: 0,
+                right: 0,
+                height: 150,
+                child: Opacity(
+                    opacity: 0.7,
+                    child: Image.asset('assets/images/login1.png'))),
             Column(
               children: [
-               
                 getVerSpace(30.h),
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 20.h),
@@ -99,7 +87,6 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
                       child: Column(
                         children: [
                           getVerSpace(20.h),
-              
                           Expanded(
                             flex: 1,
                             child: GridView.builder(
@@ -113,13 +100,15 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
                                     setState(() {
                                       if (modalSelect.select == true) {
                                         modalSelect.select = false;
-                        _selectedInterest.remove(modalSelect.name!);
+                                        _selectedInterest
+                                            .remove(modalSelect.name!);
                                       } else {
                                         modalSelect.select = true;
-                        _selectedInterest.add(modalSelect.name!);
+                                        _selectedInterest
+                                            .add(modalSelect.name!);
                                       }
                                     });
-                    print("$index : $_selectedInterest");
+                                    print("$index : $_selectedInterest");
                                   },
                                   child: Stack(
                                     alignment: Alignment.bottomCenter,
@@ -129,7 +118,8 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
                                         width: double.infinity,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                              color: modalSelect.color!.toColor(),
+                                              color:
+                                                  modalSelect.color!.toColor(),
                                               borderRadius:
                                                   BorderRadius.circular(22.h),
                                               border: modalSelect.select == true
@@ -192,13 +182,11 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
                           ),
                           getPaddingWidget(
                             EdgeInsets.symmetric(horizontal: 20.h),
-                            getButton(
-                                context, accentColor, ("Continue").tr(), Colors.white,
-                                ()async {
-                                  addDataInterest(_selectedInterest);
-                                
-                           context.read<SignInBloc>().checkSignIn();
-                              
+                            getButton(context, accentColor, ("Continue").tr(),
+                                Colors.white, () async {
+                              addDataInterest(_selectedInterest);
+
+                              context.read<SignInProvider>().checkSignIn();
                             }, 18.sp,
                                 weight: FontWeight.w700,
                                 buttonHeight: 60.h,

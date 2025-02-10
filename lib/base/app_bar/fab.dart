@@ -16,9 +16,8 @@
  *  limitations under the License.
  */
 
-import 'package:event_app/base/appBar/painter.dart';
+import 'package:event_app/base/app_bar/painter.dart';
 import 'package:flutter/material.dart';
-
 
 /// Single convex button widget
 class ConvexButton extends StatelessWidget {

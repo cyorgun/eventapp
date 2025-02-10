@@ -1,19 +1,13 @@
-
-import 'package:event_app/base/constant.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
-import '../../../dialog/loading_cards.dart';
-import 'package:evente/evente.dart';
-import '../../../widget/card4.dart';
+import '../../../provider/bookmark_provider.dart';
 import '../../../widget/card5.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../bloc/bookmark_bloc.dart';
 
 class showCaseFavorite extends StatefulWidget {
   const showCaseFavorite({super.key});
@@ -26,13 +20,11 @@ class _showCaseFavoriteState extends State<showCaseFavorite> {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-      builder:Builder(
-    builder : (context)=> TabFavourite()
-  ),
-      
+      builder: Builder(builder: (context) => TabFavourite()),
     );
   }
 }
+
 class TabFavourite extends StatefulWidget {
   const TabFavourite({Key? key}) : super(key: key);
 
@@ -46,8 +38,7 @@ class _TabFavouriteState extends State<TabFavourite> {
 
   @override
   Widget build(BuildContext context) {
-
-     SharedPreferences preferences;
+    SharedPreferences preferences;
 
     displayShowcase() async {
       preferences = await SharedPreferences.getInstance();
@@ -79,7 +70,6 @@ class _TabFavouriteState extends State<TabFavourite> {
       }
     });
 
-    
     return KeysToBeInherited(
       notification: _one,
       search: _two,
@@ -89,24 +79,22 @@ class _TabFavouriteState extends State<TabFavourite> {
           Expanded(
             child: Container(
               child: FutureBuilder(
-                future: context.watch<BookmarkBloc>().getArticles(),
+                future: context.watch<BookmarkProvider>().getArticles(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   }
-      
-      
-                     if (snapshot.hasError) {
+
+                  if (snapshot.hasError) {
                     return Center(child: Text('Error'));
                   }
-                    if (!snapshot.hasData) {
-                     
-                          return buildNullListWidget();
-                      } else {
-                        if (snapshot.data.isEmpty) {
-                          return buildNullListWidget();
-                        } else {
-                       return  ListView.separated(
+                  if (!snapshot.hasData) {
+                    return buildNullListWidget();
+                  } else {
+                    if (snapshot.data.isEmpty) {
+                      return buildNullListWidget();
+                    } else {
+                      return ListView.separated(
                         padding: EdgeInsets.all(15),
                         itemCount: snapshot.data.length,
                         separatorBuilder: (context, index) => SizedBox(
@@ -114,17 +102,21 @@ class _TabFavouriteState extends State<TabFavourite> {
                         ),
                         itemBuilder: (BuildContext context, int index) {
                           // return buildFavouriteList();
-                         return Showcase(
-                           key: _one,
-                      description: "Click here to view your favorite item.",
-                   child: Card5(events: snapshot.data[index], heroTag: 'bookmarks$index',));
+                          return Showcase(
+                              key: _one,
+                              description:
+                                  "Click here to view your favorite item.",
+                              child: Card5(
+                                events: snapshot.data[index],
+                                heroTag: 'bookmarks$index',
+                              ));
                         },
                       );
-      
-                          //  return  new noItem();
-                        }
-                      }
-                  
+
+                      //  return  new noItem();
+                    }
+                  }
+
                   // if (snapshot.hasData) {
                   //   if (snapshot.data.length == 0)
                   //     return buildNullListWidget();
@@ -146,7 +138,7 @@ class _TabFavouriteState extends State<TabFavourite> {
                   //       },
                   //     );
                   // }
-      
+
                   // if (snapshot.data.isNotEmpty){
                   //   return ListView.separated(
                   //       padding: EdgeInsets.all(15),
@@ -160,22 +152,20 @@ class _TabFavouriteState extends State<TabFavourite> {
                   //       },
                   //     );
                   // } else {
-                    
+
                   // return buildNullListWidget();
                   // }
                 },
-              ) ,
+              ),
             ),
           ),
         ],
       ),
     );
-    
-   }
+  }
 
   AppBar buildAppBar() {
     return getToolBar(() {},
-    
         title: getCustomFont(("Favourites").tr(), 24.sp, Colors.black, 1,
             fontWeight: FontWeight.w700, textAlign: TextAlign.center),
         leading: false);
@@ -189,20 +179,22 @@ class _TabFavouriteState extends State<TabFavourite> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               getAssetImage("empty.png", height: 300.0,width: 400.0 ),
+              getAssetImage("empty.png", height: 300.0, width: 400.0),
               getVerSpace(28.h),
               getCustomFont(("Not have item").tr(), 20.sp, Colors.black, 1,
                   fontWeight: FontWeight.w700, txtHeight: 1.5.h),
               getVerSpace(8.h),
               getMultilineCustomFont(
-                  ("Explore more events and get it to favorites.").tr(), 16.sp, Colors.black,
-                  fontWeight: FontWeight.w500, txtHeight: 1.5.h)
+                  ("Explore more events and get it to favorites.").tr(),
+                  16.sp,
+                  Colors.black,
+                  fontWeight: FontWeight.w500,
+                  txtHeight: 1.5.h)
             ],
           ),
         ));
   }
 }
-
 
 class KeysToBeInherited extends InheritedWidget {
   final GlobalKey notification;

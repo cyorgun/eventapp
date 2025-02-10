@@ -4,6 +4,7 @@ import 'package:event_app/app/widget/intro_views_flutter-2.4.0/lib/Constants/con
 import 'package:flutter/material.dart';
 
 import '../Models/slide_update_model.dart';
+
 /// This class is used to get user gesture and work according to it.
 
 class PageDragger extends StatefulWidget {
@@ -11,6 +12,7 @@ class PageDragger extends StatefulWidget {
   final bool? canDragLeftToRight;
   final bool? canDragRightToLeft;
   final double fullTransitionPX;
+
   //Stream controller
   final StreamController<SlideUpdate>? slideUpdateStream;
 

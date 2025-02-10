@@ -1,9 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -14,8 +13,6 @@ class HelpScreen extends StatefulWidget {
 }
 
 class _HelpScreenState extends State<HelpScreen> {
- 
-
   @override
   Widget build(BuildContext context) {
     setStatusBarColor(Colors.white);
@@ -23,7 +20,6 @@ class _HelpScreenState extends State<HelpScreen> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: getToolBar(() {
-        
         Navigator.of(context).pop();
       },
           title: getCustomFont(
@@ -46,10 +42,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 20.h),
                   children: [
                     getVerSpace(20.h),
-                    getMultilineCustomFont(
-                        ("lorem").tr(),
-                        15.sp,
-                        greyColor,
+                    getMultilineCustomFont(("lorem").tr(), 15.sp, greyColor,
                         fontWeight: FontWeight.w500,
                         txtHeight: 1.46.h,
                         textAlign: TextAlign.start)

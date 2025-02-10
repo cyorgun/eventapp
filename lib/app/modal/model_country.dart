@@ -1,4 +1,4 @@
-class ModelCountry{
+class ModelCountry {
   String? image;
   String? name;
   String? code;

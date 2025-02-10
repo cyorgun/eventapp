@@ -1,4 +1,3 @@
-
 class ModalSelectInterest {
   String? image;
   String? name;

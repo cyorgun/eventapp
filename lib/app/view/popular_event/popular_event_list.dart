@@ -1,15 +1,11 @@
-import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:evente/evente.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/featured_event/featured_event_detail2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:easy_localization/easy_localization.dart';
-
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 import '../../widget/empty_screen.dart';
 import '../home/search_screen.dart';
@@ -23,80 +19,73 @@ class PopularEventList extends StatefulWidget {
 }
 
 class _PopularEventListState extends State<PopularEventList> {
- 
-
-
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
     setStatusBarColor(Colors.white);
     return Scaffold(
-         resizeToAvoidBottomInset: false,
-         backgroundColor: Colors.white,
-         appBar: AppBar(
-             centerTitle: true,
-             backgroundColor: Colors.white,
-             elevation: 0.0,
-             iconTheme: IconThemeData(color: Colors.black),
-             title: getCustomFont(
-               ("Popular Event").tr(),
-               22.sp,
-               Colors.black,
-               1,
-               fontWeight: FontWeight.w700,
-             ),
-             actions: [
-               Padding(
-                 padding: const EdgeInsets.only(right: 15.0),
-                 child: InkWell(
-                     onTap: (() {
-                       Navigator.of(context).push(PageRouteBuilder(
-                           pageBuilder: (_, __, ___) => new SearchPage()));
-                     }),
-                     child: getSvg('search.svg', color: accentColor,height: 20.0,width: 20.0)),
-               ),
-             ]),
-         body:  Container(
-           
-           child: Padding(
-             padding: const EdgeInsets.only(top:10.0),
-             child: StreamBuilder(
-                             stream: FirebaseFirestore.instance
-                                 .collection("event")
-                       .orderBy('count', descending: true)
-                                 .snapshots(),
-                             builder: (BuildContext ctx,
-                                 AsyncSnapshot<QuerySnapshot> snapshot) {
-                               if (snapshot.connectionState ==
-                                   ConnectionState.waiting) {
-                                 return Center(
-                                     child: CircularProgressIndicator());
-                               }
-                     
-                               if (!snapshot.hasData ||
-                                   snapshot.data!.docs.isEmpty) {
-                                 return Center(child: EmptyScreen());
-                               }
-                               if (snapshot.hasError) {
-                                 return Center(child: Text('Error'));
-                               }
-                     
-                               return snapshot.hasData
-                                   ? TrendingEventCard(
-                                       list: snapshot.data?.docs,
-                                     )
-                                   : Container();
-                             },
-                           ),
-           ),
-         )
-       );
-  }
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            elevation: 0.0,
+            iconTheme: IconThemeData(color: Colors.black),
+            title: getCustomFont(
+              ("Popular Event").tr(),
+              22.sp,
+              Colors.black,
+              1,
+              fontWeight: FontWeight.w700,
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
+                child: InkWell(
+                    onTap: (() {
+                      Navigator.of(context).push(PageRouteBuilder(
+                          pageBuilder: (_, __, ___) => new SearchPage()));
+                    }),
+                    child: getSvg('search.svg',
+                        color: accentColor, height: 20.0, width: 20.0)),
+              ),
+            ]),
+        body: Container(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("event")
+                  .orderBy('count', descending: true)
+                  .snapshots(),
+              builder:
+                  (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: EmptyScreen());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error'));
+                }
+
+                return snapshot.hasData
+                    ? TrendingEventCard(
+                        list: snapshot.data?.docs,
+                      )
+                    : Container();
+              },
+            ),
+          ),
+        ));
+  }
 }
 
 class buildFeatureEventList2 extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const buildFeatureEventList2({this.list});
 
   @override
@@ -108,7 +97,7 @@ class buildFeatureEventList2 extends StatelessWidget {
       itemCount: list?.length,
       itemBuilder: (context, i) {
         final events = list?.map((e) {
-          return EventBaru.fromFirestore(e,1);
+          return EventBaru.fromFirestore(e, 1);
         }).toList();
         //  String? category = list?[i]['category'].toString();
         // String? date = list?[i]['date'].toString();
@@ -180,8 +169,8 @@ class buildFeatureEventList2 extends StatelessWidget {
                         ],
                       ),
                       getVerSpace(22.h),
-                      getButton(context, accentColor, ("Book Now").tr(), Colors.white,
-                          () {}, 14.sp,
+                      getButton(context, accentColor, ("Book Now").tr(),
+                          Colors.white, () {}, 14.sp,
                           weight: FontWeight.w700,
                           buttonHeight: 40.h,
                           borderRadius: BorderRadius.circular(14.h),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../constants/firestore_constants.dart';
 
 class UserChat {
@@ -7,7 +8,11 @@ class UserChat {
   String nickname;
   String aboutMe;
 
-  UserChat({required this.id, required this.photoUrl, required this.nickname, required this.aboutMe});
+  UserChat(
+      {required this.id,
+      required this.photoUrl,
+      required this.nickname,
+      required this.aboutMe});
 
   Map<String, String> toJson() {
     return {

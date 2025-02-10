@@ -1,4 +1,3 @@
-
 // model for slide update
 
 import '../Constants/constants.dart';

@@ -1,6 +1,4 @@
-import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/base/color_data.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,11 +32,11 @@ class _TicketConfirmDialogState extends State<TicketConfirmDialog> {
             margin: EdgeInsets.symmetric(horizontal: 30.h),
             child: Column(
               children: [
-                getVerSpace(40.h),   
-                 Image.asset( 'assets/images/Sukses.gif',
-              width: 150,
-              
-            ),
+                getVerSpace(40.h),
+                Image.asset(
+                  'assets/images/Sukses.gif',
+                  width: 150,
+                ),
               ],
             ),
           ),
@@ -66,7 +64,8 @@ class _TicketConfirmDialogState extends State<TicketConfirmDialog> {
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 30.h),
                   getButton(context, accentColor, "Ok", Colors.white, () {
-                    Navigator.of(context).pop();                  }, 18.sp,
+                    Navigator.of(context).pop();
+                  }, 18.sp,
                       weight: FontWeight.w700,
                       buttonHeight: 60.h,
                       borderRadius: BorderRadius.circular(22.h)),

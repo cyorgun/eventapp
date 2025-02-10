@@ -1,7 +1,6 @@
 import 'package:event_app/app/view/login/login_screens.dart';
 import 'package:event_app/app/view/signup/signup_screen.dart';
 import 'package:event_app/base/color_data.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,6 @@ import 'package:get/get.dart';
 
 import '../../../base/pref_data.dart';
 import '../../routes/app_routes.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -20,8 +18,6 @@ class IntroScreen extends StatefulWidget {
 }
 
 class _IntroScreenState extends State<IntroScreen> {
-
-
   IntroController controller = Get.put(IntroController());
   List<ModalIntro> introLists = DataFile.introList;
 
@@ -91,14 +87,13 @@ class _IntroScreenState extends State<IntroScreen> {
                           height: 450.h, width: double.infinity),
                       getVerSpace(40.h),
                       Visibility(
-                        visible:
-                            controller.select.value == 3 ? false : true,
+                        visible: controller.select.value == 3 ? false : true,
                         child: Column(
                           children: [
                             getPaddingWidget(
                               EdgeInsets.symmetric(horizontal: 40.h),
-                              getMultilineCustomFont(modalIntro.title ?? "",
-                                  24.sp, Colors.black,
+                              getMultilineCustomFont(
+                                  modalIntro.title ?? "", 24.sp, Colors.black,
                                   fontWeight: FontWeight.w700,
                                   txtHeight: 1.5.h,
                                   textAlign: TextAlign.center),
@@ -127,8 +122,8 @@ class _IntroScreenState extends State<IntroScreen> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20.h),
                     width: double.infinity,
-                    margin: EdgeInsets.only(
-                        left: 20.h, right: 20.h, top: 350.h),
+                    margin:
+                        EdgeInsets.only(left: 20.h, right: 20.h, top: 350.h),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(33.h),
@@ -151,8 +146,7 @@ class _IntroScreenState extends State<IntroScreen> {
                             txtHeight: 1.5.h),
                         getVerSpace(8.h),
                         getMultilineCustomFont(
-                            introLists[controller.select.value]
-                                    .description ??
+                            introLists[controller.select.value].description ??
                                 "",
                             16.sp,
                             Colors.black,
@@ -213,7 +207,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         //     image: "google.svg",
                         //     imageHeight: 24.h,
                         //     imageWidth: 24.h),
-                 
+
                         getVerSpace(130.h),
                         Row(
                           children: [
@@ -221,9 +215,9 @@ class _IntroScreenState extends State<IntroScreen> {
                                 child: getButton(context, Colors.white,
                                     "Log In", accentColor, () {
                               PrefData.setIsIntro(false);
-   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => LoginScreen()));
-               
+                              Navigator.of(context).push(PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) => LoginScreen()));
+
                               // Constant.sendToNext(
                               //     context, Routes.loginRoute);
                             }, 18.sp,
@@ -232,24 +226,21 @@ class _IntroScreenState extends State<IntroScreen> {
                                     isBorder: true,
                                     borderColor: accentColor,
                                     borderWidth: 1.h,
-                                    borderRadius:
-                                        BorderRadius.circular(22.h))),
+                                    borderRadius: BorderRadius.circular(22.h))),
                             getHorSpace(20.h),
                             Expanded(
                                 child: getButton(context, accentColor,
                                     "Sign Up", Colors.white, () {
                               PrefData.setIsIntro(false);
-                                 Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => SignUpScreen
-                      ()));
-               
+                              Navigator.of(context).push(PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) => SignUpScreen()));
+
                               // Constant.sendToNext(
                               //     context, Routes.signUpRoute);
                             }, 18.sp,
                                     weight: FontWeight.w700,
                                     buttonHeight: 60.h,
-                                    borderRadius:
-                                        BorderRadius.circular(22.h)))
+                                    borderRadius: BorderRadius.circular(22.h)))
                           ],
                         ),
                         getVerSpace(20.h),
@@ -273,10 +264,9 @@ class _IntroScreenState extends State<IntroScreen> {
                           (position) {
                             return getPaddingWidget(
                                 EdgeInsets.symmetric(horizontal: 3.h),
-                                getSvgImage(
-                                    position == controller.select.value
-                                        ? "selected_dot.svg"
-                                        : "dot.svg"));
+                                getSvgImage(position == controller.select.value
+                                    ? "selected_dot.svg"
+                                    : "dot.svg"));
                           },
                         ),
                       ),
@@ -291,8 +281,7 @@ class _IntroScreenState extends State<IntroScreen> {
                                 : "Next",
                             Colors.white, () {
                           if (controller.select.value <= 2) {
-                            controller
-                                .change(controller.select.value.obs + 1);
+                            controller.change(controller.select.value.obs + 1);
                           }
                           controller.pageController.animateToPage(
                               controller.select.value,

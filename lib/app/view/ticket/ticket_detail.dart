@@ -1,34 +1,30 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 import 'dart:ui' as ui;
+
 import 'package:dotted_line/dotted_line.dart';
-import 'package:evente/evente.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/routes/app_routes.dart';
-import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
+import 'package:event_app/app/view/ticket/capture.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:intl/intl.dart';
-import 'package:event_app/app/view/ticket/capture.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
-import '../../../base/widget_utils.dart';
 import 'package:screenshot/screenshot.dart';
 
+import '../../../base/color_data.dart';
+import '../../../base/widget_utils.dart';
+import '../../provider/sign_in_provider.dart';
 
 class TicketDetail extends StatefulWidget {
   EventBaru? event;
+
   TicketDetail({Key? key, this.event}) : super(key: key);
 
   @override
@@ -36,8 +32,6 @@ class TicketDetail extends StatefulWidget {
 }
 
 class _TicketDetailState extends State<TicketDetail> {
-
-
   ScreenshotController _screenshotController = ScreenshotController();
 
   ScreenshotController screenshotController = ScreenshotController();
@@ -98,7 +92,6 @@ class _TicketDetailState extends State<TicketDetail> {
     );
   }
 
-  
   Future<void> buildSingleNotification(String absenDesc) async {
     AndroidNotificationDetails androidNotificationDetails =
         const AndroidNotificationDetails(
@@ -117,20 +110,15 @@ class _TicketDetailState extends State<TicketDetail> {
         // ignore: prefer_interpolation_to_compose_strings
         0,
         ('Save Image Ticket').tr(),
-        absenDesc +
-            ' event ' +
-           widget.event!.title!,
+        absenDesc + ' event ' + widget.event!.title!,
         notificationDetail);
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    
-          DateTime? dateTime = widget.event?.date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
-    final sb = context.watch<SignInBloc>();
+    DateTime? dateTime = widget.event?.date?.toDate();
+    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    final sb = context.watch<SignInProvider>();
     setStatusBarColor(Colors.white);
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -148,22 +136,28 @@ class _TicketDetailState extends State<TicketDetail> {
                 onTap: () {
                   ;
                 },
-                child: getSvgImage("arrow_back.svg",
-                    height: 24.h, width: 24.h))),
+                child:
+                    getSvgImage("arrow_back.svg", height: 24.h, width: 24.h))),
         actions: [
           InkWell(
-              onTap: ()async { 
-                 final directory = (await getApplicationDocumentsDirectory()).path;
-              String fileName = widget.event?.title ?? 'Family Weekend - Ticket';
-              await _screenshotController.captureAndSave(directory, fileName: "${fileName}.png");
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Ticket has been saved to gallery', textAlign: TextAlign.center),
-                ),
-              );
-                buildSingleNotification(("Ticket has been saved to gallery").tr());
+              onTap: () async {
+                final directory =
+                    (await getApplicationDocumentsDirectory()).path;
+                String fileName =
+                    widget.event?.title ?? 'Family Weekend - Ticket';
+                await _screenshotController.captureAndSave(directory,
+                    fileName: "${fileName}.png");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Ticket has been saved to gallery',
+                        textAlign: TextAlign.center),
+                  ),
+                );
+                buildSingleNotification(
+                    ("Ticket has been saved to gallery").tr());
               },
-              child: getSvgImage("download.svg", width: 24.h, height: 24.h,color: accentColor)),
+              child: getSvgImage("download.svg",
+                  width: 24.h, height: 24.h, color: accentColor)),
           getHorSpace(20.h)
         ],
       ),
@@ -209,8 +203,8 @@ class _TicketDetailState extends State<TicketDetail> {
                                     topLeft: Radius.circular(15),
                                     topRight: Radius.circular(15)),
                                 image: DecorationImage(
-                                    image: NetworkImage(
-                                        widget.event?.image ?? ''),
+                                    image:
+                                        NetworkImage(widget.event?.image ?? ''),
                                     fit: BoxFit.fill)),
                           ),
                         ),
@@ -228,24 +222,20 @@ class _TicketDetailState extends State<TicketDetail> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 30.0, left: 15.0, right: 15.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        getCustomFont(
-                                            widget.event?.title ?? '',
-                                            25.sp,
-                                            Colors.black,
-                                            1,
-                                            fontWeight: FontWeight.w800,
-                                            txtHeight: 1.46.h),
-                                        getVerSpace(4.h),
-                                      ],
-                                    ),
-                                  ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 30.0, left: 15.0, right: 15.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    getCustomFont(widget.event?.title ?? '',
+                                        25.sp, Colors.black, 1,
+                                        fontWeight: FontWeight.w800,
+                                        txtHeight: 1.46.h),
+                                    getVerSpace(4.h),
+                                  ],
+                                ),
+                              ),
                               getVerSpace(15.h),
                               Row(
                                 children: [
@@ -278,7 +268,6 @@ class _TicketDetailState extends State<TicketDetail> {
                                   ),
                                 ],
                               ),
-                           
                               getVerSpace(26.5.h),
                               Row(
                                 mainAxisAlignment:
@@ -292,22 +281,24 @@ class _TicketDetailState extends State<TicketDetail> {
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: [SizedBox(height: 5.0,),
-                                          getCustomFont(
-                                              ("Category").tr(), 15.sp, greyColor, 1,
+                                        children: [
+                                          SizedBox(
+                                            height: 5.0,
+                                          ),
+                                          getCustomFont(("Category").tr(),
+                                              15.sp, greyColor, 1,
                                               fontWeight: FontWeight.w500,
                                               txtHeight: 1.46.h),
                                           getCustomFont(
                                               widget.event?.category ?? '',
-                                           18.sp,
-                                            Colors.black,
-                                            1,
-                                            fontWeight: FontWeight.w600,
-                                            txtHeight: 1.5.h),
-                                              
-                              getVerSpace(16.5.h),
-                                          getCustomFont(
-                                              ("Location").tr(), 15.sp, greyColor, 1,
+                                              18.sp,
+                                              Colors.black,
+                                              1,
+                                              fontWeight: FontWeight.w600,
+                                              txtHeight: 1.5.h),
+                                          getVerSpace(16.5.h),
+                                          getCustomFont(("Location").tr(),
+                                              15.sp, greyColor, 1,
                                               fontWeight: FontWeight.w500,
                                               txtHeight: 1.46.h),
                                           getVerSpace(4.h),
@@ -335,15 +326,10 @@ class _TicketDetailState extends State<TicketDetail> {
                                             txtHeight: 1.46.h),
                                         getVerSpace(4.h),
                                         getCustomFont(
-                                           date ??
-                                                '',
-                                         18.sp,
-                                            Colors.black,
-                                            1,
+                                            date ?? '', 18.sp, Colors.black, 1,
                                             fontWeight: FontWeight.w600,
                                             txtHeight: 1.5.h),
-                                            
-                              getVerSpace(16.5.h),
+                                        getVerSpace(16.5.h),
                                         getCustomFont(
                                             ("Price").tr(), 15.sp, greyColor, 1,
                                             fontWeight: FontWeight.w500,
@@ -365,7 +351,7 @@ class _TicketDetailState extends State<TicketDetail> {
                               Row(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left:15.0),
+                                    padding: const EdgeInsets.only(left: 15.0),
                                     child: CircleAvatar(
                                         backgroundImage: NetworkImage(
                                             widget.event?.image ?? ''),
@@ -374,16 +360,15 @@ class _TicketDetailState extends State<TicketDetail> {
                                   // getAssetImage("image.png", width: 58.h, height: 58.h),
                                   getHorSpace(10.h),
 
-                                
                                   Padding(
-                                    padding: const EdgeInsets.only(left:15.0,right: 15.0),
+                                    padding: const EdgeInsets.only(
+                                        left: 15.0, right: 15.0),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: [
-                                         
                                         getCustomFont(
                                             widget.event?.userName ?? '',
                                             18.sp,
@@ -437,11 +422,11 @@ class _TicketDetailState extends State<TicketDetail> {
                                 ],
                               ),
                               Center(
-                                child:   QrImageView(
-                                    data: '${widget.event?.title}',
-                                    version: QrVersions.auto,
-                                    size: 200.0,
-                                  ),
+                                child: QrImageView(
+                                  data: '${widget.event?.title}',
+                                  version: QrVersions.auto,
+                                  size: 200.0,
+                                ),
                               ),
                               SizedBox(
                                 height: 30.0,
@@ -455,8 +440,9 @@ class _TicketDetailState extends State<TicketDetail> {
                 ),
               ),
             ),
-            
-           Tangsakpals(screenshotController: _screenshotController,),
+            Tangsakpals(
+              screenshotController: _screenshotController,
+            ),
           ],
         ),
       ),

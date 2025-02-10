@@ -1,18 +1,17 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/Multiple_Language/Multiple_Language_Screen.dart';
-import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
 import 'package:event_app/app/view/notification/notification_screen.dart';
 import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:event_app/app/view/setting/privacy_screen.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
-import 'package:easy_localization/easy_localization.dart';
 import '../../../../base/color_data.dart';
-import '../../bloc/sign_in_bloc.dart';
+import '../../../provider/bookmark_provider.dart';
+import '../../../provider/sign_in_provider.dart';
 import '../../create_event/create_event_screen.dart';
 import '../../intro/welcome.dart';
 import '../../profile/change_password.dart';
@@ -31,7 +30,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return Column(
       children: [
         AppBar(
@@ -51,176 +50,184 @@ class _GuestTabProfileState extends State<GuestTabProfile>
           ],
         ),
         Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-      if(sb.name==null)  Column(
-      children: [
-          SizedBox(
-            height: 100.h,
-          ),
-         getAssetImage("guest.png", height: 300.0, width: 400.0),
-          getVerSpace(28.h),
-          getCustomFont(("Guest User").tr(), 22.sp, Colors.black, 1,
-              fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-          getVerSpace(8.h),
-          getMultilineCustomFont(
-              ("Please login to view this screen").tr(), 18.sp, Colors.black,
-              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+        if (sb.name == null)
+          Column(
+            children: [
+              SizedBox(
+                height: 100.h,
+              ),
+              getAssetImage("guest.png", height: 300.0, width: 400.0),
+              getVerSpace(28.h),
+              getCustomFont(("Guest User").tr(), 22.sp, Colors.black, 1,
+                  fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+              getVerSpace(8.h),
+              getMultilineCustomFont(("Please login to view this screen").tr(),
+                  18.sp, Colors.black,
+                  fontWeight: FontWeight.w500, txtHeight: 1.5.h),
               Padding(
-             padding: const EdgeInsets.only(left:20.0,right: 20.0,top: 15.0),
-             child: InkWell(
-              onTap: (){
-                Navigator.of(context).pushReplacement(PageRouteBuilder(pageBuilder: (_,__,___)=>WelcomePage()));
-              },
-               child: Container(
-                height: 45.0,
-                width: 130,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: BorderRadius.all(Radius.circular(50.0))
-                ),
-                child: Center(
-                  child: Text(
-                    "Login",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600
+                padding:
+                    const EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => WelcomePage()));
+                  },
+                  child: Container(
+                    height: 45.0,
+                    width: 130,
+                    decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.all(Radius.circular(50.0))),
+                    child: Center(
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ),
-               ),
-             ),
-           ),
-      ],
-     ) else  Expanded(
-            flex: 1,
-            child: ListView(
-              primary: true,
-              shrinkWrap: true,
-              children: [
-                buildProfileSection(),
-                getVerSpace(5.h),
-                getPaddingWidget(
-                  EdgeInsets.symmetric(horizontal: 20.h),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      getVerSpace(20.h),
-                      getCustomFont(("Account Settings").tr(), 16.sp, greyColor, 1,
-                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                      getVerSpace(12.h),
-                      settingContainer(() {
-                           Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => EditProfile()));
-               
-                        // Constant.sendToNext(context, Routes.editProfileRoute);
-                      }, ("Edit Profile").tr(), "edit_profile.svg"),
-                      getVerSpace(20.h),
-                      settingContainer(() {
-                        Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => ChangePassword()));
-                      }, ("Change Password").tr(), "change_password.svg"),
-                      // getVerSpace(30.h),
-                      // getCustomFont("Preferences", 16.sp, greyColor, 1,
-                      //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                      getVerSpace(20.h),
+              ),
+            ],
+          )
+        else
+          Expanded(
+              flex: 1,
+              child: ListView(
+                primary: true,
+                shrinkWrap: true,
+                children: [
+                  buildProfileSection(),
+                  getVerSpace(5.h),
+                  getPaddingWidget(
+                    EdgeInsets.symmetric(horizontal: 20.h),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        getVerSpace(20.h),
+                        getCustomFont(
+                            ("Account Settings").tr(), 16.sp, greyColor, 1,
+                            fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                        getVerSpace(12.h),
                         settingContainer(() {
-                        Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => CreateEventScreen()));
-                        // Constant.sendToNext(context, Routes.createEventRoute);
-                      }, ("Create Event").tr(), "add.svg"),
-                      getVerSpace(20.h),
-                      settingContainer(() {
-                           Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => NotificationScreen()));
-               
-                        // Constant.sendToNext(
-                        //     context, Routes.notificationScreenRoute);
-                      }, ("Notification").tr(), "notification-image.svg"),
-                      getVerSpace(20.h),
-                      settingContainer(() {
-                       Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => MultipleLanguageScreen()));
-                        // Constant.sendToNext(context, Routes.changeLanguageRoute
-                      }, ("Change Language").tr(), "language.svg"),
-                      getVerSpace(20.h),
-                      // settingContainer(() {
-                      //   Constant.sendToNext(context, Routes.myCardScreenRoute);
-                      // }, "My Cards", "card.svg"),
-                      // getVerSpace(20.h),
-                      settingContainer(() {
-                           Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => PrivacyScreen()));
-               
-                        // Constant.sendToNext(context, Routes.privacyScreenRoute);
-                      }, ("Privacy").tr(), "privacy.svg"),
-                      getVerSpace(20.h),
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => EditProfile()));
 
-                      GestureDetector(
-                        onTap: () async {
-                          await context
-                              .read<SignInBloc>()
-                              .userSignout()
-                              .then((value) =>
-                                  context.read<SignInBloc>().afterUserSignOut())
-                              .then((value) {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              Routes.welcomePage, (route) => false);
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(22.h),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: shadowColor,
-                                    offset: const Offset(0, 8),
-                                    blurRadius: 27)
-                              ]),
-                          padding: EdgeInsets.only(
-                              bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 54.h,
-                                    width: 54.h,
-                                    decoration: BoxDecoration(
-                                        color: dividerColor,
-                                        borderRadius:
-                                            BorderRadius.circular(22.h)),
-                                    padding: EdgeInsets.all(15.h),
-                                    child: getSvg("Logout.svg",
-                                        width: 24.h,
-                                        height: 24.h,
-                                        color: accentColor),
-                                  ),
-                                  getHorSpace(16.h),
-                                  getCustomFont(
-                                      ("Logout").tr(), 16.sp, Colors.black, 1,
-                                      fontWeight: FontWeight.w500)
-                                ],
-                              ),
-                              getSvgImage("arrow_right.svg",
-                                  height: 24.h, width: 24.h)
-                            ],
+                          // Constant.sendToNext(context, Routes.editProfileRoute);
+                        }, ("Edit Profile").tr(), "edit_profile.svg"),
+                        getVerSpace(20.h),
+                        settingContainer(() {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => ChangePassword()));
+                        }, ("Change Password").tr(), "change_password.svg"),
+                        // getVerSpace(30.h),
+                        // getCustomFont("Preferences", 16.sp, greyColor, 1,
+                        //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                        getVerSpace(20.h),
+                        settingContainer(() {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  CreateEventScreen()));
+                          // Constant.sendToNext(context, Routes.createEventRoute);
+                        }, ("Create Event").tr(), "add.svg"),
+                        getVerSpace(20.h),
+                        settingContainer(() {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  NotificationScreen()));
+
+                          // Constant.sendToNext(
+                          //     context, Routes.notificationScreenRoute);
+                        }, ("Notification").tr(), "notification-image.svg"),
+                        getVerSpace(20.h),
+                        settingContainer(() {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  MultipleLanguageScreen()));
+                          // Constant.sendToNext(context, Routes.changeLanguageRoute
+                        }, ("Change Language").tr(), "language.svg"),
+                        getVerSpace(20.h),
+                        // settingContainer(() {
+                        //   Constant.sendToNext(context, Routes.myCardScreenRoute);
+                        // }, "My Cards", "card.svg"),
+                        // getVerSpace(20.h),
+                        settingContainer(() {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => PrivacyScreen()));
+
+                          // Constant.sendToNext(context, Routes.privacyScreenRoute);
+                        }, ("Privacy").tr(), "privacy.svg"),
+                        getVerSpace(20.h),
+
+                        GestureDetector(
+                          onTap: () async {
+                            await context
+                                .read<SignInProvider>()
+                                .userSignout()
+                                .then((value) => context
+                                    .read<SignInProvider>()
+                                    .afterUserSignOut())
+                                .then((value) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  Routes.welcomePage, (route) => false);
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(22.h),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: shadowColor,
+                                      offset: const Offset(0, 8),
+                                      blurRadius: 27)
+                                ]),
+                            padding: EdgeInsets.only(
+                                bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: 54.h,
+                                      width: 54.h,
+                                      decoration: BoxDecoration(
+                                          color: dividerColor,
+                                          borderRadius:
+                                              BorderRadius.circular(22.h)),
+                                      padding: EdgeInsets.all(15.h),
+                                      child: getSvg("Logout.svg",
+                                          width: 24.h,
+                                          height: 24.h,
+                                          color: accentColor),
+                                    ),
+                                    getHorSpace(16.h),
+                                    getCustomFont(
+                                        ("Logout").tr(), 16.sp, Colors.black, 1,
+                                        fontWeight: FontWeight.w500)
+                                  ],
+                                ),
+                                getSvgImage("arrow_right.svg",
+                                    height: 24.h, width: 24.h)
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      getVerSpace(50.h),
-                    ],
-                  ),
-                )
-              ],
-            ))
+                        getVerSpace(50.h),
+                      ],
+                    ),
+                  )
+                ],
+              ))
       ],
     );
   }
 
   Widget buildInterestWidget() {
-    final b = context.watch<BookmarkBloc>();
+    final b = context.watch<BookmarkProvider>();
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, right: 20.0),
       child: Column(
@@ -267,7 +274,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
   }
 
   Widget buildAboutWidget() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return Padding(
       padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 15.0),
       child: Column(
@@ -287,7 +294,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
                 width: 15.0,
               ),
               getCustomFont(
-                  sb.email??"", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+                  sb.email ?? "", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -302,8 +309,8 @@ class _GuestTabProfileState extends State<GuestTabProfile>
               SizedBox(
                 width: 15.0,
               ),
-              getCustomFont(
-                  sb.phone??("Not have phone number").tr(), 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+              getCustomFont(sb.phone ?? ("Not have phone number").tr(), 16.sp,
+                  Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -321,7 +328,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
   }
 
   Widget buildProfileSection() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return Padding(
       padding: const EdgeInsets.only(
           top: 15.0, bottom: 15.0, left: 15.0, right: 15.0),
@@ -353,7 +360,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
                           const BorderRadius.all(Radius.circular(100.0)),
                       image: DecorationImage(
                           image: NetworkImage(
-                            sb.imageUrl??"",
+                            sb.imageUrl ?? "",
                           ),
                           fit: BoxFit.cover)),
                 ),
@@ -376,7 +383,7 @@ class _GuestTabProfileState extends State<GuestTabProfile>
               ],
             ),
             getVerSpace(5.h),
-            getCustomFont(sb.name??"", 22.sp, Colors.black, 1,
+            getCustomFont(sb.name ?? "", 22.sp, Colors.black, 1,
                 fontWeight: FontWeight.w700, txtHeight: 1.5.h),
             getVerSpace(20.h),
             // getPaddingWidget(

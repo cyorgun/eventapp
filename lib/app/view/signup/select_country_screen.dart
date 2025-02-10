@@ -1,4 +1,3 @@
-
 // import 'package:flutter/material.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:get/get.dart';
@@ -19,7 +18,6 @@
 //     Constant.backToPrev(context);
 //   }
 
-
 //   @override
 //   Widget build(BuildContext context) {
 //     setStatusBarColor(Colors.white);
@@ -31,7 +29,7 @@
 //       child: Scaffold(
 //         resizeToAvoidBottomInset: false,
 //         backgroundColor: Colors.white,
-//         appBar: getToolBar(() {
+//         app_bar: getToolBar(() {
 //           ;
 //         },
 //             title: getCustomFont(
@@ -51,7 +49,7 @@
 //               getVerSpace(20.h),
 //               getPaddingWidget(
 //                 EdgeInsets.symmetric(horizontal: 20.h),
-              
+
 //               ),
 //               getVerSpace(30.h),
 //               Expanded(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../../base/color_data.dart';
-import '../constants/app_constants.dart';
 import '../constants/color_constants.dart';
 
 class FullPhotoPage extends StatelessWidget {
@@ -14,7 +13,7 @@ class FullPhotoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       backgroundColor: Colors.white,
+        backgroundColor: Colors.white,
         elevation: 0.0,
         title: Text(
           "Full Photo",
@@ -26,7 +25,6 @@ class FullPhotoPage extends StatelessWidget {
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: accentColor),
-        
       ),
       body: Container(
         child: PhotoView(

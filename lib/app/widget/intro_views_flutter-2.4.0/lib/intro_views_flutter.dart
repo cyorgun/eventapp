@@ -14,6 +14,7 @@ import 'Models/slide_update_model.dart';
 import 'UI/page.dart';
 import 'UI/page_indicator_buttons.dart';
 import 'UI/pager_indicator.dart';
+
 /// This is the IntroViewsFlutter widget of app which is a stateful widget as its state is dynamic and updates asynchronously.
 class IntroViewsFlutter extends StatefulWidget {
   /// List of [PageViewModel] to display
@@ -140,8 +141,8 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
           if (slidePercent! > 0.5) {
             animatedPageDragger = AnimatedPageDragger(
               slideDirection: slideDirection,
-              transitionGoal:
-                  TransitionGoal.open, //we have to animate the open page reveal
+              transitionGoal: TransitionGoal.open,
+              //we have to animate the open page reveal
               slidePercent: slidePercent,
               slideUpdateStream: slideUpdateStream,
               vsync: this,
@@ -149,8 +150,8 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
           } else {
             animatedPageDragger = AnimatedPageDragger(
               slideDirection: slideDirection,
-              transitionGoal:
-                  TransitionGoal.close, //we have to close the page reveal
+              transitionGoal: TransitionGoal.close,
+              //we have to close the page reveal
               slidePercent: slidePercent,
               slideUpdateStream: slideUpdateStream,
               vsync: this,
@@ -236,8 +237,8 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
             textStyle: textStyle,
             acitvePageIndex: activePageIndex,
             totalPages: pages.length,
-            onPressedDoneButton: widget
-                .onTapDoneButton, //void Callback to be executed after pressing done button
+            onPressedDoneButton: widget.onTapDoneButton,
+            //void Callback to be executed after pressing done button
             slidePercent: slidePercent,
             slideDirection: slideDirection,
             onPressedSkipButton: () {

@@ -1,17 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/view/ticket/upcoming_screen.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
-import '../../ticket/past_screen.dart';
-
-import 'package:easy_localization/easy_localization.dart';
-
 
 class showCaseTicket extends StatefulWidget {
   const showCaseTicket({super.key});
@@ -24,15 +19,10 @@ class _showCaseTicketState extends State<showCaseTicket> {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-      builder:Builder(
-    builder : (context)=> TabTicket()
-  ),
-      
+      builder: Builder(builder: (context) => TabTicket()),
     );
-    
   }
 }
-
 
 class TabTicket extends StatefulWidget {
   const TabTicket({Key? key}) : super(key: key);
@@ -60,8 +50,6 @@ class _TabTicketState extends State<TabTicket>
 
   @override
   Widget build(BuildContext context) {
-
-    
     SharedPreferences preferences;
 
     displayShowcase() async {
@@ -94,7 +82,6 @@ class _TabTicketState extends State<TabTicket>
       }
     });
 
-
     return KeysToBeInherited(
       notification: _one,
       search: _two,
@@ -102,10 +89,11 @@ class _TabTicketState extends State<TabTicket>
         children: [
           buildAppBar(),
           Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-          Expanded(child: Showcase(
-                           key: _one,
-                      description: "Click here to view your ticket item.",
-                   child: UpComingScreen()))
+          Expanded(
+              child: Showcase(
+                  key: _one,
+                  description: "Click here to view your ticket item.",
+                  child: UpComingScreen()))
         ],
       ),
     );

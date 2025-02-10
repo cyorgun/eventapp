@@ -1,9 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
-import 'package:event_app/app/routes/app_routes.dart';
-import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:event_app/app/view/home/filtering_screen.dart';
 import 'package:event_app/app/view/home/search_screen.dart';
 import 'package:event_app/app/view/home/tab/tab_maps.dart';
@@ -12,27 +12,23 @@ import 'package:event_app/app/view/trending/trending_screen.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
+import 'package:evente/evente.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:evente/evente.dart';
 import 'package:shimmer/shimmer.dart';
-import 'dart:math' as math;
 
-import '../../../chat_logic/pages/chat_page.dart';
 import '../../../dialog/loading_cards.dart';
+import '../../../provider/event_provider.dart';
+import '../../../provider/sign_in_provider.dart';
 import '../../../widget/empty_screen.dart';
-import '../../bloc/event_bloc.dart';
 import '../../featured_event/featured_event_detail2.dart';
 import '../../notification/notification_screen.dart';
-import 'package:showcaseview/showcaseview.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class GuestTabHome extends StatefulWidget {
   const GuestTabHome({Key? key}) : super(key: key);
@@ -46,9 +42,8 @@ class _GuestTabHomeState extends State<GuestTabHome> {
   List<ModalFeatureEvent> featureEventLists = DataFile.featureEventList;
   String? mtoken;
   DateTime now = DateTime.now();
-  
-void getToken() async {
-    
+
+  void getToken() async {
     await FirebaseMessaging.instance.getToken().then((token) {
       setState(() {
         mtoken = token;
@@ -59,29 +54,30 @@ void getToken() async {
   }
 
   void saveToken(String token) async {
-    
-  final SignInBloc sb = context.read<SignInBloc>();
+    final SignInProvider sb = context.read<SignInProvider>();
     await FirebaseFirestore.instance.collection("UserTokens").doc(sb.uid).set({
       'token': token,
-      
     });
-    
-      print("INI TOKENNYA");
-      print(sb.uid);
+
+    print("INI TOKENNYA");
+    print(sb.uid);
   }
 
-
-  
-  
-  Future<List<EventBaru>> fetchEventsNearby(double latitude, double longitude) async {
+  Future<List<EventBaru>> fetchEventsNearby(
+      double latitude, double longitude) async {
     List<EventBaru> Events = [];
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('event').get();
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('event').get();
 
     for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      double EventLatitude = (doc.data() as Map<String, dynamic>)['mapsLatLink'] as double? ?? 0.0;
-      double EventLongitude = (doc.data() as Map<String, dynamic>)['mapsLangLink'] as double? ?? 0.0;
+      double EventLatitude =
+          (doc.data() as Map<String, dynamic>)['mapsLatLink'] as double? ?? 0.0;
+      double EventLongitude =
+          (doc.data() as Map<String, dynamic>)['mapsLangLink'] as double? ??
+              0.0;
 
-      double distance = calculateDistance(latitude, longitude, EventLatitude, EventLongitude);
+      double distance =
+          calculateDistance(latitude, longitude, EventLatitude, EventLongitude);
 
       if (distance < 50000000000000.0) {
         // Misalnya, tampilkan Event yang berjarak kurang dari 10 km dari lokasi pengguna.
@@ -91,8 +87,6 @@ void getToken() async {
 
     return Events;
   }
-
-  
 
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     // Implementasikan perhitungan jarak antara dua koordinat geografis di sini (misalnya, menggunakan haversine formula).
@@ -114,32 +108,30 @@ void getToken() async {
     return degrees * math.pi / 180;
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
-    
-      checkAndRequestLocationPermission();
+
+    checkAndRequestLocationPermission();
     getToken();
     getFromSharedPreferences();
     if (this.mounted) {
-      context.read<EventBloc>().data.isNotEmpty
+      context.read<EventProvider>().data.isNotEmpty
           ? print('data already loaded')
-          : context.read<EventBloc>().getDataPopular(mounted);
+          : context.read<EventProvider>().getDataPopular(mounted);
     }
     if (this.mounted) {
-      context.read<EventBloc>().data2.isNotEmpty
+      context.read<EventProvider>().data2.isNotEmpty
           ? print('data already loaded 2')
-          : context.read<EventBloc>().getDataTrending(mounted);
+          : context.read<EventProvider>().getDataTrending(mounted);
     }
-    
+
     getUserLocation().then((position) {
       setState(() {
         userPosition = position;
       });
-      fetchEventsNearby(userPosition!.latitude, userPosition!.longitude).then((Events) {
+      fetchEventsNearby(userPosition!.latitude, userPosition!.longitude)
+          .then((Events) {
         Events.sort((a, b) => a.distance!.compareTo(b.distance as num));
         setState(() {
           nearbyEvents = Events;
@@ -148,11 +140,9 @@ void getToken() async {
     });
   }
 
-
   Position? userPosition;
   late List<EventBaru> nearbyEvents = [];
-  
-  
+
   void getFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -162,10 +152,10 @@ void getToken() async {
   }
 
   String? role;
-  
 
   Future<Position> getUserLocation() async {
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     return position;
   }
 
@@ -181,9 +171,6 @@ void getToken() async {
     }
   }
 
-  
-
-
   DateTime getStartOfMonth() {
     final now = DateTime.now();
     return DateTime(now.year, now.month, 1);
@@ -191,9 +178,12 @@ void getToken() async {
 
   DateTime getEndOfMonth() {
     final now = DateTime.now();
-    final startOfNextMonth = (now.month < 12) ? DateTime(now.year, now.month + 1, 1) : DateTime(now.year + 1, 1, 1);
+    final startOfNextMonth = (now.month < 12)
+        ? DateTime(now.year, now.month + 1, 1)
+        : DateTime(now.year + 1, 1, 1);
     return startOfNextMonth.subtract(Duration(days: 1));
   }
+
   Future<void> requestLocationPermission() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool hasPermission = prefs.getBool('hasLocationPermissions') ?? false;
@@ -225,7 +215,10 @@ void getToken() async {
                       ),
                       Text(
                         "Location Permission",
-                        style: TextStyle(fontSize: 16 + 1, fontWeight: FontWeight.w800, fontFamily: "RedHat"),
+                        style: TextStyle(
+                            fontSize: 16 + 1,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: "RedHat"),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(
@@ -234,7 +227,10 @@ void getToken() async {
                       Text(
                         "This app collects location data to enable access location to allow location for show near event, when the app is closed not in use.",
                         style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black26, fontFamily: "RedHat"),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black26,
+                            fontFamily: "RedHat"),
                         textAlign: TextAlign.justify,
                       ),
                       SizedBox(
@@ -296,20 +292,13 @@ void getToken() async {
     }
   }
 
-
-  
-
-
   @override
   Widget build(BuildContext context) {
-
-    
-
     final startOfMonth = getStartOfMonth();
     final endOfMonth = getEndOfMonth();
 
-    final cb = context.watch<EventBloc>();
-    final sb = context.watch<SignInBloc>();
+    final cb = context.watch<EventProvider>();
+    final sb = context.watch<SignInProvider>();
     setStatusBarColor(accentColor);
     return Column(
       children: [
@@ -343,36 +332,52 @@ void getToken() async {
                   ],
                 ),
 
-                getVerSpace(30.h),       
-                      Padding(
-                      padding: EdgeInsets.only(left: 20.0.w,right: 20.w),
-                      child: InkWell(
-                        onTap: (){
-                          Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=> showCaseMaps(),));
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                getVerSpace(30.h),
+                Padding(
+                  padding: EdgeInsets.only(left: 20.0.w, right: 20.w),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(PageRouteBuilder(
+                        pageBuilder: (_, __, ___) => showCaseMaps(),
+                      ));
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        getCustomFont(
+                            ("Nearby Events").tr(), 20.sp, Colors.black, 1,
+                            fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                        Row(
                           children: [
-                                getCustomFont(("Nearby Events").tr(), 20.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                                Row(
-                                  children: [
-                                     getCustomFont(("View maps").tr(), 15.sp, greyColor, 1,
-                                  fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                                  SizedBox(width: 5.0,),
-                                   getSvg("map.svg", height: 24.h, width: 24.h,color: greyColor),
-                             
-                                  ],
-                                )
-                              ],
-                        ),
-                      ),
+                            getCustomFont(
+                                ("View maps").tr(), 15.sp, greyColor, 1,
+                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            getSvg("map.svg",
+                                height: 24.h, width: 24.h, color: greyColor),
+                          ],
+                        )
+                      ],
                     ),
-        
-                    getVerSpace(10.h),
-                    Container(
-                      height: 198.h,
-                      child: nearbyEvents == null
+                  ),
+                ),
+
+                getVerSpace(10.h),
+                Container(
+                  height: 198.h,
+                  child: nearbyEvents == null
+                      ? ListView.builder(
+                          itemCount: 5,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return LoadingCard(
+                              height: 200.0,
+                            );
+                          },
+                        )
+                      : nearbyEvents.isEmpty
                           ? ListView.builder(
                               itemCount: 5,
                               scrollDirection: Axis.horizontal,
@@ -382,40 +387,32 @@ void getToken() async {
                                 );
                               },
                             )
-                          : nearbyEvents.isEmpty
-                              ? ListView.builder(
-                                  itemCount: 5,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return LoadingCard(
-                                      height: 200.0,
-                                    );
-                                  },
-                                )
-                              : ListView.builder(
-                                  itemCount: nearbyEvents.take(5).length ?? 0,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    final hotel = nearbyEvents[index];
-                                    return buildNearHotelList(
-                                      hotel: hotel,
-                                    );
-                                  },
-                                ),  ),
-        
-           getVerSpace(24.h),
+                          : ListView.builder(
+                              itemCount: nearbyEvents.take(5).length ?? 0,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                final hotel = nearbyEvents[index];
+                                return buildNearHotelList(
+                                  hotel: hotel,
+                                );
+                              },
+                            ),
+                ),
+
+                getVerSpace(24.h),
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 20.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      getCustomFont(("Upcoming Events").tr(), 20.sp, Colors.black, 1,
+                      getCustomFont(
+                          ("Upcoming Events").tr(), 20.sp, Colors.black, 1,
                           fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                       // GestureDetector(
                       //   onTap: () {
                       //        Navigator.of(context).push(PageRouteBuilder(
                       // pageBuilder: (_, __, ___) => FeatureEventList()));
-               
+
                       //     // Constant.sendToNext(
                       //     //     context, Routes.featureEventListRoute);
                       //   },
@@ -434,7 +431,8 @@ void getToken() async {
                     stream: FirebaseFirestore.instance
                         .collection("event")
                         .where('date',
-                            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
+                            isGreaterThanOrEqualTo:
+                                Timestamp.fromDate(DateTime.now()))
                         .orderBy('date', descending: false)
                         .limit(10)
                         .snapshots(),
@@ -445,33 +443,33 @@ void getToken() async {
                       }
 
                       if (snapshot.data!.docs.isEmpty) {
-                        return Center(child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                 
-                     Container(
+                        return Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
                               decoration: BoxDecoration(
                                   color: lightColor,
                                   borderRadius: BorderRadius.circular(187.h)),
                               padding: EdgeInsets.all(10.h),
                               child: getAssetImage("empty.png",
-                              height: 100.0,
-                                   width: 134.h,boxFit: BoxFit.cover),
+                                  height: 100.0,
+                                  width: 134.h,
+                                  boxFit: BoxFit.cover),
                             ),
-                            getCustomFont(
-                                ("Not have upcoming events").tr(), 16.sp, Colors.black, 1,
+                            getCustomFont(("Not have upcoming events").tr(),
+                                16.sp, Colors.black, 1,
                                 fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                          
-              ],
-            ));
+                          ],
+                        ));
                       }
                       if (snapshot.hasError) {
                         return Center(child: Text('Error'));
                       }
 
                       // return loadingCard(ctx);
-                return        snapshot.hasData
+                      return snapshot.hasData
                           ? buildFeatureEventList(
                               list: snapshot.data?.docs,
                             )
@@ -480,8 +478,8 @@ void getToken() async {
                   ),
                 ),
                 // buildFeatureEventList(context),
-                 getVerSpace(12.h),
-        
+                getVerSpace(12.h),
+
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 20.h),
                   Row(
@@ -491,13 +489,15 @@ void getToken() async {
                           ("Choose by Category").tr(), 20.sp, Colors.black, 1,
                           fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                       GestureDetector(
-                        onTap: () {   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => TrendingScreen()));
-               
+                        onTap: () {
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => TrendingScreen()));
+
                           // Constant.sendToNext(
                           //     context, Routes.trendingScreenRoute);
                         },
-                        child: getCustomFont(("View All").tr(), 15.sp, greyColor, 1,
+                        child: getCustomFont(
+                            ("View All").tr(), 15.sp, greyColor, 1,
                             fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                       )
                     ],
@@ -519,23 +519,23 @@ void getToken() async {
                             elevation: 0.0,
                             centerTitle: true,
                             automaticallyImplyLeading: false,
-                                  leadingWidth: 0.0,
+                            leadingWidth: 0.0,
                             title: TabBar(
                               isScrollable: true,
-                                    tabAlignment: TabAlignment.start,
-                                    padding: EdgeInsets.all(0.0),
+                              tabAlignment: TabAlignment.start,
+                              padding: EdgeInsets.all(0.0),
                               indicatorSize: TabBarIndicatorSize.tab,
                               unselectedLabelColor: Colors.black,
                               labelColor: Colors.white,
-                                      dividerHeight: 0,
-                                    indicatorPadding: EdgeInsets.all(0),
+                              dividerHeight: 0,
+                              indicatorPadding: EdgeInsets.all(0),
                               labelStyle: const TextStyle(fontSize: 19.0),
                               // ignore: unnecessary_new
                               // ignore: prefer_const_constr
                               indicator: BubbleTabIndicator(
                                 indicatorHeight: 45.0,
                                 indicatorColor: accentColor,
-                                      padding: EdgeInsets.all(0.0),
+                                padding: EdgeInsets.all(0.0),
                                 tabBarIndicatorSize: TabBarIndicatorSize.tab,
                               ),
                               tabs: <Widget>[
@@ -547,7 +547,7 @@ void getToken() async {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                         Text(
+                                        Text(
                                           ("All").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -591,7 +591,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Swimming").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -635,7 +635,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Game").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -679,7 +679,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Football").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -723,7 +723,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Comedy").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -768,7 +768,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Konser").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -813,7 +813,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Trophy").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -858,7 +858,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Tour").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -902,7 +902,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Festival").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -946,7 +946,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Study").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -990,7 +990,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Party").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -1035,7 +1035,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Olympic").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -1079,7 +1079,7 @@ void getToken() async {
                                             getHorSpace(6.h),
                                           ],
                                         ),
-                                         Text(
+                                        Text(
                                           ("Culture").tr(),
                                           style: TextStyle(
                                               fontFamily: Constant.fontsFamily,
@@ -1111,11 +1111,11 @@ void getToken() async {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1124,7 +1124,7 @@ void getToken() async {
                                   if (snapshot.hasError) {
                                     return Center(child: Text('Error'));
                                   }
-                                  
+
                                   return snapshot.hasData
                                       ? TrendingEventCard2(
                                           list: snapshot.data?.docs,
@@ -1145,12 +1145,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                  return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   // if (snapshot.hasError) {
@@ -1181,12 +1181,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                 return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1215,12 +1215,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                     return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1249,12 +1249,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1284,11 +1284,11 @@ void getToken() async {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1317,12 +1317,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                  return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1351,12 +1351,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                   return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1386,11 +1386,11 @@ void getToken() async {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1419,12 +1419,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                  return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1453,12 +1453,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1487,12 +1487,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1521,12 +1521,12 @@ void getToken() async {
                                     AsyncSnapshot<QuerySnapshot> snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
-                                   return ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: [
-                                    loadingCard2(context),
-                                    loadingCard2(context),
-                                    ]);
+                                    return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          loadingCard2(context),
+                                          loadingCard2(context),
+                                        ]);
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -1549,84 +1549,92 @@ void getToken() async {
                     ),
                   ),
                 ),
-    getVerSpace(20.h),
-                
-                    Padding(
-                      padding: EdgeInsets.only(left: 20.0.w),
-                      child: getCustomFont(("Events of this month").tr(), 20.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                    ),
-        
-                    getVerSpace(10.h),
-                    Container(
-                      height: 298.h,
-                      child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("event")
-                            .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
-                            .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
-                            .orderBy('date', descending: false)
-                            .limit(10)
-                            .snapshots(),
-                        builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return loadingCard(ctx);
-                          }
-        
-                          if (snapshot.data!.docs.isEmpty) {
-                            return Center(
-                                child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Container(
-                                //          decoration: BoxDecoration(
-                                //              color: lightColor,
-                                //              borderRadius: BorderRadius.circular(187.h)),
-                                //          padding: EdgeInsets.all(10.h),
-                                //          child: getAssetImage("empty.png",
-                                //          height: 100.0,
-                                //               width: 134.h,boxFit: BoxFit.cover),
-                                //        ),
-                                getCustomFont(("Not have upcoming events").tr(), 16.sp, Colors.black, 1,
-                                    fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                              ],
-                            ));
-                          }
-                          if (snapshot.hasError) {
-                            return Center(child: Text('Error'));
-                          }
-        
-                          // return loadingCard(ctx);
-                          return snapshot.hasData
-                              ? TrendingEventCard3(
-                                  list: snapshot.data?.docs,
-                                )
-                              // buildFeatureEventList(
-                              //    list: snapshot.data?.docs,
-                              //  )
-                              : Container();
-                        },
-                      ),
-                    ),
-        
+                getVerSpace(20.h),
+
+                Padding(
+                  padding: EdgeInsets.only(left: 20.0.w),
+                  child: getCustomFont(
+                      ("Events of this month").tr(), 20.sp, Colors.black, 1,
+                      fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                ),
+
+                getVerSpace(10.h),
+                Container(
+                  height: 298.h,
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("event")
+                        .where('date',
+                            isGreaterThanOrEqualTo:
+                                Timestamp.fromDate(startOfMonth))
+                        .where('date',
+                            isLessThanOrEqualTo: Timestamp.fromDate(endOfMonth))
+                        .orderBy('date', descending: false)
+                        .limit(10)
+                        .snapshots(),
+                    builder: (BuildContext ctx,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return loadingCard(ctx);
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Container(
+                            //          decoration: BoxDecoration(
+                            //              color: lightColor,
+                            //              borderRadius: BorderRadius.circular(187.h)),
+                            //          padding: EdgeInsets.all(10.h),
+                            //          child: getAssetImage("empty.png",
+                            //          height: 100.0,
+                            //               width: 134.h,boxFit: BoxFit.cover),
+                            //        ),
+                            getCustomFont(("Not have upcoming events").tr(),
+                                16.sp, Colors.black, 1,
+                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                          ],
+                        ));
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error'));
+                      }
+
+                      // return loadingCard(ctx);
+                      return snapshot.hasData
+                          ? TrendingEventCard3(
+                              list: snapshot.data?.docs,
+                            )
+                          // buildFeatureEventList(
+                          //    list: snapshot.data?.docs,
+                          //  )
+                          : Container();
+                    },
+                  ),
+                ),
+
                 // buildTrendingEventList(),
                 getPaddingWidget(
                   EdgeInsets.symmetric(horizontal: 20.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      getCustomFont(("Popular Events").tr(), 20.sp, Colors.black, 1,
+                      getCustomFont(
+                          ("Popular Events").tr(), 20.sp, Colors.black, 1,
                           fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                       GestureDetector(
                         onTap: () {
-                             Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => PopularEventList()));
-               
+                          Navigator.of(context).push(PageRouteBuilder(
+                              pageBuilder: (_, __, ___) => PopularEventList()));
+
                           // Constant.sendToNext(
                           //     context, Routes.popularEventListRoute);
                         },
-                        child: getCustomFont(("View All").tr(), 15.sp, greyColor, 1,
+                        child: getCustomFont(
+                            ("View All").tr(), 15.sp, greyColor, 1,
                             fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                       )
                     ],
@@ -1932,7 +1940,7 @@ void getToken() async {
               )),
         ),
         Padding(
-          padding: const EdgeInsets.only(right: 15.0,left: 15.0),
+          padding: const EdgeInsets.only(right: 15.0, left: 15.0),
           child: InkWell(
             onTap: () {
               Navigator.of(context).push(PageRouteBuilder(
@@ -1964,9 +1972,9 @@ void getToken() async {
   }
 
   Widget buildAppBar() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return getPaddingWidget(
-      EdgeInsets.only(left: 20.h,right: 20.0),
+      EdgeInsets.only(left: 20.h, right: 20.0),
       Row(
         children: [
           Column(
@@ -2016,9 +2024,9 @@ void getToken() async {
                 color: lightColor, borderRadius: BorderRadius.circular(22.h)),
             child: GestureDetector(
                 onTap: () {
-                     Navigator.of(context).push(PageRouteBuilder(
+                  Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => NotificationScreen()));
-               
+
                   // Constant.sendToNext(context, Routes.notificationScreenRoute);
                 },
                 child: getSvg("notification.svg", height: 24.h, width: 24.h)),
@@ -2032,6 +2040,7 @@ void getToken() async {
 class buildPopularEventList extends StatelessWidget {
   final List<DocumentSnapshot>? list;
   String? id;
+
   buildPopularEventList({this.list, this.id});
 
   @override
@@ -2042,9 +2051,8 @@ class buildPopularEventList extends StatelessWidget {
         primary: false,
         itemCount: list?.length,
         itemBuilder: (context, i) {
-          final events = list?.map((e)
-           {
-            return EventBaru.fromFirestore(e,1);
+          final events = list?.map((e) {
+            return EventBaru.fromFirestore(e, 1);
           }).toList();
           // String? category = list?[i]['category'].toString();
           // String? date = list?[i]['date'].toString();
@@ -2091,13 +2099,11 @@ class buildPopularEventList extends StatelessWidget {
             child: Row(
               children: [
                 Stack(
-                  children: 
-                    [
-                      
-                      Container(
+                  children: [
+                    Container(
                       height: 150.0,
-                      margin:
-                          EdgeInsets.only(bottom: 20.h, left: 20.0, right: 20.0),
+                      margin: EdgeInsets.only(
+                          bottom: 20.h, left: 20.0, right: 20.0),
                       decoration: BoxDecoration(
                           color: Colors.white,
                           boxShadow: [
@@ -2115,9 +2121,9 @@ class buildPopularEventList extends StatelessWidget {
                             height: 102,
                             width: 102,
                             decoration: BoxDecoration(
-                          color: Colors.black12,
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(20.0)),
+                                color: Colors.black12,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(20.0)),
                                 image: DecorationImage(
                                     image: NetworkImage(
                                       events?[i].image ?? '',
@@ -2129,7 +2135,8 @@ class buildPopularEventList extends StatelessWidget {
                           //     width: 82.h, height: 82.h),
                           getHorSpace(10.h),
                           Padding(
-                            padding: const EdgeInsets.only(left: 5.0,right: 5.0),
+                            padding:
+                                const EdgeInsets.only(left: 5.0, right: 5.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -2148,12 +2155,12 @@ class buildPopularEventList extends StatelessWidget {
                                 Row(
                                   children: [
                                     getSvg("calender.svg",
-                                        color:Colors.grey[400],
+                                        color: Colors.grey[400],
                                         width: 16.h,
                                         height: 16.h),
                                     getHorSpace(5.h),
-                                    getCustomFont(
-                                        date.toString() ?? "", 15.sp, greyColor, 1,
+                                    getCustomFont(date.toString() ?? "", 15.sp,
+                                        greyColor, 1,
                                         fontWeight: FontWeight.w500,
                                         txtHeight: 1.5.h),
                                   ],
@@ -2168,8 +2175,11 @@ class buildPopularEventList extends StatelessWidget {
                                     getHorSpace(5.h),
                                     Container(
                                       width: 150.w,
-                                      child: getCustomFont(events?[i].location ?? "", 15.sp,
-                                          greyColor, 1,
+                                      child: getCustomFont(
+                                          events?[i].location ?? "",
+                                          15.sp,
+                                          greyColor,
+                                          1,
                                           fontWeight: FontWeight.w500,
                                           txtHeight: 1.5.h),
                                     ),
@@ -2177,7 +2187,8 @@ class buildPopularEventList extends StatelessWidget {
                                 ),
                                 getVerSpace(7.h),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     StreamBuilder(
                                       stream: FirebaseFirestore.instance
@@ -2186,13 +2197,15 @@ class buildPopularEventList extends StatelessWidget {
                                           .collection(events[i].title ?? '')
                                           .snapshots(),
                                       builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                                          AsyncSnapshot<QuerySnapshot>
+                                              snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
                                           return Center(
-                                              child: CircularProgressIndicator());
+                                              child:
+                                                  CircularProgressIndicator());
                                         }
-                
+
                                         if (snapshot.data!.docs.isEmpty) {
                                           return Center(child: Container());
                                         }
@@ -2201,62 +2214,75 @@ class buildPopularEventList extends StatelessWidget {
                                         }
                                         return snapshot.hasData
                                             ? Padding(
-                                              padding: const EdgeInsets.only(right:20.0),
-                                              child: new joinEvents(
+                                                padding: const EdgeInsets.only(
+                                                    right: 20.0),
+                                                child: new joinEvents(
                                                   list: snapshot.data?.docs,
                                                 ),
-                                            )
+                                              )
                                             : Container();
                                       },
                                     ),
-                           if(events[i].price!>0)
-                                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                "\$ " + (events?[i].price.toString() ?? ""),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                       if(events[i].price==0)  
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
+                                    if (events[i].price! > 0)
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 0.0, bottom: 0.0),
+                                            child: Container(
+                                              height: 35.h,
+                                              width: 80.0,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.051),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.h)),
+                                              child: Center(
+                                                  child: Text(
+                                                "\$ " +
+                                                    (events?[i]
+                                                            .price
+                                                            .toString() ??
+                                                        ""),
+                                                style: TextStyle(
+                                                    color: accentColor,
+                                                    fontSize: 15.sp,
+                                                    fontFamily: 'Gilroy',
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                                textAlign: TextAlign.center,
+                                              )),
+                                            )),
+                                      ),
+                                    if (events[i].price == 0)
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 0.0, bottom: 0.0),
+                                            child: Container(
+                                              height: 35.h,
+                                              width: 80.0,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.051),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.h)),
+                                              child: Center(
+                                                  child: Text(
+                                                ("Free").tr(),
+                                                style: TextStyle(
+                                                    color: accentColor,
+                                                    fontSize: 15.sp,
+                                                    fontFamily: 'Gilroy',
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                                textAlign: TextAlign.center,
+                                              )),
+                                            )),
+                                      ),
                                   ],
                                 ),
                               ],
@@ -2265,26 +2291,28 @@ class buildPopularEventList extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     Padding(
-                      padding: const EdgeInsets.only(top:5.0,left: 305.0),
+                      padding: const EdgeInsets.only(top: 5.0, left: 305.0),
                       child: Container(
-                              decoration: BoxDecoration(
-                                  color:Colors.grey[400],
-                                  borderRadius: BorderRadius.circular(10.h)),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 3.h, horizontal: 10.h),
-                              child: Row(
-                                children: 
-                                      [
-                                        Icon(Icons.remove_red_eye,color: Colors.white,size: 15.0,),
-                                        SizedBox(width:5),
-                                        getCustomFont(
-                                  events?[i].count.toString() ?? "", 13.sp, Colors.white, 1,
-                                      fontWeight: FontWeight.w600, txtHeight: 1.69.h),
-                                    ],
-                              ),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(10.h)),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 3.h, horizontal: 10.h),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.white,
+                              size: 15.0,
                             ),
+                            SizedBox(width: 5),
+                            getCustomFont(events?[i].count.toString() ?? "",
+                                13.sp, Colors.white, 1,
+                                fontWeight: FontWeight.w600, txtHeight: 1.69.h),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -2297,6 +2325,7 @@ class buildPopularEventList extends StatelessWidget {
 
 class buildFeatureEventList extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const buildFeatureEventList({this.list});
 
   @override
@@ -2310,7 +2339,7 @@ class buildFeatureEventList extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return EventBaru.fromFirestore(e,1);
+            return EventBaru.fromFirestore(e, 1);
           }).toList();
 
           DateTime? dateTime = events![i].date?.toDate();
@@ -2371,8 +2400,7 @@ class buildFeatureEventList extends StatelessWidget {
                           height: 120.0,
                           width: 100.0,
                           decoration: BoxDecoration(
-                            
-                          color: Colors.black12,
+                            color: Colors.black12,
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10.0)),
                             image: DecorationImage(
@@ -2420,8 +2448,11 @@ class buildFeatureEventList extends StatelessWidget {
                                   getHorSpace(5.h),
                                   Container(
                                     width: 100.0,
-                                    child: getCustomFont(events?[i].location ?? "",
-                                        15.sp, greyColor, 1,
+                                    child: getCustomFont(
+                                        events?[i].location ?? "",
+                                        15.sp,
+                                        greyColor,
+                                        1,
                                         fontWeight: FontWeight.w500,
                                         txtHeight: 1.5.h),
                                   ),
@@ -2441,7 +2472,7 @@ class buildFeatureEventList extends StatelessWidget {
                                     return Center(
                                         child: CircularProgressIndicator());
                                   }
-                              
+
                                   if (snapshot.data!.docs.isEmpty) {
                                     return Center(child: Container());
                                   }
@@ -2461,55 +2492,54 @@ class buildFeatureEventList extends StatelessWidget {
                       ],
                     ),
                   ),
-                    if(events[i].price!>0)
-                                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(right:20.0, bottom: 20.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                "\$ " + (events?[i].price.toString() ?? ""),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
+                  if (events[i].price! > 0)
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                          padding:
+                              const EdgeInsets.only(right: 20.0, bottom: 20.0),
+                          child: Container(
+                            height: 35.h,
+                            width: 80.0,
+                            decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.051),
+                                borderRadius: BorderRadius.circular(50.h)),
+                            child: Center(
+                                child: Text(
+                              "\$ " + (events?[i].price.toString() ?? ""),
+                              style: TextStyle(
+                                  color: accentColor,
+                                  fontSize: 15.sp,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w700),
+                              textAlign: TextAlign.center,
                             )),
-                      ),
-                       if(events[i].price==0)  
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(right: 20.0, bottom: 20.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
+                          )),
+                    ),
+                  if (events[i].price == 0)
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                          padding:
+                              const EdgeInsets.only(right: 20.0, bottom: 20.0),
+                          child: Container(
+                            height: 35.h,
+                            width: 80.0,
+                            decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.051),
+                                borderRadius: BorderRadius.circular(50.h)),
+                            child: Center(
+                                child: Text(
+                              ("Free").tr(),
+                              style: TextStyle(
+                                  color: accentColor,
+                                  fontSize: 15.sp,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w700),
+                              textAlign: TextAlign.center,
                             )),
-                      ),
-                              
+                          )),
+                    ),
                 ],
               ),
             ),
@@ -2518,16 +2548,124 @@ class buildFeatureEventList extends StatelessWidget {
       ),
     );
   }
-
-
 }
 
+Widget loadingCard(BuildContext context) {
+  return Container(
+    height: 130.0,
+    width: MediaQuery.of(context).size.width - 100,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(
+        15.0,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Color(0xFF333333).withOpacity(0.06),
+          offset: const Offset(0, 2),
+          blurRadius: 10,
+        ),
+      ],
+    ),
+    child: Shimmer.fromColors(
+      baseColor: Colors.black38,
+      highlightColor: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: 0, top: 0),
+        child: Container(
+          width: double.maxFinite,
+          height: 30.0 * 2 + 20.0,
+          margin: EdgeInsets.only(
+            top: 10,
+            left: 5,
+            right: 5,
+          ),
+          padding: EdgeInsets.only(
+            top: 0,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 25,
+              ),
+              Container(
+                height: 150.0,
+                width: 100.0,
+                color: Colors.black12,
+                child: Text(
+                  '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 18.0,
+                      width: 200.0,
+                      color: Colors.black12,
+                      child: Text(
+                        '',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 18.0,
+                      width: 150.0,
+                      color: Colors.black12,
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 18.0,
+                      width: 50.0,
+                      color: Colors.black12,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(right: 0, bottom: 10),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Center(
+                    child: Container(
+                      height: 25.0,
+                      width: 25.0,
+                      color: Colors.black12,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
-  
-  Widget loadingCard(BuildContext context) {
-    return Container(
-      height: 130.0,
-      width: MediaQuery.of(context).size.width-100,
+Widget loadingCard2(BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Container(
+      height: 100.0,
+      width: 250,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
@@ -2545,40 +2683,32 @@ class buildFeatureEventList extends StatelessWidget {
         baseColor: Colors.black38,
         highlightColor: Colors.white,
         child: Padding(
-          padding: EdgeInsets.only(bottom: 0, top: 0),
+          padding: EdgeInsets.all(0),
           child: Container(
             width: double.maxFinite,
             height: 30.0 * 2 + 20.0,
-            margin: EdgeInsets.only(
-              top: 10,
-              left:  5,
-              right:  5,
-            ),
             padding: EdgeInsets.only(
-              top:  0,
+              top: 0,
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 25,
-                ),
-                  Container(
-                      height: 150.0,
-                      width: 100.0,
-                      color: Colors.black12,
-                      child: Text(
-                        '',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                Container(
+                  height: 150.0,
+                  width: 250,
+                  color: Colors.black12,
+                  child: Text(
+                    '',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                ),
                 SizedBox(
                   width: 15,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top:20.0),
+                  padding: const EdgeInsets.only(top: 20.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2599,30 +2729,24 @@ class buildFeatureEventList extends StatelessWidget {
                       ),
                       Container(
                         height: 18.0,
-                        width: 150.0,
-                        color: Colors.black12,
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Container(
-                        height: 18.0,
-                        width: 50.0,
+                        width: 80.0,
                         color: Colors.black12,
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(
-                      right:  0, bottom:  10),
+                  padding: EdgeInsets.only(left: 100, bottom: 10, top: 10.0),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Center(
                       child: Container(
                         height: 25.0,
-                        width: 25.0,
-                        color: Colors.black12,
+                        width: 65.0,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
                       ),
                     ),
                   ),
@@ -2632,117 +2756,13 @@ class buildFeatureEventList extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-
-  Widget loadingCard2(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 100.0,
-        width: 250,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(
-            15.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0xFF333333).withOpacity(0.06),
-              offset: const Offset(0, 2),
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: Shimmer.fromColors(
-          baseColor: Colors.black38,
-          highlightColor: Colors.white,
-          child: Padding(
-            padding: EdgeInsets.all(0),
-            child: Container(
-              width: double.maxFinite,
-              height: 30.0 * 2 + 20.0,
-          
-              padding: EdgeInsets.only(
-                top:  0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-             
-                    Container(
-                        height: 150.0,
-        width: 250,
-                        color: Colors.black12,
-                        child: Text(
-                          '',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top:20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 18.0,
-                          width: 200.0,
-                          color: Colors.black12,
-                          child: Text(
-                            '',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-             
-                        Container(
-                          height: 18.0,
-                          width: 80.0,
-                          color: Colors.black12,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        left:  100, bottom:  10,top: 10.0),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Center(
-                        child: Container(
-                          height: 25.0,
-                          width: 65.0,
-                          decoration: BoxDecoration(
-                          color: Colors.black12,
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
+    ),
+  );
+}
 
 class TrendingEventCard extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const TrendingEventCard({this.list});
 
   @override
@@ -2754,7 +2774,7 @@ class TrendingEventCard extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return EventBaru.fromFirestore(e,1);
+            return EventBaru.fromFirestore(e, 1);
           }).toList();
           // String? category = list?[i]['category'].toString();
           // String? date = list?[i]['date'].toString();
@@ -2850,9 +2870,10 @@ class TrendingEventCard extends StatelessWidget {
                             getVerSpace(16.h),
                             Container(
                               width: 300.0.w,
-                              child: getCustomFont(events?[i].title ?? "", 20.5.sp,
-                                  Colors.black, 1,
-                                  fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                              child: getCustomFont(events?[i].title ?? "",
+                                  20.5.sp, Colors.black, 1,
+                                  fontWeight: FontWeight.w700,
+                                  txtHeight: 1.5.h),
                             ),
                             getVerSpace(3.h),
                             Row(
@@ -2864,8 +2885,11 @@ class TrendingEventCard extends StatelessWidget {
                                 getHorSpace(5.h),
                                 Container(
                                   width: 250.0.w,
-                                  child: getCustomFont(events?[i].location ?? "", 15.sp,
-                                      greyColor, 1,
+                                  child: getCustomFont(
+                                      events?[i].location ?? "",
+                                      15.sp,
+                                      greyColor,
+                                      1,
                                       fontWeight: FontWeight.w500,
                                       txtHeight: 1.5.h),
                                 )
@@ -2904,55 +2928,60 @@ class TrendingEventCard extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                  if(events[i].price!>0)
-                                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                "\$ " + (events?[i].price.toString() ?? ""),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                       if(events[i].price==0)  
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                              
+                                if (events[i].price! > 0)
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, bottom: 0.0),
+                                        child: Container(
+                                          height: 35.h,
+                                          width: 80.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withOpacity(0.051),
+                                              borderRadius:
+                                                  BorderRadius.circular(50.h)),
+                                          child: Center(
+                                              child: Text(
+                                            "\$ " +
+                                                (events?[i].price.toString() ??
+                                                    ""),
+                                            style: TextStyle(
+                                                color: accentColor,
+                                                fontSize: 15.sp,
+                                                fontFamily: 'Gilroy',
+                                                fontWeight: FontWeight.w700),
+                                            textAlign: TextAlign.center,
+                                          )),
+                                        )),
+                                  ),
+                                if (events[i].price == 0)
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, bottom: 0.0),
+                                        child: Container(
+                                          height: 35.h,
+                                          width: 80.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withOpacity(0.051),
+                                              borderRadius:
+                                                  BorderRadius.circular(50.h)),
+                                          child: Center(
+                                              child: Text(
+                                            ("Free").tr(),
+                                            style: TextStyle(
+                                                color: accentColor,
+                                                fontSize: 15.sp,
+                                                fontFamily: 'Gilroy',
+                                                fontWeight: FontWeight.w700),
+                                            textAlign: TextAlign.center,
+                                          )),
+                                        )),
+                                  ),
                               ],
                             ),
                             getVerSpace(16.h),
@@ -2972,6 +3001,7 @@ class TrendingEventCard extends StatelessWidget {
 
 class TrendingEventCard2 extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const TrendingEventCard2({this.list});
 
   @override
@@ -2983,7 +3013,7 @@ class TrendingEventCard2 extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return EventBaru.fromFirestore(e,1);
+            return EventBaru.fromFirestore(e, 1);
           }).toList();
           // String? category = list?[i]['category'].toString();
           // String? date = list?[i]['date'].toString();
@@ -3079,9 +3109,10 @@ class TrendingEventCard2 extends StatelessWidget {
                             getVerSpace(16.h),
                             Container(
                               width: 190.0.w,
-                              child: getCustomFont(events?[i].title ?? "", 20.5.sp,
-                                  Colors.black, 1,
-                                  fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                              child: getCustomFont(events?[i].title ?? "",
+                                  20.5.sp, Colors.black, 1,
+                                  fontWeight: FontWeight.w700,
+                                  txtHeight: 1.5.h),
                             ),
                             getVerSpace(3.h),
                             Row(
@@ -3093,8 +3124,11 @@ class TrendingEventCard2 extends StatelessWidget {
                                 getHorSpace(5.h),
                                 Container(
                                   width: 150.0.w,
-                                  child: getCustomFont(events?[i].location ?? "", 15.sp,
-                                      greyColor, 1,
+                                  child: getCustomFont(
+                                      events?[i].location ?? "",
+                                      15.sp,
+                                      greyColor,
+                                      1,
                                       fontWeight: FontWeight.w500,
                                       txtHeight: 1.5.h),
                                 )
@@ -3133,55 +3167,60 @@ class TrendingEventCard2 extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                  if(events[i].price!>0)
-                                     Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                "\$ " + (events?[i].price.toString() ?? ""),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                       if(events[i].price==0)  
-                         Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                            child: Container(
-                              height: 35.h,
-                              width: 80.0,
-                              decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.051),
-                                  borderRadius: BorderRadius.circular(50.h)),
-                              child: Center(
-                                  child: Text(
-                                ("Free").tr(),
-                                style: TextStyle(
-                                    color: accentColor,
-                                    fontSize: 15.sp,
-                                            fontFamily: 'Gilroy',
-                                    fontWeight: FontWeight.w700),
-                                textAlign: TextAlign.center,
-                              )),
-                            )),
-                      ),
-                              
+                                if (events[i].price! > 0)
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, bottom: 0.0),
+                                        child: Container(
+                                          height: 35.h,
+                                          width: 80.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withOpacity(0.051),
+                                              borderRadius:
+                                                  BorderRadius.circular(50.h)),
+                                          child: Center(
+                                              child: Text(
+                                            "\$ " +
+                                                (events?[i].price.toString() ??
+                                                    ""),
+                                            style: TextStyle(
+                                                color: accentColor,
+                                                fontSize: 15.sp,
+                                                fontFamily: 'Gilroy',
+                                                fontWeight: FontWeight.w700),
+                                            textAlign: TextAlign.center,
+                                          )),
+                                        )),
+                                  ),
+                                if (events[i].price == 0)
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 0.0, bottom: 0.0),
+                                        child: Container(
+                                          height: 35.h,
+                                          width: 80.0,
+                                          decoration: BoxDecoration(
+                                              color: Colors.black
+                                                  .withOpacity(0.051),
+                                              borderRadius:
+                                                  BorderRadius.circular(50.h)),
+                                          child: Center(
+                                              child: Text(
+                                            ("Free").tr(),
+                                            style: TextStyle(
+                                                color: accentColor,
+                                                fontSize: 15.sp,
+                                                fontFamily: 'Gilroy',
+                                                fontWeight: FontWeight.w700),
+                                            textAlign: TextAlign.center,
+                                          )),
+                                        )),
+                                  ),
                               ],
                             ),
                             getVerSpace(16.h),
@@ -3201,6 +3240,7 @@ class TrendingEventCard2 extends StatelessWidget {
 
 class joinEvents extends StatelessWidget {
   joinEvents({this.list});
+
   final List<DocumentSnapshot>? list;
 
   @override
@@ -3227,8 +3267,7 @@ class joinEvents extends StatelessWidget {
                       height: 24.0,
                       width: 24.0,
                       decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(70.0)),
+                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
                           image: DecorationImage(
                               image: NetworkImage(_img ?? ''),
                               fit: BoxFit.cover)),
@@ -3248,7 +3287,7 @@ class joinEvents extends StatelessWidget {
                 height: 32.h,
                 width: 32.h,
                 decoration: BoxDecoration(
-                                color: accentColor,
+                    color: accentColor,
                     borderRadius: BorderRadius.circular(30.h),
                     border: Border.all(color: Colors.white, width: 1.5.h)),
                 alignment: Alignment.center,
@@ -3256,15 +3295,14 @@ class joinEvents extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    getCustomFont(list?.length.toString() ?? '', 12.sp,
-                        Colors.white, 1,
+                    getCustomFont(
+                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                     getCustomFont(" +", 12.sp, Colors.white, 1,
                         fontWeight: FontWeight.w600),
                   ],
                 ),
               ),
-
             ],
           ),
         )
@@ -3273,12 +3311,9 @@ class joinEvents extends StatelessWidget {
   }
 }
 
-
-
-
-
 class buildNearHotelList extends StatelessWidget {
   final EventBaru? hotel;
+
   const buildNearHotelList({this.hotel});
 
   @override
@@ -3299,7 +3334,8 @@ class buildNearHotelList extends StatelessWidget {
                         event: hotel,
                       ),
                   transitionDuration: const Duration(milliseconds: 1000),
-                  transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+                  transitionsBuilder:
+                      (_, Animation<double> animation, __, Widget child) {
                     return Opacity(
                       opacity: animation.value,
                       child: child,
@@ -3316,7 +3352,9 @@ class buildNearHotelList extends StatelessWidget {
                   margin: EdgeInsets.only(right: 20.h, left: 20.h),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(22.h),
-                    image: DecorationImage(image: NetworkImage(hotel?.image ?? ''), fit: BoxFit.cover),
+                    image: DecorationImage(
+                        image: NetworkImage(hotel?.image ?? ''),
+                        fit: BoxFit.cover),
                   ),
                   child: Stack(
                     children: [
@@ -3326,8 +3364,14 @@ class buildNearHotelList extends StatelessWidget {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(22.h),
                             gradient: LinearGradient(
-                                colors: ["#000000".toColor().withOpacity(0.0), "#000000".toColor().withOpacity(0.88)],
-                                stops: const [0.0, 1.0],
+                                colors: [
+                                  "#000000".toColor().withOpacity(0.0),
+                                  "#000000".toColor().withOpacity(0.88)
+                                ],
+                                stops: const [
+                                  0.0,
+                                  1.0
+                                ],
                                 begin: Alignment.centerRight,
                                 end: Alignment.centerLeft)),
                         padding: EdgeInsets.only(left: 24.h),
@@ -3337,18 +3381,23 @@ class buildNearHotelList extends StatelessWidget {
                           children: [
                             Container(
                               width: 270.w,
-                              child: getCustomFont(hotel?.title ?? "", 18.sp, Colors.white, 2,
-                                  fontWeight: FontWeight.w700, txtHeight: 1.3.h),
+                              child: getCustomFont(
+                                  hotel?.title ?? "", 18.sp, Colors.white, 2,
+                                  fontWeight: FontWeight.w700,
+                                  txtHeight: 1.3.h),
                             ),
                             getVerSpace(4.h),
                             Row(
                               children: [
-                                getSvgImage("location.svg", width: 20.h, height: 20.h),
+                                getSvgImage("location.svg",
+                                    width: 20.h, height: 20.h),
                                 getHorSpace(5.h),
                                 Container(
                                   width: 200.w,
-                                  child: getCustomFont(hotel?.location ?? "", 15.sp, Colors.white, 1,
-                                      fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                                  child: getCustomFont(hotel?.location ?? "",
+                                      15.sp, Colors.white, 1,
+                                      fontWeight: FontWeight.w500,
+                                      txtHeight: 1.5.h),
                                 ),
                               ],
                             ),
@@ -3356,7 +3405,8 @@ class buildNearHotelList extends StatelessWidget {
                             Container(
                               width: MediaQuery.of(context).size.width / 1,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   // Row(
                                   //   children: [
@@ -3414,9 +3464,11 @@ class buildNearHotelList extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  getButton(context, accentColor, "Book Now", Colors.white, () {}, 14.sp,
+                                  getButton(context, accentColor, "Book Now",
+                                      Colors.white, () {}, 14.sp,
                                       weight: FontWeight.w700,
                                       buttonHeight: 40.h,
                                       borderRadius: BorderRadius.circular(14.h),
@@ -3461,11 +3513,9 @@ class buildNearHotelList extends StatelessWidget {
   }
 }
 
-
-
-
 class TrendingEventCard3 extends StatelessWidget {
   final List<DocumentSnapshot>? list;
+
   const TrendingEventCard3({this.list});
 
   @override
@@ -3523,106 +3573,102 @@ class TrendingEventCard3 extends StatelessWidget {
                           // userProfile: userProfile,
                         )));
               },
-              child:
-              
-               Container(
-                margin: EdgeInsets.only(right: 20.w, left: 20.w, bottom: 20.0.h),
-                child:  Stack(
-              children: [
-                // Background image
-                Container(
-                  width: 210.w,
-                  // height: 400.h,
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                         BoxShadow(
-                    blurRadius: 10.0,
-                    spreadRadius: 4.0,
-                    color: Colors.black12.withOpacity(0.035))
-                    ],
-                    borderRadius: BorderRadius.circular(20),
-                    image: DecorationImage(
-                      image: NetworkImage(events?[i].image ?? ""),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                // Calendar overlay
-             
-            
-            
-            
-                // Bottom info
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          events?[i].title ?? "",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
+              child: Container(
+                margin:
+                    EdgeInsets.only(right: 20.w, left: 20.w, bottom: 20.0.h),
+                child: Stack(
+                  children: [
+                    // Background image
+                    Container(
+                      width: 210.w,
+                      // height: 400.h,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 10.0,
+                              spreadRadius: 4.0,
+                              color: Colors.black12.withOpacity(0.035))
+                        ],
+                        borderRadius: BorderRadius.circular(20),
+                        image: DecorationImage(
+                          image: NetworkImage(events?[i].image ?? ""),
+                          fit: BoxFit.cover,
                         ),
-                        Row(
+                      ),
+                    ),
+                    // Calendar overlay
+
+                    // Bottom info
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(20)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                              size: 17.0,
-                            ),
-                            SizedBox(width: 4),
-                            Container(
-                              width: 100.w,
-                              // color: Colors.yellow,
-                              child: Text(
-                                events?[i].location ?? "",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 12.sp, fontWeight: FontWeight.bold),
-                                    overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                            Text(
+                              events?[i].title ?? "",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
                               ),
+                              maxLines: 2,
                             ),
-                            Spacer(),
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                "\$${events[i].price}",
-                                style: TextStyle(
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
                                   color: Colors.red,
-                                  fontSize: 15.sp,
-                                  fontWeight: FontWeight.bold,
+                                  size: 17.0,
                                 ),
-                              ),
+                                SizedBox(width: 4),
+                                Container(
+                                  width: 100.w,
+                                  // color: Colors.yellow,
+                                  child: Text(
+                                    events?[i].location ?? "",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                Spacer(),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 3, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    "\$${events[i].price}",
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                     
-                     
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-       
-       
-                
+
                 //  Stack(
                 //   alignment: Alignment.topCenter,
                 //   children: [
@@ -3691,7 +3737,7 @@ class TrendingEventCard3 extends StatelessWidget {
                 //                     if (snapshot.connectionState == ConnectionState.waiting) {
                 //                       return Center(child: CircularProgressIndicator());
                 //                     }
-                                
+
                 //                     if (snapshot.data!.docs.isEmpty) {
                 //                       return Center(child: Container());
                 //                     }
@@ -3764,13 +3810,9 @@ class TrendingEventCard3 extends StatelessWidget {
                 //     )
                 //   ],
                 // ),
-            
-            
               ),
             ),
           );
         });
   }
 }
-
-

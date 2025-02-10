@@ -8,9 +8,11 @@ import '../Models/page_button_view_model.dart';
 class SkipButton extends StatelessWidget {
   //callback for skip button
   final VoidCallback? onTap;
+
   //view model
   final PageButtonViewModel? pageButtonViewModel;
   final Widget? child;
+
   //Constructor
   SkipButton({
     this.onTap,
@@ -33,7 +35,7 @@ class SkipButton extends StatelessWidget {
       opacity = pageButtonViewModel!.slidePercent;
     }
 
-    return  ElevatedButton(
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0.0,
       ),
@@ -54,9 +56,11 @@ class SkipButton extends StatelessWidget {
 class DoneButton extends StatelessWidget {
   //Callback
   final VoidCallback? onTap;
+
   //View Model
   final PageButtonViewModel? pageButtonViewModel;
   final Widget? child;
+
   //Constructor
   DoneButton({
     this.onTap,
@@ -75,7 +79,7 @@ class DoneButton extends StatelessWidget {
       opacity = 1.0 - pageButtonViewModel!.slidePercent!;
     }
 
-    return  ElevatedButton(
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
         elevation: 0.0,
       ),

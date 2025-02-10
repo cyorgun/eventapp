@@ -1,10 +1,9 @@
-
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
+import 'package:evente/controller/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:evente/controller/controller.dart';
 
 class EventpublishDialog extends StatefulWidget {
   const EventpublishDialog({Key? key}) : super(key: key);
@@ -15,6 +14,7 @@ class EventpublishDialog extends StatefulWidget {
 
 class _EventpublishDialogState extends State<EventpublishDialog> {
   HomeController controller = Get.put(HomeController());
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -33,16 +33,17 @@ class _EventpublishDialogState extends State<EventpublishDialog> {
             height: 190.h,
             margin: EdgeInsets.symmetric(horizontal: 30.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+                color: Colors.white,
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(34.h))),
             child: Column(
               children: [
-                getVerSpace(40.h),  
-                 Image.asset( 'assets/images/Sukses.gif',
-              width: 150,
-              
-            ),   ],
+                getVerSpace(40.h),
+                Image.asset(
+                  'assets/images/Sukses.gif',
+                  width: 150,
+                ),
+              ],
             ),
           ),
           Container(
@@ -68,7 +69,7 @@ class _EventpublishDialogState extends State<EventpublishDialog> {
                     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                 getVerSpace(30.h),
                 getButton(context, accentColor, "Finish", Colors.white, () {
-                     Navigator.pop(context);
+                  Navigator.pop(context);
                   //  Get.back();
                   controller.onChange(1.obs);
                 }, 18.sp,

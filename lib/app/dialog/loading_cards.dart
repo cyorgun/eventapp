@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skeleton_text/skeleton_text.dart';
-import 'package:provider/provider.dart';
 
 import '../../base/color_data.dart';
-
-
 
 class LoadingFeaturedCard extends StatelessWidget {
   const LoadingFeaturedCard({Key? key}) : super(key: key);
@@ -17,17 +14,13 @@ class LoadingFeaturedCard extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-                color: accentColor,
-                borderRadius: BorderRadius.circular(5))));
+                color: accentColor, borderRadius: BorderRadius.circular(5))));
   }
 }
 
-
-
-
-
 class LoadingCard extends StatelessWidget {
   final double? height;
+
   const LoadingCard({Key? key, required this.height}) : super(key: key);
 
   @override
@@ -37,8 +30,7 @@ class LoadingCard extends StatelessWidget {
       child: SkeletonAnimation(
         child: Container(
           decoration: BoxDecoration(
-              color:Colors.black12, 
-              borderRadius: BorderRadius.circular(5)),
+              color: Colors.black12, borderRadius: BorderRadius.circular(5)),
           height: height,
           width: MediaQuery.of(context).size.width,
         ),

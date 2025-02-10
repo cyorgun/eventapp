@@ -1,27 +1,26 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/dialog/event_publish_dialog.dart';
-import 'package:event_app/app/view/bloc/sign_in_bloc.dart';
 import 'package:event_app/base/constant.dart';
+import 'package:evente/evente.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
-
-import 'package:evente/evente.dart';
-import 'package:http/http.dart' as http;
-import 'package:easy_localization/easy_localization.dart';
+import '../../provider/sign_in_provider.dart';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({Key? key}) : super(key: key);
@@ -205,7 +204,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Future uploadPicture() async {
-    final SignInBloc sb = context.read<SignInBloc>();
+    final SignInProvider sb = context.read<SignInProvider>();
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('Profile Pictures/${DateTime.now()}');
@@ -221,7 +220,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   handleUpdateData() async {
-    final sb = context.read<SignInBloc>();
+    final sb = context.read<SignInProvider>();
 
     DateTime chosenDate = DateFormat('dd/MM/yyyy').parse(dateCtrl.text);
     Timestamp timestamp = Timestamp.fromDate(chosenDate);
@@ -299,11 +298,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       "location": locCtrl.text,
                       "loves": "",
                       'count': 0,
-                      "mapsLangLink": double.tryParse(double.tryParse(_controllerLongitude.text)
-                              !.toStringAsFixed(2) )??
+                      "mapsLangLink": double.tryParse(
+                              double.tryParse(_controllerLongitude.text)!
+                                  .toStringAsFixed(2)) ??
                           '0.00',
-                      "mapsLatLink": double.tryParse(double.tryParse(_controllerLatitude.text)
-                              !.toStringAsFixed(2) )??
+                      "mapsLatLink": double.tryParse(
+                              double.tryParse(_controllerLatitude.text)!
+                                  .toStringAsFixed(2)) ??
                           '0.00',
                       "price": int.tryParse(priceCtrl.text) ?? 0,
                       "title": titleCtrl.text,
@@ -672,8 +673,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                   primary: accentColor,
                                 ),
                                 textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                  ),
+                                  style: TextButton.styleFrom(),
                                 ),
                               ),
                               child: child!);

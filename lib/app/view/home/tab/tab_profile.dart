@@ -1,10 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/app/view/Multiple_Language/Multiple_Language_Screen.dart';
-import 'package:event_app/app/view/bloc/bookmark_bloc.dart';
 import 'package:event_app/app/view/notification/notification_screen.dart';
 import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:event_app/app/view/setting/privacy_screen.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,9 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import 'package:easy_localization/easy_localization.dart';
 import '../../../../base/color_data.dart';
-import '../../bloc/sign_in_bloc.dart';
+import '../../../provider/bookmark_provider.dart';
+import '../../../provider/sign_in_provider.dart';
 import '../../create_event/create_event_screen.dart';
 import '../../profile/change_password.dart';
 
@@ -29,12 +28,8 @@ class _showCaseProfileState extends State<showCaseProfile> {
   @override
   Widget build(BuildContext context) {
     return ShowCaseWidget(
-      builder:Builder(
-    builder : (context)=> TabProfile()
-  ),
-      
+      builder: Builder(builder: (context) => TabProfile()),
     );
-  
   }
 }
 
@@ -45,7 +40,8 @@ class TabProfile extends StatefulWidget {
   State<TabProfile> createState() => _TabProfileState();
 }
 
-class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMixin {
+class _TabProfileState extends State<TabProfile>
+    with AutomaticKeepAliveClientMixin {
   var interestList = {"Art", "Music", "Food", "Technology", "Party"};
 
   GlobalKey _one = GlobalKey();
@@ -61,7 +57,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
 
     displayShowcase() async {
       preferences = await SharedPreferences.getInstance();
-      bool? showcaseVisibilityStatus = preferences.getBool("profileShowcasesssss");
+      bool? showcaseVisibilityStatus =
+          preferences.getBool("profileShowcasesssss");
 
       if (showcaseVisibilityStatus == null) {
         preferences.setBool("profileShowcasesssss", false).then((bool success) {
@@ -87,7 +84,7 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
     });
 
     super.build(context);
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return KeysToBeInherited(
       notification: _one,
       search: _two,
@@ -102,7 +99,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
             backgroundColor: Colors.white,
             toolbarHeight: 73.h,
             elevation: 0,
-            title: getCustomFont(("Profile").tr(), 24.sp, Colors.black, 1, fontWeight: FontWeight.w700),
+            title: getCustomFont(("Profile").tr(), 24.sp, Colors.black, 1,
+                fontWeight: FontWeight.w700),
             centerTitle: true,
             actions: [
               // GestureDetector(
@@ -128,73 +126,69 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         getVerSpace(20.h),
-                        getCustomFont(("Account Settings").tr(), 16.sp, greyColor, 1,
+                        getCustomFont(
+                            ("Account Settings").tr(), 16.sp, greyColor, 1,
                             fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                         getVerSpace(12.h),
-                        
-              Showcase(  
-                 key: _one,
-                      description: "Click here to edit profil.",
-                   
-              
+
+                        Showcase(
+                          key: _one,
+                          description: "Click here to edit profil.",
                           child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_, __, ___) => EditProfile()));
-                          
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => EditProfile()));
+
                             // Constant.sendToNext(context, Routes.editProfileRoute);
                           }, ("Edit Profile").tr(), "edit_profile.svg"),
                         ),
                         getVerSpace(20.h),
-                       
-              Showcase(  
-                 key: _two,
-                      description: "Click here to setting change password.",
-                   
-              
+
+                        Showcase(
+                          key: _two,
+                          description: "Click here to setting change password.",
                           child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_, __, ___) => ChangePassword()));
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => ChangePassword()));
                           }, ("Change Password").tr(), "change_password.svg"),
                         ),
                         // getVerSpace(30.h),
                         // getCustomFont("Preferences", 16.sp, greyColor, 1,
                         //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                         getVerSpace(20.h),
-                        
-              Showcase(  
-                 key: _three,
-                      description: "Click here to setting create event.",
-                   
-              
+
+                        Showcase(
+                          key: _three,
+                          description: "Click here to setting create event.",
                           child: settingContainer(() {
-                            Navigator.of(context)
-                                .push(PageRouteBuilder(pageBuilder: (_, __, ___) => CreateEventScreen()));
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    CreateEventScreen()));
                             // Constant.sendToNext(context, Routes.createEventRoute);
                           }, ("Create Event").tr(), "add.svg"),
                         ),
                         getVerSpace(20.h),
-                       
-              Showcase(  
-                 key: _four,
-                      description: "Click here to see notification.",
-                   
-              
+
+                        Showcase(
+                          key: _four,
+                          description: "Click here to see notification.",
                           child: settingContainer(() {
-                            Navigator.of(context)
-                                .push(PageRouteBuilder(pageBuilder: (_, __, ___) => NotificationScreen()));
-                          
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    NotificationScreen()));
+
                             // Constant.sendToNext(
                             //     context, Routes.notificationScreenRoute);
                           }, ("Notification").tr(), "notification-image.svg"),
                         ),
                         getVerSpace(20.h),
-                       
-              Showcase(  
-                 key: _five,
-                      description: "Click here to setting change language.",
-                   
-              
+
+                        Showcase(
+                          key: _five,
+                          description: "Click here to setting change language.",
                           child: settingContainer(() {
-                            Navigator.of(context)
-                                .push(PageRouteBuilder(pageBuilder: (_, __, ___) => MultipleLanguageScreen()));
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    MultipleLanguageScreen()));
                             // Constant.sendToNext(context, Routes.changeLanguageRoute
                           }, ("Change Language").tr(), "language.svg"),
                         ),
@@ -203,15 +197,14 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
                         //   Constant.sendToNext(context, Routes.myCardScreenRoute);
                         // }, "My Cards", "card.svg"),
                         // getVerSpace(20.h),
-                        
-              Showcase(  
-                 key: _six,
-                      description: "Click here to see privacy.",
-                   
-              
+
+                        Showcase(
+                          key: _six,
+                          description: "Click here to see privacy.",
                           child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_, __, ___) => PrivacyScreen()));
-                          
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => PrivacyScreen()));
+
                             // Constant.sendToNext(context, Routes.privacyScreenRoute);
                           }, ("Privacy").tr(), "privacy.svg"),
                         ),
@@ -220,19 +213,28 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
                         GestureDetector(
                           onTap: () async {
                             await context
-                                .read<SignInBloc>()
+                                .read<SignInProvider>()
                                 .userSignout()
-                                .then((value) => context.read<SignInBloc>().afterUserSignOut())
+                                .then((value) => context
+                                    .read<SignInProvider>()
+                                    .afterUserSignOut())
                                 .then((value) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(Routes.welcomePage, (route) => false);
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  Routes.welcomePage, (route) => false);
                             });
                           },
                           child: Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(22.h),
-                                boxShadow: [BoxShadow(color: shadowColor, offset: const Offset(0, 8), blurRadius: 27)]),
-                            padding: EdgeInsets.only(bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: shadowColor,
+                                      offset: const Offset(0, 8),
+                                      blurRadius: 27)
+                                ]),
+                            padding: EdgeInsets.only(
+                                bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -241,16 +243,24 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
                                     Container(
                                       height: 54.h,
                                       width: 54.h,
-                                      decoration:
-                                          BoxDecoration(color: dividerColor, borderRadius: BorderRadius.circular(22.h)),
+                                      decoration: BoxDecoration(
+                                          color: dividerColor,
+                                          borderRadius:
+                                              BorderRadius.circular(22.h)),
                                       padding: EdgeInsets.all(15.h),
-                                      child: getSvg("Logout.svg", width: 24.h, height: 24.h, color: accentColor),
+                                      child: getSvg("Logout.svg",
+                                          width: 24.h,
+                                          height: 24.h,
+                                          color: accentColor),
                                     ),
                                     getHorSpace(16.h),
-                                    getCustomFont(("Logout").tr(), 16.sp, Colors.black, 1, fontWeight: FontWeight.w500)
+                                    getCustomFont(
+                                        ("Logout").tr(), 16.sp, Colors.black, 1,
+                                        fontWeight: FontWeight.w500)
                                   ],
                                 ),
-                                getSvgImage("arrow_right.svg", height: 24.h, width: 24.h)
+                                getSvgImage("arrow_right.svg",
+                                    height: 24.h, width: 24.h)
                               ],
                             ),
                           ),
@@ -267,7 +277,7 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
   }
 
   Widget buildInterestWidget() {
-    final b = context.watch<BookmarkBloc>();
+    final b = context.watch<BookmarkProvider>();
     return Padding(
       padding: const EdgeInsets.only(left: 20.0, right: 20.0),
       child: Column(
@@ -276,7 +286,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
           getVerSpace(10.h),
           Row(
             children: [
-              getCustomFont(("Interests").tr(), 16.sp, greyColor, 1, fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+              getCustomFont(("Interests").tr(), 16.sp, greyColor, 1,
+                  fontWeight: FontWeight.w500, txtHeight: 1.5.h),
               getHorSpace(3.h),
               // getSvgImage('edit.svg',
               //     color: Colors.black,
@@ -292,16 +303,19 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
               runSpacing: 10.h,
               children: b.list!
                   .map((i) => Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15.h, vertical: 10.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15.h, vertical: 10.h),
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(27.h),
                             border: Border.all(color: accentColor, width: 1.h)),
-                        child: getCustomFont(i, 15.sp, accentColor, 1, fontWeight: FontWeight.w600),
+                        child: getCustomFont(i, 15.sp, accentColor, 1,
+                            fontWeight: FontWeight.w600),
                       ))
                   .toList(),
             ),
-          if (b.list == null || b.list!.isEmpty) Text(("Not Have Interest Item").tr()),
+          if (b.list == null || b.list!.isEmpty)
+            Text(("Not Have Interest Item").tr()),
           SizedBox(
             width: 15.0,
           ),
@@ -311,13 +325,14 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
   }
 
   Widget buildAboutWidget() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return Padding(
       padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 15.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          getCustomFont(("About").tr(), 16.sp, greyColor, 1, fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+          getCustomFont(("About").tr(), 16.sp, greyColor, 1,
+              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
           getVerSpace(10.h),
           Row(
             children: [
@@ -329,7 +344,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
               SizedBox(
                 width: 15.0,
               ),
-              getCustomFont(sb.email ?? "", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+              getCustomFont(
+                  sb.email ?? "", 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -344,7 +360,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
               SizedBox(
                 width: 15.0,
               ),
-              getCustomFont(sb.phone ?? ("Not have phone number").tr(), 16.sp, Color.fromARGB(255, 32, 32, 32), 1,
+              getCustomFont(sb.phone ?? ("Not have phone number").tr(), 16.sp,
+                  Color.fromARGB(255, 32, 32, 32), 1,
                   fontWeight: FontWeight.w500, txtHeight: 1.5.h),
             ],
           ),
@@ -362,9 +379,10 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
   }
 
   Widget buildProfileSection() {
-    final sb = context.watch<SignInBloc>();
+    final sb = context.watch<SignInProvider>();
     return Padding(
-      padding: const EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0, right: 15.0),
+      padding: const EdgeInsets.only(
+          top: 15.0, bottom: 15.0, left: 15.0, right: 15.0),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -372,7 +390,12 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
               Radius.circular(30.h),
             ),
             color: Colors.white,
-            boxShadow: [BoxShadow(color: shadowColor, offset: const Offset(0, 8), blurRadius: 27)]),
+            boxShadow: [
+              BoxShadow(
+                  color: shadowColor,
+                  offset: const Offset(0, 8),
+                  blurRadius: 27)
+            ]),
         child: Column(
           children: [
             getVerSpace(21.h),
@@ -384,7 +407,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
                   width: 120.h,
                   // ignore: prefer_const_constructors
                   decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(100.0)),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(100.0)),
                       image: DecorationImage(
                           image: NetworkImage(
                             sb.imageUrl ?? "",
@@ -410,7 +434,8 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
               ],
             ),
             getVerSpace(5.h),
-            getCustomFont(sb.name ?? "", 22.sp, Colors.black, 1, fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+            getCustomFont(sb.name ?? "", 22.sp, Colors.black, 1,
+                fontWeight: FontWeight.w700, txtHeight: 1.5.h),
             getVerSpace(20.h),
             // getPaddingWidget(
             //   EdgeInsets.symmetric(horizontal: 20.h),
@@ -504,7 +529,6 @@ class _TabProfileState extends State<TabProfile> with AutomaticKeepAliveClientMi
   @override
   bool get wantKeepAlive => true;
 }
-
 
 class KeysToBeInherited extends InheritedWidget {
   final GlobalKey notification;

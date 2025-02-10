@@ -1,12 +1,10 @@
-
-import 'package:evente/evente.dart';
 import 'package:event_app/app/dialog/pass_change_dialog.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../base/color_data.dart';
-import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 
 class ResetPassword extends StatefulWidget {
@@ -17,8 +15,6 @@ class ResetPassword extends StatefulWidget {
 }
 
 class _ResetPasswordState extends State<ResetPassword> {
- 
-
   ResetController controller = Get.put(ResetController());
 
   @override
@@ -29,8 +25,7 @@ class _ResetPasswordState extends State<ResetPassword> {
       backgroundColor: Colors.white,
       appBar: getToolBar(
         () {
-          
-        Navigator.of(context).pop();
+          Navigator.of(context).pop();
         },
         title: getSvgImage("event_logo.svg", width: 72.h, height: 35.h),
       ),
@@ -78,12 +73,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                         getCustomFont("Old Password", 16.sp, Colors.black, 1,
                             fontWeight: FontWeight.w600),
                         getVerSpace(7.h),
-                        getDefaultTextFiledWithLabel(
-                            context,
-                            "Enter old password",
-                            controller.oldPassController,
-                            isEnable: false,
-                            height: 60.h, validator: (email) {
+                        getDefaultTextFiledWithLabel(context,
+                            "Enter old password", controller.oldPassController,
+                            isEnable: false, height: 60.h, validator: (email) {
                           if (email!.isEmpty) {
                             return "Please enter old password.";
                           }
@@ -96,12 +88,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                         getCustomFont("New Password", 16.sp, Colors.black, 1,
                             fontWeight: FontWeight.w600),
                         getVerSpace(7.h),
-                        getDefaultTextFiledWithLabel(
-                            context,
-                            "Enter new password",
-                            controller.newPassController,
-                            isEnable: false,
-                            height: 60.h, validator: (email) {
+                        getDefaultTextFiledWithLabel(context,
+                            "Enter new password", controller.newPassController,
+                            isEnable: false, height: 60.h, validator: (email) {
                           if (email!.isEmpty) {
                             return "Please enter new password.";
                           }
@@ -130,8 +119,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                             withSufix: true,
                             isPass: true),
                         getVerSpace(36.h),
-                        getButton(
-                            context, accentColor, "Submit", Colors.white, () {
+                        getButton(context, accentColor, "Submit", Colors.white,
+                            () {
                           showDialog(
                               builder: (context) {
                                 return const PassChangeDialog();

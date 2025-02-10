@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-
 class DeleteDialog extends StatefulWidget {
   final index;
 
@@ -17,7 +16,6 @@ class DeleteDialog extends StatefulWidget {
 }
 
 class _DeleteDialogState extends State<DeleteDialog> {
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -67,10 +65,10 @@ class _DeleteDialogState extends State<DeleteDialog> {
                 Row(
                   children: [
                     Expanded(
-                        child: getButton(context, Colors.white, "No",
-                            accentColor, () {
-                          Get.back();
-                            }, 18.sp,
+                        child: getButton(
+                            context, Colors.white, "No", accentColor, () {
+                      Get.back();
+                    }, 18.sp,
                             weight: FontWeight.w700,
                             buttonHeight: 60.h,
                             isBorder: true,

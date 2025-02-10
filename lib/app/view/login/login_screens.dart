@@ -1,21 +1,19 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/view/home/home_screen.dart';
 import 'package:event_app/app/view/intro/welcome.dart';
 import 'package:event_app/app/view/login/forgot_password.dart';
 import 'package:event_app/app/view/signup/signup_screen.dart';
+import 'package:event_app/app/widget/Rounded_Button.dart';
+import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:event_app/app/widget/Rounded_Button.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar copy.dart';
-import '../../routes/app_routes.dart';
-import 'package:evente/evente.dart';
-import '../bloc/sign_in_bloc.dart';
+import '../../provider/sign_in_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,9 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = new TextEditingController();
   bool rememberMe = true;
 
-
-
-
   final formKey = GlobalKey<FormState>();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -39,8 +34,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool signInStart = false;
   late String email;
   late String pass;
+
   // Icon lockIcon = LockIcon().lock;
   bool offsecureText = true;
+
   Widget _title() {
     return Text(
       ("Welcome Back!").tr(),
@@ -66,9 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
   handleSignInwithemailPassword() async {
-    final SignInBloc sb = Provider.of<SignInBloc>(context, listen: false);
+    final SignInProvider sb =
+        Provider.of<SignInProvider>(context, listen: false);
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       await AppService().checkInternet().then((hasInternet) {
@@ -89,9 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             setState(() {
                               // signInComplete = true;
                             });
-   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => HomeScreen()));
-               
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => HomeScreen()));
+
                             // Constant.sendToNext(
                             //     context, Routes.homeScreenRoute);
                           })));
@@ -120,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   final _btnController = new RoundedLoadingButtonController();
+
   void lockPressed() {
     if (offsecureText == true) {
       setState(() {
@@ -260,16 +258,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     right: 0,
                     height: 150,
                     child: Opacity(
-                      opacity: 0.7,
-                      child: Image.asset('assets/images/login1.png'))),
+                        opacity: 0.7,
+                        child: Image.asset('assets/images/login1.png'))),
                 Column(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Container(
-                    child: Opacity(
-                      opacity: 0.7,
-                      child: Image.asset('assets/images/login2.png')),
+                      child: Opacity(
+                          opacity: 0.7,
+                          child: Image.asset('assets/images/login2.png')),
                       height: 120,
                     )
                   ],
@@ -297,7 +295,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             getVerSpace(30.h),
-                            getCustomFont(("Email").tr(), 16.sp, Colors.black, 1,
+                            getCustomFont(
+                                ("Email").tr(), 16.sp, Colors.black, 1,
                                 fontWeight: FontWeight.w600),
                             getVerSpace(20.h),
                             TextFormField(
@@ -316,28 +315,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                   filled: true,
                                   fillColor: Colors.white,
                                   enabledBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: borderColor, width: 1.h)),
                                   disabledBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: borderColor, width: 1.h)),
                                   focusedBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: accentColor, width: 1.h)),
                                   errorBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: errorColor, width: 1.h)),
                                   focusedErrorBorder: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: errorColor, width: 1.h)),
                                   errorStyle: TextStyle(
@@ -347,8 +341,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       height: 1.5.h,
                                       fontFamily: Constant.fontsFamily),
                                   border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(22.h),
+                                      borderRadius: BorderRadius.circular(22.h),
                                       borderSide: BorderSide(
                                           color: borderColor, width: 1.h)),
                                   suffixIconConstraints: BoxConstraints(
@@ -375,7 +368,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               height: 20,
                             ),
-                            getCustomFont(("Password").tr(), 16.sp, Colors.black, 1,
+                            getCustomFont(
+                                ("Password").tr(), 16.sp, Colors.black, 1,
                                 fontWeight: FontWeight.w600),
                             SizedBox(
                               height: 20,
@@ -455,14 +449,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => ForgotPassword()));
-               
+                                Navigator.of(context).push(PageRouteBuilder(
+                                    pageBuilder: (_, __, ___) =>
+                                        ForgotPassword()));
+
                                 // Constant.sendToNext(
                                 //     context, Routes.forgotPasswordRoute);
                               },
-                              child: getCustomFont(
-                                  ("Forgot Password?").tr(), 14.sp, Colors.black, 1,
+                              child: getCustomFont(("Forgot Password?").tr(),
+                                  14.sp, Colors.black, 1,
                                   fontWeight: FontWeight.w700,
                                   textAlign: TextAlign.end),
                             ),
@@ -478,7 +473,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: accentColor.withOpacity(0.9),
                               elevation: 0,
                               child: Wrap(
-                                children:  [
+                                children: [
                                   Text(
                                     ('Sign In').tr(),
                                     style: TextStyle(
@@ -492,11 +487,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             SizedBox(
                               height: 20.0,
                             ),
-
-                            
-                              GestureDetector(
+                            GestureDetector(
                               child: getRichText(
-                                 ( "Sign In with Google / ").tr(),
+                                  ("Sign In with Google / ").tr(),
                                   Colors.black,
                                   FontWeight.w500,
                                   15.sp,
@@ -505,14 +498,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                   FontWeight.w700,
                                   14.sp),
                               onTap: () {
-                                   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => WelcomePage()));
-               
+                                Navigator.of(context).push(PageRouteBuilder(
+                                    pageBuilder: (_, __, ___) =>
+                                        WelcomePage()));
+
                                 // Constant.sendToNext(
                                 //     context, Routes.welcomePage);
                               },
                             ),
-                            SizedBox(height: 15.9,),
+                            SizedBox(
+                              height: 15.9,
+                            ),
                             GestureDetector(
                               child: getRichText(
                                   ("If you are new / ").tr(),
@@ -524,9 +520,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   FontWeight.w700,
                                   14.sp),
                               onTap: () {
-                                   Navigator.of(context).push(PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => SignUpScreen()));
-               
+                                Navigator.of(context).push(PageRouteBuilder(
+                                    pageBuilder: (_, __, ___) =>
+                                        SignUpScreen()));
+
                                 // Constant.sendToNext(
                                 //     context, Routes.signUpRoute);
                               },
