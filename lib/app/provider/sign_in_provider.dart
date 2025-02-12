@@ -334,27 +334,4 @@ class SignInProvider extends ChangeNotifier {
 
     notifyListeners();
   }
-
-  Future<int> getTotalUsersCount() async {
-    final String fieldName = 'count';
-    final DocumentReference ref =
-        firestore.collection('item_count').doc('users_count');
-    DocumentSnapshot snap = await ref.get();
-    if (snap.exists == true) {
-      int itemCount = snap[fieldName] ?? 0;
-      return itemCount;
-    } else {
-      await ref.set({fieldName: 0});
-      return 0;
-    }
-  }
-
-  Future increaseUserCount() async {
-    await getTotalUsersCount().then((int documentCount) async {
-      await firestore
-          .collection('item_count')
-          .doc('users_count')
-          .update({'count': documentCount + 1});
-    });
-  }
 }
