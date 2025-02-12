@@ -62,7 +62,11 @@
                 <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
         android:value="ca-app-pub-3940256099942544~3347511713"/>
-    </application>
+       <meta-data
+           android:name="com.google.android.gms.auth.api.signin"
+           android:value="default_web_client_id" />
+
+   </application>
        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
         <queries>

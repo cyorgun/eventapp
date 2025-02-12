@@ -73,8 +73,8 @@ class _WelcomePageState extends State<WelcomePage> {
             );
           } else {
             sb.checkUserExists().then((value) {
-              print("values 1  ");
-              print(value);
+              openSnacbar(
+                  scaffoldKey, (value.toString()));
               if (value == true) {
                 sb
                     .getUserDataFromFirebase(sb.uid)
@@ -83,8 +83,8 @@ class _WelcomePageState extends State<WelcomePage> {
                               handleAfterSignIn();
                             });
               } else {
-                print("values 2  ");
-                print(value);
+                openSnacbar(
+                    scaffoldKey, (value.toString() + "2"));
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
                     .then((value) => sb.increaseUserCount())

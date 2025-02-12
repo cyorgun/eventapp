@@ -12,7 +12,20 @@
           "package_name": "com.cyorgun.eventapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "420151056289-31sccobhn0k3jb7dalqtgfqpvmq414va.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cyorgun.eventapp",
+            "certificate_hash": "690a74c12a6022439e4293056d184b93cda2defa"
+          }
+        },
+        {
+          "client_id": "420151056289-n1jmhpa9jcs9binm5jqrd7402qdji32s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAbbpnf9pJgoOYjS5aA2tUyWlSd9LpMmY8"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "420151056289-n1jmhpa9jcs9binm5jqrd7402qdji32s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
