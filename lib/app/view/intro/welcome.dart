@@ -87,7 +87,6 @@ class _WelcomePageState extends State<WelcomePage> {
                 print(value);
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
-                    .then((value) => sb.increaseUserCount())
                     .then((value) {
                               _googleController.success();
                               handleAfterSignIn();
@@ -261,7 +260,6 @@ class _WelcomePageState extends State<WelcomePage> {
               } else {
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
-                    .then((value) => sb.increaseUserCount())
                     .then((value) {
                               _appleController.success();
                               handleAfterSignIn();

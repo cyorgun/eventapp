@@ -70,8 +70,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             if (sb.hasError == false) {
               sb.getTimestamp().then((value) => sb
                   .saveToFirebase()
-                  .then((value) => sb.increaseUserCount())
-                  .then((value)  {
+                  .then((value) {
                             setState(() {
                               // signUpCompleted = true;
                             });
