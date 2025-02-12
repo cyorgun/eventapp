@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:event_app/app/provider/sign_in_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,15 +9,13 @@ class BookmarkProvider extends ChangeNotifier {
 
   List<String>? get list => _list;
 
-  Future<List> getArticles() async {
+  Future<List> getArticles(String? uid) async {
     String _collectionName = 'event';
     String _fieldName = 'bookmarked items';
 
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    String? _uid = sp.getString('uid');
 
     final DocumentReference ref =
-        FirebaseFirestore.instance.collection('users').doc(_uid);
+        FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot snap = await ref.get();
     List bookmarkedList = snap[_fieldName];
     print('mainList: $bookmarkedList');
@@ -31,7 +30,7 @@ class BookmarkProvider extends ChangeNotifier {
           .where('title', whereIn: bookmarkedList)
           .get()
           .then((QuerySnapshot snap) {
-        d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e, 1)).toList());
+        d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       });
     } else if (bookmarkedList == null || bookmarkedList.isEmpty) {
       print('bookmarkedList is empty or null');
@@ -51,7 +50,7 @@ class BookmarkProvider extends ChangeNotifier {
           .where('title', whereIn: chunks[0])
           .get()
           .then((QuerySnapshot snap) {
-        d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e, 1)).toList());
+        d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       }).then((value) async {
         await FirebaseFirestore.instance
             .collection(_collectionName)
@@ -59,7 +58,7 @@ class BookmarkProvider extends ChangeNotifier {
             .get()
             .then((QuerySnapshot snap) {
           d.addAll(
-              snap.docs.map((e) => EventBaru.fromFirestore(e, 1)).toList());
+              snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
         });
       });
     } else if (bookmarkedList.length > 20) {
@@ -123,13 +122,7 @@ class BookmarkProvider extends ChangeNotifier {
     await sp.setStringList('interestIten', list!);
   }
 
-  Future getDataToSP() async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    _list = sp.getStringList('interestIten');
-    notifyListeners();
-  }
-
-  Future getInterestDatafromFirebase(uid) async {
+  Future getInterestDataFromFirebase(uid) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -161,13 +154,11 @@ class BookmarkProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future onBookmarkIconClick(String? timestamp) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    String? _uid = sp.getString('uid');
+  Future onBookmarkIconClick(String? timestamp, String? uid) async {
     String _fieldName = 'bookmarked items';
 
     final DocumentReference ref =
-        FirebaseFirestore.instance.collection('users').doc(_uid);
+        FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot snap = await ref.get();
     List d = snap[_fieldName];
 
@@ -181,14 +172,12 @@ class BookmarkProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future onLoveIconClick(String? timestamp) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
+  Future onLoveIconClick(String? timestamp, String? uid) async {
     final String _collectionName = 'event';
-    String? _uid = sp.getString('uid');
     String _fieldName = 'loved items';
 
     final DocumentReference ref =
-        FirebaseFirestore.instance.collection('users').doc(_uid);
+        FirebaseFirestore.instance.collection('users').doc(uid);
     final DocumentReference ref1 =
         FirebaseFirestore.instance.collection(_collectionName).doc(timestamp);
 

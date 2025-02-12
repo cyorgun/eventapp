@@ -7,10 +7,11 @@ import 'package:get/get.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
+import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
 import '../home/search_screen.dart';
 import '../home/tab/tab_home.dart';
-import 'featured_event_detail2.dart';
+import 'featured_event_detail.dart';
 
 class FeatureEventList extends StatefulWidget {
   const FeatureEventList({Key? key}) : super(key: key);
@@ -149,10 +150,7 @@ class buildFeatureEventList2 extends StatelessWidget {
 
         return InkWell(
           onTap: () {
-            Navigator.of(context).push(PageRouteBuilder(
-                pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                      event: events?[i],
-                    )));
+            Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events?[i]);
           },
           child: Container(
             width: 374.h,

@@ -32,7 +32,7 @@ class CreateEventScreen extends StatefulWidget {
 class _CreateEventScreenState extends State<CreateEventScreen> {
   // CreateEventController controller =Get.put(CreateEventController());
   String dropdownvalue = ('swimming').tr();
-  String dropdownvalue2 = 'trending';
+  String dropdownvalue2 = 'category';
 
   int _latitude = 0;
   var items = [
@@ -49,7 +49,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     ('olympic').tr(),
     ('culture').tr()
   ];
-  var items2 = ['trending', "feature", "popular"];
 
   String? imageUrl;
 

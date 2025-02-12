@@ -11,7 +11,8 @@ import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
-import '../../featured_event/featured_event_detail2.dart';
+import '../../../routes/app_routes.dart';
+import '../../featured_event/featured_event_detail.dart';
 
 class showCaseMaps extends StatefulWidget {
   const showCaseMaps({super.key});
@@ -420,24 +421,8 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
           const EdgeInsets.only(left: 0.0, right: 8.0, top: 5.0, bottom: 5.0),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                    event: lokasiList[i],
-                    // category: category,
-                    // date: date,
-                    // description: description,
-                    // id: id,
-                    // image: image,
-                    // location: location,
-                    // mapsLangLink: mapsLangLink,
-                    // mapsLatLink: mapsLatLink,
-                    // price: price,
-                    // title: title,
-                    // type: type,
-                    // userDesc: userDesc,
-                    // userName: userName,
-                    // userProfile: userProfile,
-                  )));
+          Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: lokasiList[i]);
+
         },
         child: Container(
           height: 140.0,

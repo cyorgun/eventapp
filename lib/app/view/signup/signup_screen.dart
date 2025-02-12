@@ -12,6 +12,7 @@ import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar.dart';
 import '../../provider/sign_in_provider.dart';
+import '../../routes/app_routes.dart';
 import '../select_interest/select_interest_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -65,24 +66,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           setState(() {
             // signUpStarted = true;
           });
-          sb.signUpwithEmailPassword(name, email, pass, phone).then((_) async {
+          sb.signUpWithEmailPassword(name, email, pass, phone).then((_) async {
             if (sb.hasError == false) {
               sb.getTimestamp().then((value) => sb
                   .saveToFirebase()
                   .then((value) => sb.increaseUserCount())
-                  .then((value) => sb.guestSignout().then((value) => sb
-                      .saveDataToSP()
-                      .then((value) => sb.setSignIn().then((value) {
+                  .then((value)  {
                             setState(() {
                               // signUpCompleted = true;
                             });
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    SelectInterestScreen()));
-
-                            // Constant.sendToNext(
-                            //     context, Routes.selectInterestRoute);
-                          })))));
+                            Navigator.popAndPushNamed(context, Routes.selectInterestRoute);
+                          }));
             } else {
               setState(() {
                 // signUpStarted = false;
@@ -132,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   InkWell(
                       onTap: () {
-                        ;
+                        Navigator.pop(context);
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(top: 20.0, left: 20.0),
@@ -496,9 +490,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     Navigator.of(context).push(PageRouteBuilder(
                                         pageBuilder: (_, __, ___) =>
                                             LoginScreen()));
-
-                                    // Constant.sendToNext(
-                                    //     context, Routes.loginRoute);
                                   },
                                 ),
                                 getVerSpace(30.h),

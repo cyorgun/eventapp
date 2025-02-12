@@ -249,8 +249,6 @@ class _EditProfileState extends State<EditProfile> {
                     : getButton(
                         context, accentColor, ("Save").tr(), Colors.white, () {
                         handleUpdateData();
-
-                        sb.saveDataToSP();
                       }, 18.sp,
                         weight: FontWeight.w700,
                         buttonHeight: 60.h,

@@ -16,18 +16,18 @@ import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
 import '../../dialog/ticket_confirm_dialog.dart';
 import '../../provider/sign_in_provider.dart';
+import '../../routes/app_routes.dart';
 import '../ticket/ticket_detail.dart';
 
 class BuyTicket extends StatefulWidget {
-  EventBaru? event;
-
-  BuyTicket({Key? key, this.event}) : super(key: key);
+  const BuyTicket({Key? key}) : super(key: key);
 
   @override
   State<BuyTicket> createState() => _BuyTicketState();
 }
 
 class _BuyTicketState extends State<BuyTicket> {
+  late EventBaru event;
   int _itemCount = 1;
 
   Map<String, dynamic>? paymentIntent;
@@ -36,15 +36,16 @@ class _BuyTicketState extends State<BuyTicket> {
   int? prices;
   int? totalPrice;
 
-  @override
-  void initState() {
-    prices = widget.event?.price ?? 0;
-    totalPrice = widget.event?.price ?? 0;
+
+  void initVariables() {
+    prices = event.price ?? 0;
+    totalPrice = event.price ?? 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final EventBaru event = widget.event!;
+    event = ModalRoute.of(context)?.settings.arguments as EventBaru;
+    initVariables();
     final sb = context.watch<SignInProvider>();
     void addData() {
       FirebaseFirestore.instance
@@ -52,7 +53,7 @@ class _BuyTicketState extends State<BuyTicket> {
         FirebaseFirestore.instance
             .collection("JoinEvent")
             .doc("user")
-            .collection(widget.event?.title ?? '')
+            .collection(event.title ?? '')
             .doc(sb.uid)
             .set({"name": sb.name, "uid": sb.uid, "photoProfile": sb.imageUrl});
       });
@@ -62,7 +63,7 @@ class _BuyTicketState extends State<BuyTicket> {
       FirebaseFirestore.instance.runTransaction((transaction) async {
         final eventDocRef = FirebaseFirestore.instance
             .collection("event")
-            .doc(widget.event?.id ?? '');
+            .doc(event.id ?? '');
         final snapshot = await transaction.get(eventDocRef);
 
         if (snapshot.exists) {
@@ -78,7 +79,7 @@ class _BuyTicketState extends State<BuyTicket> {
                 Map<String, dynamic>.from(existingData["joinEvent"]);
             FirebaseFirestore.instance
                 .collection('event')
-                .doc(widget.event?.id)
+                .doc(event.id)
                 .update({'join': FieldValue.increment(1)});
             if (!joinEventData.containsKey(sb.uid)) {
               joinEventData[sb.uid ?? ''] = newData;
@@ -92,7 +93,7 @@ class _BuyTicketState extends State<BuyTicket> {
             transaction.update(eventDocRef, {"joinEvent": joinEventData});
             FirebaseFirestore.instance
                 .collection('event')
-                .doc(widget.event?.id)
+                .doc(event.id)
                 .update({'join': FieldValue.increment(1)});
             // transaction.update(eventDocRef, {"paymentType": "COD"});
           } else {
@@ -101,7 +102,7 @@ class _BuyTicketState extends State<BuyTicket> {
             });
             FirebaseFirestore.instance
                 .collection('event')
-                .doc(widget.event?.id)
+                .doc(event.id)
                 .update({'join': FieldValue.increment(1)});
             // transaction.update(eventDocRef, {"paymentType": "COD"});
           }
@@ -405,10 +406,7 @@ class _BuyTicketState extends State<BuyTicket> {
                           Colors.white,
                           buttonWidth: MediaQuery.of(context).size.width / 2.5,
                           () async {
-                        Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => PaymentScreen()));
-
-                        // Constant.sendToNext(context, Routes.paymentRoute);
+                        Navigator.pushNamed(context, Routes.paymentRoute);
                         showDialog(
                             builder: (context) {
                               return const TicketConfirmDialog();
@@ -420,7 +418,7 @@ class _BuyTicketState extends State<BuyTicket> {
 
                         Navigator.of(context).pushReplacement(PageRouteBuilder(
                             pageBuilder: (_, __, ___) => TicketDetail(
-                                  event: widget.event,
+                                  event: event,
                                 )));
                       }, 18.sp,
                           weight: FontWeight.w700,
@@ -451,8 +449,6 @@ class _BuyTicketState extends State<BuyTicket> {
                           addData();
                           Navigator.of(context).push(PageRouteBuilder(
                               pageBuilder: (_, __, ___) => PaymentScreen()));
-
-                          // Constant.sendToNext(context, Routes.paymentRoute);
                           showDialog(
                               builder: (context) {
                                 return const TicketConfirmDialog();

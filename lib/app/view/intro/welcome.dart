@@ -18,8 +18,7 @@ import '../../../base/constant.dart';
 import '../../dialog/snacbar copy.dart';
 import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
-import '../Multiple_Language/Multiple_Language_Screen.dart';
-import '../guest/guest_home_screen.dart';
+import '../Multiple_Language/multiple_language_screen.dart';
 import '../select_interest/select_interest_screen.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -42,8 +41,6 @@ class _WelcomePageState extends State<WelcomePage> {
   final Future<bool> _isAvailableFuture = TheAppleSignIn.isAvailable();
 
   handleSkip() {
-    final sb = context.read<SignInProvider>();
-    sb.setGuestUser();
     // nextScreen(context, DonePage());
   }
 
@@ -80,27 +77,21 @@ class _WelcomePageState extends State<WelcomePage> {
               print(value);
               if (value == true) {
                 sb
-                    .getUserDatafromFirebase(sb.uid)
-                    .then((value) => sb.guestSignout())
-                    .then((value) => sb
-                        .saveDataToSP()
-                        .then((value) => sb.setSignIn().then((value) {
+                    .getUserDataFromFirebase(sb.uid)
+                    .then((value)  {
                               _googleController.success();
                               handleAfterSignIn();
-                            })));
+                            });
               } else {
                 print("values 2  ");
                 print(value);
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
                     .then((value) => sb.increaseUserCount())
-                    .then((value) => sb.guestSignout())
-                    .then((value) => sb
-                        .saveDataToSP()
-                        .then((value) => sb.setSignIn().then((value) {
+                    .then((value) {
                               _googleController.success();
                               handleAfterSignIn();
-                            }))));
+                            }));
               }
             });
           }
@@ -248,46 +239,6 @@ class _WelcomePageState extends State<WelcomePage> {
     }
   }
 
-  // void handleFacebbokLogin() async {
-  //   final SignInBloc sb = Provider.of<SignInBloc>(context, listen: false);
-  //   await AppService().checkInternet().then((hasInternet) async {
-  //     if (hasInternet == false) {
-  //       openSnacbar(scaffoldKey, 'check your internet connection!');
-  //     } else {
-  //       await sb.signInwithFacebook().then((_) {
-  //         if (sb.hasError == true) {
-  //           openSnacbar(scaffoldKey, 'error fb login');
-  //           _facebookController.reset();
-  //         } else {
-  //           sb.checkUserExists().then((value) {
-  //             if (value == true) {
-  //               sb
-  //                   .getUserDatafromFirebase(sb.uid)
-  //                   .then((value) => sb.guestSignout())
-  //                   .then((value) => sb
-  //                       .saveDataToSP()
-  //                       .then((value) => sb.setSignIn().then((value) {
-  //                             _facebookController.success();
-  //                             handleAfterSignIn();
-  //                           })));
-  //             } else {
-  //               sb.getTimestamp().then((value) => sb
-  //                   .saveToFirebase()
-  //                   .then((value) => sb.increaseUserCount())
-  //                   .then((value) => sb.guestSignout().then((value) => sb
-  //                       .saveDataToSP()
-  //                       .then((value) => sb.setSignIn().then((value) {
-  //                             _facebookController.success();
-  //                             handleAfterSignIn();
-  //                           })))));
-  //             }
-  //           });
-  //         }
-  //       });
-  //     }
-  //   });
-  // }
-
   handleAppleSignIn() async {
     final sb = context.read<SignInProvider>();
     await AppService().checkInternet().then((hasInternet) async {
@@ -302,24 +253,19 @@ class _WelcomePageState extends State<WelcomePage> {
             sb.checkUserExists().then((value) {
               if (value == true) {
                 sb
-                    .getUserDatafromFirebase(sb.uid)
-                    .then((value) => sb.guestSignout())
-                    .then((value) => sb
-                        .saveDataToSP()
-                        .then((value) => sb.setSignIn().then((value) {
+                    .getUserDataFromFirebase(sb.uid)
+                    .then((value) {
                               _appleController.success();
                               handleAfterSignIn();
-                            })));
+                            });
               } else {
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
                     .then((value) => sb.increaseUserCount())
-                    .then((value) => sb.saveDataToSP().then((value) => sb
-                        .guestSignout()
-                        .then((value) => sb.setSignIn().then((value) {
+                    .then((value) {
                               _appleController.success();
                               handleAfterSignIn();
-                            })))));
+                            }));
               }
             });
           }
@@ -339,9 +285,6 @@ class _WelcomePageState extends State<WelcomePage> {
   gotoNextScreen() {
     Navigator.of(context).push(
         PageRouteBuilder(pageBuilder: (_, __, ___) => SelectInterestScreen()));
-
-    //  Constant.sendToNext(
-    //                             context, Routes.selectInterestRoute);
   }
 
   @override
@@ -477,30 +420,6 @@ class _WelcomePageState extends State<WelcomePage> {
                       SizedBox(
                         height: 10,
                       ),
-                      RoundedLoadingButton(
-                        child: Wrap(
-                          children: [
-                            Text(
-                              ('Gust Mode').tr(),
-                              style: TextStyle(
-                                  fontFamily: Constant.fontsFamily,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black),
-                            )
-                          ],
-                        ),
-                        controller: _facebookController,
-                        onPressed: () => Navigator.of(context).pushReplacement(
-                            PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    GuestHomeScreen())),
-                        width: MediaQuery.of(context).size.width * 0.80,
-                        color: Colors.white,
-                        elevation: 3,
-                        borderRadius: 50,
-                        animateOnTap: false,
-                      ),
                       SizedBox(
                         height: 10,
                       ),
@@ -528,9 +447,6 @@ class _WelcomePageState extends State<WelcomePage> {
                   onPressed: () {
                     Navigator.of(context).push(PageRouteBuilder(
                         pageBuilder: (_, __, ___) => SignUpScreen()));
-
-                    // Constant.sendToNext(
-                    //     context, Routes.signUpRoute);
                   },
                 ),
                 SizedBox(

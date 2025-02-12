@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../base/widget_utils.dart';
+import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
-import '../featured_event/featured_event_detail2.dart';
+import '../featured_event/featured_event_detail.dart';
 
 class FilterScreen extends StatefulWidget {
   @override
@@ -507,11 +508,8 @@ class _FilterScreenState extends State<FilterScreen> {
                                 .collection('event')
                                 .doc(snapshot.data!.docs[i].id)
                                 .update({'count': FieldValue.increment(1)});
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    FeaturedEvent2Detail(
-                                      event: events?[i],
-                                    )));
+                            Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events[i]);
+
                           },
                           child: Container(
                             height: 150.0,

@@ -134,7 +134,7 @@ class _TicketDetailState extends State<TicketDetail> {
             EdgeInsets.only(top: 26.h, bottom: 23.h),
             GestureDetector(
                 onTap: () {
-                  ;
+                  Navigator.pop(context);
                 },
                 child:
                     getSvgImage("arrow_back.svg", height: 24.h, width: 24.h))),

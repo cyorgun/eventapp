@@ -18,20 +18,8 @@ class Constant {
     return (percent * total) / 100;
   }
 
-  static backToPrev(BuildContext context) {
-    Get.back();
-  }
-
   static getCurrency(BuildContext context) {
     return "ETH";
-  }
-
-  static sendToNext(BuildContext context, String route, {Object? arguments}) {
-    if (arguments != null) {
-      Get.toNamed(route, arguments: arguments);
-    } else {
-      Get.toNamed(route);
-    }
   }
 
   static double getToolbarHeight(BuildContext context) {
@@ -40,14 +28,6 @@ class Constant {
 
   static double getToolbarTopHeight(BuildContext context) {
     return MediaQuery.of(context).padding.top;
-  }
-
-  static sendToScreen(Widget widget, BuildContext context) {
-    Get.to(widget);
-  }
-
-  static backToFinish(BuildContext context) {
-    Get.back();
   }
 
   static closeApp() {

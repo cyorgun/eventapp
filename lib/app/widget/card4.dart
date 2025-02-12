@@ -6,7 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../../base/color_data.dart';
 import '../../base/widget_utils.dart';
-import '../view/featured_event/featured_event_detail2.dart';
+import '../routes/app_routes.dart';
+import '../view/featured_event/featured_event_detail.dart';
 
 class Card4 extends StatelessWidget {
   final EventBaru events;
@@ -155,10 +156,7 @@ class Card4 extends StatelessWidget {
           ),
         ),
         onTap: () {
-          Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (_, __, ___) => new FeaturedEvent2Detail(
-                    event: events,
-                  )));
+          Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events);
         });
   }
 }

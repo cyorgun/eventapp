@@ -62,7 +62,6 @@ class _PassChangeDialogState extends State<PassChangeDialog> {
                     txtHeight: 1.5.h),
                 getVerSpace(30.h),
                 getButton(context, accentColor, "Ok", Colors.white, () {
-                  // Constant.sendToNext(context, Routes.loginRoute);
                   Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => LoginScreen()));
                 }, 18.sp,

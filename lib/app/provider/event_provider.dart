@@ -69,12 +69,12 @@ class EventProvider extends ChangeNotifier {
     if (_lastVisible == null)
       rawData = await firestore
           .collection('event')
-          .where('type', isEqualTo: 'trending')
+          .where('type', isEqualTo: 'category')
           .get();
     else
       rawData = await firestore
           .collection('event')
-          .where('type', isEqualTo: 'trending')
+          .where('type', isEqualTo: 'category')
           .get();
 
     if (rawData.docs.length > 0) {

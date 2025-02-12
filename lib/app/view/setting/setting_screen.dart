@@ -56,9 +56,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     settingContainer(() {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => EditProfile()));
-
-                      // Constant.sendToNext(context, Routes.editProfileRoute);
-                    }, ("Edit Profile").tr(), "edit_profile.svg"),
+                      }, ("Edit Profile").tr(), "edit_profile.svg"),
                     getVerSpace(20.h),
                     settingContainer(() {
                       Navigator.of(context).push(PageRouteBuilder(
@@ -71,9 +69,6 @@ class _SettingScreenState extends State<SettingScreen> {
                     settingContainer(() {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => NotificationScreen()));
-
-                      // Constant.sendToNext(
-                      //     context, Routes.notificationScreenRoute);
                     }, ("Notification").tr(), "notification-image.svg"),
                     getVerSpace(20.h),
                     settingContainer(() {
@@ -86,15 +81,11 @@ class _SettingScreenState extends State<SettingScreen> {
                     settingContainer(() {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => PrivacyScreen()));
-
-                      // Constant.sendToNext(context, Routes.privacyScreenRoute);
                     }, ("Privacy").tr(), "privacy.svg"),
                     getVerSpace(20.h),
                     settingContainer(() {
                       Navigator.of(context).push(PageRouteBuilder(
                           pageBuilder: (_, __, ___) => HelpScreen()));
-
-                      // Constant.sendToNext(context, Routes.helpScreenRoute);
                     }, ("Help").tr(), "info.svg"),
                   ],
                 )),
@@ -104,15 +95,12 @@ class _SettingScreenState extends State<SettingScreen> {
                   () async {
                 await context
                     .read<SignInProvider>()
-                    .userSignout()
+                    .userSignOut()
                     .then((value) =>
                         context.read<SignInProvider>().afterUserSignOut())
                     .then((value) {
                   Navigator.of(context).push(PageRouteBuilder(
                       pageBuilder: (_, __, ___) => LoginScreen()));
-
-                  // Constant.sendToNext(
-                  //     context, Routes.loginRoute);
                 });
               },
                   //      {

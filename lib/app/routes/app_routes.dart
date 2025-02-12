@@ -1,4 +1,5 @@
 abstract class Routes {
+  static const onboardingPage = Paths.onboardingPage;
   static const splashScreen = Paths.splashScreen;
   static const homeRoute = Paths.homePath;
   static const introRoute = Paths.introPath;
@@ -7,12 +8,12 @@ abstract class Routes {
   static const forgotPasswordRoute = Paths.forgotPasswordPath;
   static const resetPasswordRoute = Paths.resetPasswordPath;
   static const signUpRoute = Paths.signUpPath;
-  static const selectCountryRoute = Paths.selectCountryPath;
   static const verifyRoute = Paths.verifyPath;
   static const selectInterestRoute = Paths.selectInterestPath;
   static const trendingScreenRoute = Paths.trendingScreenPath;
   static const featuredEventDetailRoute = Paths.featuredEventDetailPath;
   static const buyTicketRoute = Paths.buyTicketPath;
+  static const multipleLanguageScreen = Paths.multipleLanguagePath;
   static const paymentRoute = Paths.paymentpath;
   static const createEventRoute = Paths.createEventPath;
   static const ticketDetailRoute = Paths.ticketDetailPath;
@@ -29,6 +30,8 @@ abstract class Routes {
 }
 
 abstract class Paths {
+  static const multipleLanguagePath = "/MultipleLanguageScreen";
+  static const onboardingPage = "/OnboardingPage";
   static const splashScreen = "/SplashScreen";
   static const homePath = "/";
   static const welcomePage = "/WelcomePage";

@@ -15,26 +15,25 @@ import 'package:readmore/readmore.dart';
 import '../../chat_logic/pages/chat_page.dart';
 import '../../provider/bookmark_provider.dart';
 import '../../provider/sign_in_provider.dart';
+import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
 import '../../widget/love_icon.dart';
 import '../../widget/map_sheet.dart';
 import '../home/tab/tab_home.dart';
 import 'buy_ticket.dart';
 
-class FeaturedEvent2Detail extends StatefulWidget {
-  EventBaru? event;
-
-  FeaturedEvent2Detail({
+class FeaturedEventDetail extends StatefulWidget {
+  const FeaturedEventDetail({
     Key? key,
-    this.event,
   }) : super(key: key);
 
   @override
-  State<FeaturedEvent2Detail> createState() => _FeaturedEvent2DetailState();
+  State<FeaturedEventDetail> createState() => _FeaturedEventDetailState();
 }
 
-class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
+class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
   late GoogleMapController mapController;
+  late EventBaru event;
 
   final LatLng _center = const LatLng(45.521563, -122.677433);
 
@@ -44,8 +43,8 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 
   @override
   Widget build(BuildContext context) {
+    event = ModalRoute.of(context)?.settings.arguments as EventBaru;
     final sb = context.watch<SignInProvider>();
-    final EventBaru event = widget.event!;
 // event.joinEvent!.forEach((id, data) {
 //     String name = data['name'];
 //     String photoProfile = data['photoProfile'];
@@ -139,10 +138,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       ),
                       getButton(context, accentColor, ("Buy Ticket").tr(),
                           Colors.white, () {
-                        Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => new BuyTicket(
-                                  event: event,
-                                )));
+                        Navigator.pushNamed(context, Routes.buyTicketRoute, arguments: event);
                       }, 18.sp,
                           weight: FontWeight.w700,
                           buttonHeight: 60.h,
@@ -160,12 +156,11 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   }
 
   handleLoveClick() {
-    final EventBaru event = widget.event!;
-    context.read<BookmarkProvider>().onBookmarkIconClick(event.title);
+    final SignInProvider sb = context.read<SignInProvider>();
+    context.read<BookmarkProvider>().onBookmarkIconClick(event.title, sb.uid);
   }
 
   Widget buildFollowWidget(BuildContext context) {
-    final EventBaru event = widget.event!;
     return getPaddingWidget(
       EdgeInsets.symmetric(horizontal: 20.h),
       Container(
@@ -209,7 +204,6 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
   }
 
   Container buildTicketPrice() {
-    final EventBaru event = widget.event!;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10.h),
       padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 16.h),
@@ -263,7 +257,6 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
 
   Widget buildImageWidget() {
     final sb = context.watch<SignInProvider>();
-    final EventBaru event = widget.event!;
 
     DateTime? dateTime = event.date?.toDate();
     String date = DateFormat('d MMMM, yyyy').format(dateTime!);
@@ -731,7 +724,7 @@ class _FeaturedEvent2DetailState extends State<FeaturedEvent2Detail> {
                       onTap: () {
                         Navigator.of(context).push(PageRouteBuilder(
                             pageBuilder: (_, __, ___) =>
-                                FeaturedEvent2Detail()));
+                                FeaturedEventDetail()));
 
                         // Constant.sendToNext(
                         //     context, Routes.featureEventListRoute);

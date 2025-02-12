@@ -7,7 +7,6 @@ import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/home/filtering_screen.dart';
 import 'package:event_app/app/view/home/tab/tab_maps.dart';
 import 'package:event_app/app/view/popular_event/popular_event_list.dart';
-import 'package:event_app/app/view/trending/trending_screen.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
@@ -26,8 +25,10 @@ import 'package:showcaseview/showcaseview.dart';
 import '../../../dialog/loading_cards.dart';
 import '../../../provider/event_provider.dart';
 import '../../../provider/sign_in_provider.dart';
+import '../../../routes/app_routes.dart';
 import '../../../widget/empty_screen.dart';
-import '../../featured_event/featured_event_detail2.dart';
+import '../../category/category_screen.dart';
+import '../../featured_event/featured_event_detail.dart';
 import '../../notification/notification_screen.dart';
 import '../search_screen.dart';
 
@@ -61,7 +62,6 @@ class _TabHomeState extends State<TabHome> {
   DateTime now = DateTime.now();
 
   Position? userPosition;
-  late List<EventBaru> nearbyEvents = [];
 
   void getToken() async {
     await FirebaseMessaging.instance.getToken().then((token) {
@@ -81,30 +81,6 @@ class _TabHomeState extends State<TabHome> {
 
     print("INI TOKENNYA");
     print(sb.uid);
-  }
-
-  Future<List<EventBaru>> fetchEventsNearby(
-      double latitude, double longitude) async {
-    List<EventBaru> Events = [];
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('event').get();
-
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      double EventLatitude =
-          (doc.data() as Map<String, dynamic>)['mapsLatLink'] as double? ?? 0.0;
-      double EventLongitude =
-          (doc.data() as Map<String, dynamic>)['mapsLangLink'] as double? ??
-              0.0;
-
-      double distance =
-          calculateDistance(latitude, longitude, EventLatitude, EventLongitude);
-
-      if (distance < 50000000000000.0) {
-        // Misalnya, tampilkan Event yang berjarak kurang dari 10 km dari lokasi pengguna.
-        Events.add(EventBaru.fromFirestore(doc, distance));
-      }
-    }
-    return Events;
   }
 
   double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -143,19 +119,6 @@ class _TabHomeState extends State<TabHome> {
           ? print('data already loaded 2')
           : context.read<EventProvider>().getDataTrending(mounted);
     }
-    checkAndRequestLocationPermission();
-    getUserLocation().then((position) {
-      setState(() {
-        userPosition = position;
-      });
-      fetchEventsNearby(userPosition!.latitude, userPosition!.longitude)
-          .then((Events) {
-        Events.sort((a, b) => a.distance!.compareTo(b.distance as num));
-        setState(() {
-          nearbyEvents = Events;
-        });
-      });
-    });
   }
 
   Future<Position> getUserLocation() async {
@@ -556,1537 +519,75 @@ class _TabHomeState extends State<TabHome> {
                         ),
                       ],
                     ),
-
                     getVerSpace(30.h),
                     Padding(
                       padding: EdgeInsets.only(left: 20.0.w, right: 20.w),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => showCaseMaps(),
-                          ));
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            getCustomFont(
-                                ("Nearby Events").tr(), 20.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                            Row(
-                              children: [
-                                getCustomFont(
-                                    ("View maps").tr(), 15.sp, greyColor, 1,
-                                    fontWeight: FontWeight.w500,
-                                    txtHeight: 1.5.h),
-                                SizedBox(
-                                  width: 5.0,
-                                ),
-                                getSvg("map.svg",
-                                    height: 24.h,
-                                    width: 24.h,
-                                    color: greyColor),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    getVerSpace(10.h),
-                    Container(
-                      height: 198.h,
-                      child: nearbyEvents == null
-                          ? ListView.builder(
-                              itemCount: 5,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                return LoadingCard(
-                                  height: 200.0,
-                                );
-                              },
-                            )
-                          : nearbyEvents.isEmpty
-                              ? ListView.builder(
-                                  itemCount: 5,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    return LoadingCard(
-                                      height: 200.0,
-                                    );
-                                  },
-                                )
-                              : ListView.builder(
-                                  itemCount: nearbyEvents.take(5).length ?? 0,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (context, index) {
-                                    final hotel = nearbyEvents[index];
-                                    return buildNearHotelList(
-                                      hotel: hotel,
-                                    );
-                                  },
-                                ),
-
-                      //  StreamBuilder(
-                      //    stream: FirebaseFirestore.instance
-                      //        .collection("event")
-                      //       //  .where('date',
-                      //       //      isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
-                      //       //  .orderBy('date', descending: false)
-                      //        .limit(10)
-                      //        .snapshots(),
-                      //    builder: (BuildContext ctx,
-                      //        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      //      if (snapshot.connectionState == ConnectionState.waiting) {
-                      //        return loadingCard(ctx);
-                      //      }
-
-                      //      if (snapshot.data!.docs.isEmpty) {
-                      //        return Center(child: Column(
-                      //                mainAxisAlignment: MainAxisAlignment.center,
-                      //                crossAxisAlignment: CrossAxisAlignment.center,
-                      //                children: [
-
-                      //     Container(
-                      //              decoration: BoxDecoration(
-                      //                  color: lightColor,
-                      //                  borderRadius: BorderRadius.circular(187.h)),
-                      //              padding: EdgeInsets.all(10.h),
-                      //              child: getAssetImage("empty.png",
-                      //              height: 100.0,
-                      //                   width: 134.h,boxFit: BoxFit.cover),
-                      //            ),
-                      //            getCustomFont(
-                      //                ("Not have upcoming events").tr(), 16.sp, Colors.black, 1,
-                      //                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-
-                      //                ],
-                      //              ));
-                      //      }
-                      //      if (snapshot.hasError) {
-                      //        return Center(child: Text('Error'));
-                      //      }
-
-                      //      // return loadingCard(ctx);
-                      //                      return        snapshot.hasData
-                      //          ? TrendingEventCard2(list: snapshot.data?.docs,)
-                      //           // buildFeatureEventList(
-                      //           //    list: snapshot.data?.docs,
-                      //           //  )
-                      //          : Container();
-                      //    },
-                      //  ),
-                    ),
-
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    getPaddingWidget(
-                      EdgeInsets.symmetric(horizontal: 20.h),
-                      Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           getCustomFont(
-                              ("Upcoming Events").tr(), 20.sp, Colors.black, 1,
+                              ("Featured Events").tr(), 20.sp, Colors.black, 1,
                               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                  pageBuilder: (_, __, ___) =>
-                                      FeaturedEvent2Detail()));
-
-                              // Constant.sendToNext(
-                              //     context, Routes.featureEventListRoute);
-                            },
-                            child: getCustomFont(
-                                ("View All").tr(), 15.sp, greyColor, 1,
-                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                          )
-                        ],
-                      ),
-                    ),
-                    // if (role == "users") const Text("dsadsadsadasdsa"),
-                    getVerSpace(0.h),
-
-                    Showcase(
-                      key: _four,
-                      description: 'Filtering upcoming events',
-                      child: Container(
-                        height: 224.h,
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("event")
-                              .where('date',
-                                  isGreaterThanOrEqualTo:
-                                      Timestamp.fromDate(DateTime.now()))
-                              .orderBy('date', descending: false)
-                              .limit(10)
-                              .snapshots(),
-                          builder: (BuildContext ctx,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return loadingCard(ctx);
-                            }
-
-                            if (snapshot.data!.docs.isEmpty) {
-                              return Center(
-                                  child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        color: lightColor,
-                                        borderRadius:
-                                            BorderRadius.circular(187.h)),
-                                    padding: EdgeInsets.all(10.h),
-                                    child: getAssetImage("empty.png",
-                                        height: 100.0,
-                                        width: 134.h,
-                                        boxFit: BoxFit.cover),
-                                  ),
-                                  getCustomFont(
-                                      ("Not have upcoming events").tr(),
-                                      16.sp,
-                                      Colors.black,
-                                      1,
-                                      fontWeight: FontWeight.w500,
-                                      txtHeight: 1.5.h),
-                                ],
-                              ));
-                            }
-                            if (snapshot.hasError) {
-                              return Center(child: Text('Error'));
-                            }
-
-                            // return loadingCard(ctx);
-                            return snapshot.hasData
-                                ? buildFeatureEventList(
-                                    list: snapshot.data?.docs,
-                                  )
-                                : Container();
-                          },
-                        ),
-                      ),
-                    ),
-                    // buildFeatureEventList(context),
-                    getVerSpace(24.h),
-
-                    getPaddingWidget(
-                      EdgeInsets.symmetric(horizontal: 20.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          getCustomFont(("Choose by Category").tr(), 20.sp,
-                              Colors.black, 1,
-                              fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                          GestureDetector(
+                          /*InkWell(
                             onTap: () {
                               Navigator.of(context).push(PageRouteBuilder(
                                   pageBuilder: (_, __, ___) =>
                                       TrendingScreen()));
-
-                              // Constant.sendToNext(
-                              //     context, Routes.trendingScreenRoute);
                             },
                             child: getCustomFont(
                                 ("View All").tr(), 15.sp, greyColor, 1,
                                 fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                          )
+                          )*/
                         ],
                       ),
                     ),
-                    getVerSpace(12.h),
-                    Showcase(
-                      key: _five,
-                      description:
-                          'Information effectively filtering events by category.',
-                      child: Container(
-                        height: 350.0,
-                        child: DefaultTabController(
-                          length: 13,
-                          child: Scaffold(
-                            backgroundColor: Colors.white,
-                            appBar: PreferredSize(
-                              preferredSize: const Size.fromHeight(
-                                  45.0), // here the desired height
-                              // ignore: unnecessary_new
-                              child: new AppBar(
-                                  backgroundColor: Colors.transparent,
-                                  elevation: 0.0,
-                                  centerTitle: false,
-                                  automaticallyImplyLeading: false,
-                                  leadingWidth: 0.0,
-                                  title: TabBar(
-                                    tabAlignment: TabAlignment.start,
-                                    padding: EdgeInsets.all(0.0),
-                                    isScrollable: true,
-                                    indicatorSize: TabBarIndicatorSize.tab,
-                                    unselectedLabelColor: Colors.black,
-                                    labelColor: Colors.white,
-                                    labelStyle: const TextStyle(fontSize: 19.0),
-                                    indicatorPadding: EdgeInsets.all(0),
-
-                                    // ignore: unnecessary_new
-                                    // ignore: prefer_const_constr
-                                    indicator: BubbleTabIndicator(
-                                      indicatorHeight: 45.0,
-                                      indicatorColor: accentColor,
-                                      padding: EdgeInsets.all(0.0),
-                                      // insets: EdgeInsets.only(left:14,right: 10.0),
-                                      tabBarIndicatorSize:
-                                          TabBarIndicatorSize.tab,
-                                    ),
-                                    tabs: <Widget>[
-                                      // ignore: unnecessary_new
-                                      new Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                ("All").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_7_swimming.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Swimming").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_8_game.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Game").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_9_fotball.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Football").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_10_comedy.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Comedy").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_11_konser.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Konser").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_12_trophy.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Trophy").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_1_tour.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Tour").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_2_festival.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Festival").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_3_study.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Study").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_4_party.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Party").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_5_olympic.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Olympic").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Tab(
-                                        child: Container(
-                                          height: 47.h,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 2.0,
-                                                            bottom: 2.0),
-                                                    child: Container(
-                                                      height: 44.h,
-                                                      width: 44.h,
-                                                      decoration: BoxDecoration(
-                                                          color: lightAccent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.h)),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 9.h,
-                                                              vertical: 9.h),
-                                                      child: getAssetImage(
-                                                          "i_6_culture.png",
-                                                          height: 26.h,
-                                                          width: 26.h),
-                                                    ),
-                                                  ),
-                                                  getHorSpace(6.h),
-                                                ],
-                                              ),
-                                              Text(
-                                                ("Culture").tr(),
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                        Constant.fontsFamily,
-                                                    fontSize: 15.0,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              getHorSpace(6.h)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                            ),
-                            body: Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: TabBarView(
-                                children: [
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          // .orderBy('createdAt', descending: false)
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'swimming')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        // if (snapshot.hasError) {
-                                        //   return Center(child: Text('Error'));
-                                        // }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category', isEqualTo: 'game')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'football')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'comedy')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'konser')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'trophy')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category', isEqualTo: 'tour')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'festival')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category', isEqualTo: 'study')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category', isEqualTo: 'party')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'olympic')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 350.0,
-                                    child: StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("event")
-                                          .where('category',
-                                              isEqualTo: 'culture')
-                                          .limit(10)
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return ListView(
-                                              scrollDirection: Axis.horizontal,
-                                              children: [
-                                                loadingCard2(context),
-                                                loadingCard2(context),
-                                              ]);
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: EmptyScreen());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? TrendingEventCard2(
-                                                list: snapshot.data?.docs,
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // buildTrendingCategoryList(),
-                    // getVerSpace(24.h),
-                    // Container(
-                    //   height: 290.0,
-                    //   child: StreamBuilder(
-                    //     stream: FirebaseFirestore.instance
-                    //         .collection("event")
-                    //         .where('type', isEqualTo: 'trending')
-                    //         .snapshots(),
-                    //     builder: (BuildContext ctx,
-                    //         AsyncSnapshot<QuerySnapshot> snapshot) {
-                    //       return snapshot.hasData
-                    //           ? TrendingEventCard2(
-                    //               list: snapshot.data?.docs,
-                    //             )
-                    //           : Container();
-                    //     },
-                    //   ),
-                    // ),
-                    // if (cb.data2.isEmpty)
-                    //   Column(
-                    //     children: [
-                    //       SizedBox(
-                    //         height: MediaQuery.of(context).size.height * 0.20,
-                    //       ),
-                    //       Text("Empty"),
-                    //     ],
-                    //   ),
-                    //           SizedBox(
-                    //             height: 300.0,
-                    //             child: ListView.builder(
-                    //               scrollDirection: Axis.horizontal,
-                    // shrinkWrap: true,
-                    // primary: false,
-                    //               itemCount: cb.data2.length,
-
-                    //               itemBuilder: (_, int index) {
-                    //                 //  return Card1(d: cb.data[index], heroTag: 'tab1$index');
-                    //                 // return Card2(d: cb.data[index], heroTag: 'tab1$index');
-                    //                 return buildTrendingEventList(cb.data2[index]);
-                    //                 // return buildTrendingCategoryList();
-                    //                 // return Opacity(
-                    //                 //   opacity: cb.isLoading ? 1.0 : 0.0,
-                    //                 //   child: cb.lastVisible == null
-                    //                 //       ? LoadingCard(height: 250)
-                    //                 //       : Center(
-                    //                 //           child: SizedBox(
-                    //                 //               width: 32.0,
-                    //                 //               height: 32.0,
-                    //                 //               child: new CupertinoActivityIndicator()),
-                    //                 //         ),
-                    //                 // );
-                    //               },
-                    //             ),
-                    //           ),
-
-                    Padding(
-                      padding: EdgeInsets.only(left: 20.0.w),
-                      child: getCustomFont(
-                          ("Events of this month").tr(), 20.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                    ),
-
                     getVerSpace(10.h),
-                    Container(
-                      height: 298.h,
+                    /*Container(
+                      height: 198.h,
                       child: StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection("event")
-                            .where('date',
-                                isGreaterThanOrEqualTo:
-                                    Timestamp.fromDate(startOfMonth))
-                            .where('date',
-                                isLessThanOrEqualTo:
-                                    Timestamp.fromDate(endOfMonth))
-                            .orderBy('date', descending: false)
-                            .limit(10)
+                            .where('type', isEqualTo: "company")
+                            .limit(7)
                             .snapshots(),
                         builder: (BuildContext ctx,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return loadingCard(ctx);
+                            return LoadingCard(
+                              height: 200.0,
+                            );
                           }
 
-                          if (snapshot.data!.docs.isEmpty) {
-                            return Center(
-                                child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Container(
-                                //          decoration: BoxDecoration(
-                                //              color: lightColor,
-                                //              borderRadius: BorderRadius.circular(187.h)),
-                                //          padding: EdgeInsets.all(10.h),
-                                //          child: getAssetImage("empty.png",
-                                //          height: 100.0,
-                                //               width: 134.h,boxFit: BoxFit.cover),
-                                //        ),
-                                getCustomFont(("Not have upcoming events").tr(),
-                                    16.sp, Colors.black, 1,
-                                    fontWeight: FontWeight.w500,
-                                    txtHeight: 1.5.h),
-                              ],
-                            ));
+                          else if (snapshot.data!.docs.isEmpty) {
+                            return Center(child: EmptyScreen());
                           }
-                          if (snapshot.hasError) {
+                          else if (snapshot.hasError) {
                             return Center(child: Text('Error'));
                           }
-
-                          // return loadingCard(ctx);
-                          return snapshot.hasData
-                              ? TrendingEventCard3(
-                                  list: snapshot.data?.docs,
-                                )
-                              // buildFeatureEventList(
-                              //    list: snapshot.data?.docs,
-                              //  )
-                              : Container();
+                          else {
+                            var eventsSnapshot = snapshot.data?.docs ?? [];
+                            return eventsSnapshot.isNotEmpty
+                              ? buildFeaturedEventList(list: eventsSnapshot)
+                              : Container();}
                         },
                       ),
-                    ),
-
+                    ),*/
+                    Center(child: Text("Very soon!".tr()),),
                     getVerSpace(20.h),
-                    // buildTrendingEventList(),
                     getPaddingWidget(
                       EdgeInsets.symmetric(horizontal: 20.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           getCustomFont(
-                              ("Popular Events").tr(), 20.sp, Colors.black, 1,
+                              ("User Events").tr(), 20.sp, Colors.black, 1,
                               fontWeight: FontWeight.w700, txtHeight: 1.5.h),
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(PageRouteBuilder(
                                   pageBuilder: (_, __, ___) =>
-                                      PopularEventList()));
-
-                              // Constant.sendToNext(
-                              //     context, Routes.popularEventListRoute);
+                                      CategoryScreen()));
                             },
                             child: getCustomFont(
                                 ("View All").tr(), 15.sp, greyColor, 1,
@@ -2096,12 +597,10 @@ class _TabHomeState extends State<TabHome> {
                       ),
                     ),
                     getVerSpace(12.h),
-                    // cb.hasData == false
-                    // ignore: unnecessary_null_comparison
                     StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection("event")
-                          .orderBy('count', descending: true)
+                          .where('type', isEqualTo: 'user')
                           .limit(7)
                           .snapshots(),
                       builder: (BuildContext ctx,
@@ -2118,53 +617,13 @@ class _TabHomeState extends State<TabHome> {
                           return Center(child: Text('Error'));
                         }
                         return snapshot.hasData
-                            ? buildPopularEventList(
+                            ? buildUserEventList(
                                 list: snapshot.data?.docs,
-                                id: snapshot.data?.docs[0].id,
                               )
                             : Container();
                       },
                     ),
-
-                    // if (cb.data.isEmpty)
-                    //   Column(
-                    //     children: [
-                    //       SizedBox(
-                    //         height: MediaQuery.of(context).size.height * 0.20,
-                    //       ),
-                    //       Text("Empty"),
-                    //     ],
-                    //   ),
-                    // ListView.separated(
-                    //   padding: EdgeInsets.all(15),
-                    //   physics: NeverScrollableScrollPhysics(),
-                    //   itemCount: cb.data.length,
-                    //   separatorBuilder: (BuildContext context, int index) =>
-                    //       SizedBox(
-                    //     height: 15,
-                    //   ),
-                    //   shrinkWrap: true,
-                    //   itemBuilder: (_, int index) {
-                    //     //  return Card1(d: cb.data[index], heroTag: 'tab1$index');
-                    //     // return Card2(d: cb.data[index], heroTag: 'tab1$index');
-                    //     return buildPopularEventList(cb.data[index]);
-
-                    //     // return Opacity(
-                    //     //   opacity: cb.isLoading ? 1.0 : 0.0,
-                    //     //   child: cb.lastVisible == null
-                    //     //       ? LoadingCard(height: 250)
-                    //     //       : Center(
-                    //     //           child: SizedBox(
-                    //     //               width: 32.0,
-                    //     //               height: 32.0,
-                    //     //               child: new CupertinoActivityIndicator()),
-                    //     //         ),
-                    //     // );
-                    //   },
-                    // ),
-
-                    // buildPopularEventList(),
-                    getVerSpace(40.h),
+                    getVerSpace(10.h),
                   ],
                 ))
           ],
@@ -2173,189 +632,6 @@ class _TabHomeState extends State<TabHome> {
     );
   }
 
-  // Widget buildPopularEventList(EventBaru event) {
-  //   // return ListView.builder(
-  //   //   padding: EdgeInsets.symmetric(horizontal: 20.h),
-  //   //   itemCount: popularEventLists.length,
-  //   //   primary: false,
-  //   //   shrinkWrap: true,
-  //   //   itemBuilder: (context, index) {
-  //   //     ModalPopularEvent modalPopularEvent = popularEventLists[index];
-  //   return Container(
-  //     margin: EdgeInsets.only(bottom: 20.h),
-  //     decoration: BoxDecoration(
-  //         color: Colors.white,
-  //         boxShadow: [
-  //           BoxShadow(
-  //               color: shadowColor, blurRadius: 27, offset: const Offset(0, 8))
-  //         ],
-  //         borderRadius: BorderRadius.circular(22.h)),
-  //     padding: EdgeInsets.only(top: 7.h, left: 7.h, bottom: 6.h, right: 20.h),
-  //     child: Row(
-  //       children: [
-  //         Expanded(
-  //           child: Row(
-  //             children: [
-  //               Container(
-  //                 height: 82,
-  //                 width: 82,
-  //                 decoration: BoxDecoration(
-  //                     borderRadius: BorderRadius.all(Radius.circular(20.0)),
-  //                     image: DecorationImage(
-  //                         image: NetworkImage(
-  //                           event.image ?? '',
-  //                         ),
-  //                         fit: BoxFit.cover)),
-  //               ),
-  //               // Image.network(event.image??'',height: 82,width: 82,),
-  //               // getAssetImage(event.image ?? "",
-  //               //     width: 82.h, height: 82.h),
-  //               getHorSpace(10.h),
-  //               Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   getCustomFont(event.title ?? "", 18.sp, Colors.black, 1,
-  //                       fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-  //                   getVerSpace(4.h),
-  //                   getCustomFont(event.date ?? '', 15.sp, greyColor, 1,
-  //                       fontWeight: FontWeight.w500, txtHeight: 1.46.h)
-  //                 ],
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //         Container(
-  //           height: 34.h,
-  //           decoration: BoxDecoration(
-  //               color: lightAccent, borderRadius: BorderRadius.circular(12.h)),
-  //           alignment: Alignment.center,
-  //           padding: EdgeInsets.symmetric(horizontal: 12.h),
-  //           child: Row(
-  //             children: [
-  //               getCustomFont('\$ ', 15.sp, accentColor, 1,
-  //                   fontWeight: FontWeight.w600, txtHeight: 1.46.h),
-  //               getCustomFont(
-  //                   event.price.toString() ?? '', 15.sp, accentColor, 1,
-  //                   fontWeight: FontWeight.w600, txtHeight: 1.46.h),
-  //             ],
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  //   //   },
-  //   // );
-  // }
-
-  // Widget buildTrendingEventList(Event2 event) {
-  //   return SizedBox(
-  //     height: 289.h,
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         Constant.sendToNext(context, Routes.featuredEventDetailRoute);
-  //       },
-  //       child: Container(
-  //         margin: EdgeInsets.only(right: 20.h, left: 20.h),
-  //         child: Stack(
-  //           alignment: Alignment.topCenter,
-  //           children: [
-  //             Container(
-  //               decoration: BoxDecoration(
-  //                   borderRadius: BorderRadius.circular(22.h),
-  //                   image: DecorationImage(
-  //                       image: NetworkImage(event.image ?? ''),
-  //                       fit: BoxFit.fill)),
-  //               height: 170.h,
-  //               width: 248.h,
-  //               padding: EdgeInsets.only(left: 12.h, top: 12.h),
-  //               child: Wrap(
-  //                 children: [
-  //                   Container(
-  //                     decoration: BoxDecoration(
-  //                         color: "#B2000000".toColor(),
-  //                         borderRadius: BorderRadius.circular(12.h)),
-  //                     padding:
-  //                         EdgeInsets.symmetric(vertical: 4.h, horizontal: 10.h),
-  //                     child: getCustomFont(
-  //                         event.date ?? "", 13.sp, Colors.white, 1,
-  //                         fontWeight: FontWeight.w600, txtHeight: 1.69.h),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             Positioned(
-  //               width: 230.h,
-  //               top: 132.h,
-  //               child: Container(
-  //                 decoration: BoxDecoration(
-  //                     color: Colors.white,
-  //                     boxShadow: [
-  //                       BoxShadow(
-  //                           color: shadowColor,
-  //                           blurRadius: 27,
-  //                           offset: const Offset(0, 8))
-  //                     ],
-  //                     borderRadius: BorderRadius.circular(22.h)),
-  //                 padding: EdgeInsets.symmetric(horizontal: 16.h),
-  //                 child: Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.start,
-  //                   children: [
-  //                     getVerSpace(16.h),
-  //                     getCustomFont(event.title ?? "", 18.sp, Colors.black, 1,
-  //                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-  //                     getVerSpace(3.h),
-  //                     Row(
-  //                       children: [
-  //                         getSvgImage("location.svg",
-  //                             width: 20.h, height: 20.h, color: greyColor),
-  //                         getHorSpace(5.h),
-  //                         getCustomFont(
-  //                             event.location ?? "", 15.sp, greyColor, 1,
-  //                             fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-  //                       ],
-  //                     ),
-  //                     getVerSpace(10.h),
-  //                     Row(
-  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                       children: [
-  //                         Row(
-  //                           children: [
-  //                             CircleAvatar(
-  //                               backgroundImage:
-  //                                   NetworkImage(event.userProfile ?? ''),
-  //                               radius: 10.0,
-  //                             ),
-  //                             // getAssetImage(
-  //                             //     event.sponser ?? '',
-  //                             //     height: 30.h,
-  //                             //     width: 30.h),
-  //                             getHorSpace(8.h),
-  //                             getCustomFont(
-  //                                 event.userName ?? '', 15.sp, greyColor, 1,
-  //                                 fontWeight: FontWeight.w500,
-  //                                 txtHeight: 1.46.h)
-  //                           ],
-  //                         ),
-  //                         getButton(context, accentColor, "Join", Colors.white,
-  //                             () {}, 14.sp,
-  //                             weight: FontWeight.w700,
-  //                             buttonHeight: 40.h,
-  //                             borderRadius: BorderRadius.circular(14.h),
-  //                             buttonWidth: 70.h)
-  //                       ],
-  //                     ),
-  //                     getVerSpace(16.h),
-  //                   ],
-  //                 ),
-  //                 // height: 133.h,
-  //               ),
-  //             )
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget buildSearchWidget(BuildContext context) {
     return Row(
       children: [
@@ -2503,14 +779,18 @@ class _TabHomeState extends State<TabHome> {
   }
 }
 
-class buildPopularEventList extends StatelessWidget {
+class buildUserEventList extends StatelessWidget {
   final List<DocumentSnapshot>? list;
-  String? id;
 
-  buildPopularEventList({this.list, this.id});
+  buildUserEventList({this.list});
 
   @override
   Widget build(BuildContext context) {
+    list?.sort((a, b) {
+      int countA = a['count'] ?? 0; // Null olursa 0 kabul et
+      int countB = b['count'] ?? 0;
+      return countB.compareTo(countA); // Büyükten küçüğe sıralama
+    });
     return ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
@@ -2518,413 +798,93 @@ class buildPopularEventList extends StatelessWidget {
         itemCount: list?.length,
         itemBuilder: (context, i) {
           final events = list?.map((e) {
-            return EventBaru.fromFirestore(e, 1);
+            return EventBaru.fromFirestore(e,1);
           }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
           DateTime? dateTime = events![i].date?.toDate();
           String date = DateFormat('d MMMM, yyyy').format(dateTime!);
 
-          return InkWell(
-            onTap: () {
-              FirebaseFirestore.instance
-                  .collection('event')
-                  .doc(list?[i].id)
-                  .update({'count': FieldValue.increment(1)});
-              Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                        event: events?[i],
-                        // category: category,
-                        // date: date,
-                        // description: description,
-                        // id: id,
-                        // image: image,
-                        // location: location,
-                        // mapsLangLink: mapsLangLink,
-                        // mapsLatLink: mapsLatLink,
-                        // price: price,
-                        // title: title,
-                        // type: type,
-                        // userDesc: userDesc,
-                        // userName: userName,
-                        // userProfile: userProfile,
-                      )));
-            },
-            child: Row(
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      height: 150.0,
-                      margin: EdgeInsets.only(
-                          bottom: 20.h, left: 20.0, right: 20.0),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                                color: shadowColor,
-                                blurRadius: 27,
-                                offset: const Offset(0, 8))
-                          ],
-                          borderRadius: BorderRadius.circular(22.h)),
-                      padding: EdgeInsets.only(
-                          top: 7.h, left: 7.h, bottom: 6.h, right: 20.h),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 102,
-                            width: 102,
-                            decoration: BoxDecoration(
-                                color: Colors.black12,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0)),
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                      events?[i].image ?? '',
-                                    ),
-                                    fit: BoxFit.cover)),
-                          ),
-                          // Image.network(event.image??'',height: 82,width: 82,),
-                          // getAssetImage(event.image ?? "",
-                          //     width: 82.h, height: 82.h),
-                          getHorSpace(10.h),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(left: 5.0, right: 5.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 210.w,
-                                  child: getCustomFont(events?[i].title ?? "",
-                                      20.5.sp, Colors.black, 1,
-                                      fontWeight: FontWeight.w700,
-                                      overflow: TextOverflow.ellipsis,
-                                      txtHeight: 1.5.h),
-                                ),
-                                SizedBox(
-                                  height: 5.0,
-                                ),
-                                Row(
-                                  children: [
-                                    getSvg("calender.svg",
-                                        color: Colors.grey[400],
-                                        width: 16.h,
-                                        height: 16.h),
-                                    getHorSpace(5.h),
-                                    getCustomFont(date.toString() ?? "", 15.sp,
-                                        greyColor, 1,
-                                        fontWeight: FontWeight.w500,
-                                        txtHeight: 1.5.h),
-                                  ],
-                                ),
-                                getVerSpace(5.h),
-                                Row(
-                                  children: [
-                                    getSvg("Location.svg",
-                                        color: Colors.grey[400],
-                                        width: 18.h,
-                                        height: 18.h),
-                                    getHorSpace(5.h),
-                                    Container(
-                                      width: 150.w,
-                                      child: getCustomFont(
-                                          events?[i].location ?? "",
-                                          15.sp,
-                                          greyColor,
-                                          1,
-                                          fontWeight: FontWeight.w500,
-                                          txtHeight: 1.5.h),
-                                    ),
-                                  ],
-                                ),
-                                getVerSpace(7.h),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    StreamBuilder(
-                                      stream: FirebaseFirestore.instance
-                                          .collection("JoinEvent")
-                                          .doc("user")
-                                          .collection(events[i].title ?? '')
-                                          .snapshots(),
-                                      builder: (BuildContext ctx,
-                                          AsyncSnapshot<QuerySnapshot>
-                                              snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
-
-                                        if (snapshot.data!.docs.isEmpty) {
-                                          return Center(child: Container());
-                                        }
-                                        if (snapshot.hasError) {
-                                          return Center(child: Text('Error'));
-                                        }
-                                        return snapshot.hasData
-                                            ? Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 20.0),
-                                                child: new joinEvents(
-                                                  list: snapshot.data?.docs,
-                                                ),
-                                              )
-                                            : Container();
-                                      },
-                                    ),
-                                    if (events[i].price! > 0)
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 0.0, bottom: 0.0),
-                                            child: Container(
-                                              height: 35.h,
-                                              width: 80.0,
-                                              decoration: BoxDecoration(
-                                                  color: Colors.black
-                                                      .withOpacity(0.051),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.h)),
-                                              child: Center(
-                                                  child: Text(
-                                                "\$ " +
-                                                    (events?[i]
-                                                            .price
-                                                            .toString() ??
-                                                        ""),
-                                                style: TextStyle(
-                                                    color: accentColor,
-                                                    fontSize: 15.sp,
-                                                    fontFamily: 'Gilroy',
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                                textAlign: TextAlign.center,
-                                              )),
-                                            )),
-                                      ),
-                                    if (events[i].price == 0)
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 0.0, bottom: 0.0),
-                                            child: Container(
-                                              height: 35.h,
-                                              width: 80.0,
-                                              decoration: BoxDecoration(
-                                                  color: Colors.black
-                                                      .withOpacity(0.051),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          50.h)),
-                                              child: Center(
-                                                  child: Text(
-                                                ("Free").tr(),
-                                                style: TextStyle(
-                                                    color: accentColor,
-                                                    fontSize: 15.sp,
-                                                    fontFamily: 'Gilroy',
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                                textAlign: TextAlign.center,
-                                              )),
-                                            )),
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5.0, left: 305.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.grey[400],
-                            borderRadius: BorderRadius.circular(10.h)),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 3.h, horizontal: 10.h),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.white,
-                              size: 15.0,
-                            ),
-                            SizedBox(width: 5),
-                            getCustomFont(events?[i].count.toString() ?? "",
-                                13.sp, Colors.white, 1,
-                                fontWeight: FontWeight.w600, txtHeight: 1.69.h),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        });
-  }
-}
-
-class buildFeatureEventList extends StatelessWidget {
-  final List<DocumentSnapshot>? list;
-
-  const buildFeatureEventList({this.list});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 196.h,
-      child: ListView.builder(
-        primary: false,
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemCount: list?.length,
-        itemBuilder: (context, i) {
-          final events = list?.map((e) {
-            return EventBaru.fromFirestore(e, 1);
-          }).toList();
-
-          DateTime? dateTime = events![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
-          // DateTime date = DateFormat('dd/MM/yyyy').format(events![i].date.toString());
-          return InkWell(
-            onTap: () {
-              FirebaseFirestore.instance
-                  .collection('event')
-                  .doc(list?[i].id)
-                  .update({'count': FieldValue.increment(1)});
-              Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                        event: events?[i],
-                      )));
-            },
-            child: Container(
-              width: 374.h,
-              height: 196.h,
-              margin: EdgeInsets.only(
-                  right: 0.h, left: 20.h, top: 15.0, bottom: 15.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22.h),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                      color: shadowColor,
-                      blurRadius: 27,
-                      offset: const Offset(0, 8))
-                ],
-                // image: DecorationImage(
-                //     image: NetworkImage(events?[i].image ?? ''),
-                //     fit: BoxFit.cover),
-              ),
+          return Container(
+            margin: EdgeInsets.only(
+                bottom: 20.h, left: 20.0, right: 20.0),
+            child: InkWell(
+              onTap: () {
+                FirebaseFirestore.instance
+                    .collection('event')
+                    .doc(list?[i].id)
+                    .update({'count': FieldValue.increment(1)});
+                Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events[i]);
+              },
               child: Stack(
                 children: [
                   Container(
-                    height: 196.h,
-                    width: double.infinity,
+                    height: 130.0,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(22.h),
-                      // gradient: LinearGradient(
-                      //     colors: [
-                      //       "#000000".toColor().withOpacity(0.0),
-                      //       "#000000".toColor().withOpacity(0.88)
-                      //     ],
-                      //     stops: const [
-                      //       0.0,
-                      //       1.0
-                      //     ],
-                      //     begin: Alignment.centerRight,
-                      //     end: Alignment.centerLeft)
-                    ),
-                    padding: EdgeInsets.only(left: 24.h),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 120.0,
-                          width: 100.0,
-                          decoration: BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
-                            image: DecorationImage(
-                                image: NetworkImage(events?[i].image ?? ''),
-                                fit: BoxFit.cover),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              color: shadowColor,
+                              blurRadius: 27,
+                              offset: const Offset(0, 8))
+                        ],
+                        borderRadius: BorderRadius.circular(22.h)),
+                    padding: EdgeInsets.only(
+                        top: 7.h, left: 7.h, bottom: 6.h, right: 20.h),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(left: 5.0, right: 5.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 210.w,
+                            child: getCustomFont(events?[i].title ?? "",
+                                20.5.sp, Colors.black, 1,
+                                fontWeight: FontWeight.w700,
+                                overflow: TextOverflow.ellipsis,
+                                txtHeight: 1.5.h),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15.0, top: 20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          SizedBox(
+                            height: 5.0,
+                          ),
+                          Row(
                             children: [
+                              getSvg("calender.svg",
+                                  color: Colors.grey[400],
+                                  width: 16.h,
+                                  height: 16.h),
+                              getHorSpace(5.h),
+                              getCustomFont(date.toString() ?? "", 15.sp,
+                                  greyColor, 1,
+                                  fontWeight: FontWeight.w500,
+                                  txtHeight: 1.5.h),
+                            ],
+                          ),
+                          getVerSpace(5.h),
+                          Row(
+                            children: [
+                              getSvg("Location.svg",
+                                  color: Colors.grey[400],
+                                  width: 18.h,
+                                  height: 18.h),
+                              getHorSpace(5.h),
                               Container(
-                                width: 170.0,
-                                child: getCustomFont(events?[i].title ?? "",
-                                    20.5.sp, Colors.black, 1,
-                                    fontWeight: FontWeight.w700,
-                                    overflow: TextOverflow.ellipsis,
+                                width: 150.w,
+                                child: getCustomFont(
+                                    events?[i].location ?? "",
+                                    15.sp,
+                                    greyColor,
+                                    1,
+                                    fontWeight: FontWeight.w500,
                                     txtHeight: 1.5.h),
                               ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Row(
-                                children: [
-                                  getSvg("calender.svg",
-                                      color: Colors.grey[400],
-                                      width: 16.h,
-                                      height: 16.h),
-                                  getHorSpace(5.h),
-                                  getCustomFont(date.toString() ?? "", 15.sp,
-                                      greyColor, 1,
-                                      fontWeight: FontWeight.w500,
-                                      txtHeight: 1.5.h),
-                                ],
-                              ),
-                              getVerSpace(5.h),
-                              Row(
-                                children: [
-                                  getSvg("Location.svg",
-                                      color: Colors.grey[400],
-                                      width: 18.h,
-                                      height: 18.h),
-                                  getHorSpace(5.h),
-                                  Container(
-                                    width: 100.0,
-                                    child: getCustomFont(
-                                        events?[i].location ?? "",
-                                        15.sp,
-                                        greyColor,
-                                        1,
-                                        fontWeight: FontWeight.w500,
-                                        txtHeight: 1.5.h),
-                                  ),
-                                ],
-                              ),
-                              getVerSpace(7.h),
+                            ],
+                          ),
+                          getVerSpace(7.h),
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
                               StreamBuilder(
                                 stream: FirebaseFirestore.instance
                                     .collection("JoinEvent")
@@ -2932,11 +892,13 @@ class buildFeatureEventList extends StatelessWidget {
                                     .collection(events[i].title ?? '')
                                     .snapshots(),
                                 builder: (BuildContext ctx,
-                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                    AsyncSnapshot<QuerySnapshot>
+                                        snapshot) {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return Center(
-                                        child: CircularProgressIndicator());
+                                        child:
+                                            CircularProgressIndicator());
                                   }
 
                                   if (snapshot.data!.docs.isEmpty) {
@@ -2946,73 +908,51 @@ class buildFeatureEventList extends StatelessWidget {
                                     return Center(child: Text('Error'));
                                   }
                                   return snapshot.hasData
-                                      ? new joinEvents(
-                                          list: snapshot.data?.docs,
+                                      ? Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 20.0),
+                                          child: new joinEvents(
+                                            list: snapshot.data?.docs,
+                                          ),
                                         )
                                       : Container();
                                 },
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                  if (events[i].price! > 0)
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                          padding:
-                              const EdgeInsets.only(right: 20.0, bottom: 20.0),
-                          child: Container(
-                            height: 35.h,
-                            width: 80.0,
-                            decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.051),
-                                borderRadius: BorderRadius.circular(50.h)),
-                            child: Center(
-                                child: Text(
-                              "\$ " + (events?[i].price.toString() ?? ""),
-                              style: TextStyle(
-                                  color: accentColor,
-                                  fontSize: 15.sp,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w700),
-                              textAlign: TextAlign.center,
-                            )),
-                          )),
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.grey[400],
+                          borderRadius: BorderRadius.circular(10.h)),
+                      padding: EdgeInsets.symmetric(
+                          vertical: 3.h, horizontal: 10.h),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.white,
+                            size: 15.0,
+                          ),
+                          SizedBox(width: 5),
+                          getCustomFont(events?[i].count.toString() ?? "",
+                              13.sp, Colors.white, 1,
+                              fontWeight: FontWeight.w600, txtHeight: 1.69.h),
+                        ],
+                      ),
                     ),
-                  if (events[i].price == 0)
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                          padding:
-                              const EdgeInsets.only(right: 20.0, bottom: 20.0),
-                          child: Container(
-                            height: 35.h,
-                            width: 80.0,
-                            decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.051),
-                                borderRadius: BorderRadius.circular(50.h)),
-                            child: Center(
-                                child: Text(
-                              ("Free").tr(),
-                              style: TextStyle(
-                                  color: accentColor,
-                                  fontSize: 15.sp,
-                                  fontFamily: 'Gilroy',
-                                  fontWeight: FontWeight.w700),
-                              textAlign: TextAlign.center,
-                            )),
-                          )),
-                    ),
+                  ),
                 ],
               ),
             ),
           );
-        },
-      ),
-    );
+        });
   }
 }
 
@@ -3267,24 +1207,8 @@ class TrendingEventCard extends StatelessWidget {
                     .collection('event')
                     .doc(list?[i].id)
                     .update({'count': FieldValue.increment(1)});
-                Navigator.of(context).push(PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                          event: events?[i],
-                          // category: category,
-                          // date: date,
-                          // description: description,
-                          // id: id,
-                          // image: image,
-                          // location: location,
-                          // mapsLangLink: mapsLangLink,
-                          // mapsLatLink: mapsLatLink,
-                          // price: price,
-                          // title: title,
-                          // type: type,
-                          // userDesc: userDesc,
-                          // userName: userName,
-                          // userProfile: userProfile,
-                        )));
+                Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events[i]);
+
               },
               child: Container(
                 margin: EdgeInsets.only(right: 20.h, left: 20.h, bottom: 20.0),
@@ -3501,24 +1425,7 @@ class TrendingEventCard2 extends StatelessWidget {
                     .collection('event')
                     .doc(list?[i].id)
                     .update({'count': FieldValue.increment(1)});
-                Navigator.of(context).push(PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                          event: events?[i],
-                          // category: category,
-                          // date: date,
-                          // description: description,
-                          // id: id,
-                          // image: image,
-                          // location: location,
-                          // mapsLangLink: mapsLangLink,
-                          // mapsLatLink: mapsLatLink,
-                          // price: price,
-                          // title: title,
-                          // type: type,
-                          // userDesc: userDesc,
-                          // userName: userName,
-                          // userProfile: userProfile,
-                        )));
+                Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events[i]);
               },
               child: Container(
                 margin: EdgeInsets.only(right: 20.h, left: 20.h, bottom: 20.0),
@@ -3790,508 +1697,221 @@ class KeysToBeInherited extends InheritedWidget {
   }
 }
 
-class buildNearHotelList extends StatelessWidget {
-  final EventBaru? hotel;
+class buildFeaturedEventList extends StatelessWidget {
+  final List<DocumentSnapshot> list;
 
-  const buildNearHotelList({this.hotel});
+  const buildFeaturedEventList({required this.list});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-      child: SizedBox(
-          height: 196.h,
-          child: InkWell(
-            onTap: () {
-              // Navigator.of(context).push(PageRouteBuilder(
-              //     pageBuilder: (_, __, ___) =>  FeaturedHotel2Detail(
-              //       Hotel: Hotels?[i],
-              //         )));
-
-              Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => new FeaturedEvent2Detail(
-                        event: hotel,
-                      ),
-                  transitionDuration: const Duration(milliseconds: 1000),
-                  transitionsBuilder:
-                      (_, Animation<double> animation, __, Widget child) {
-                    return Opacity(
-                      opacity: animation.value,
-                      child: child,
-                    );
-                  }));
-            },
-            child: Hero(
-              tag: 'hero-tagss-${hotel?.id}' ?? '',
-              child: Material(
-                color: Colors.transparent,
-                child: Container(
-                  width: 374.w,
-                  height: 196.h,
-                  margin: EdgeInsets.only(right: 20.h, left: 20.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(22.h),
-                    image: DecorationImage(
-                        image: NetworkImage(hotel?.image ?? ''),
-                        fit: BoxFit.cover),
-                  ),
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 196.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(22.h),
-                            gradient: LinearGradient(
-                                colors: [
-                                  "#000000".toColor().withOpacity(0.0),
-                                  "#000000".toColor().withOpacity(0.88)
-                                ],
-                                stops: const [
-                                  0.0,
-                                  1.0
-                                ],
-                                begin: Alignment.centerRight,
-                                end: Alignment.centerLeft)),
-                        padding: EdgeInsets.only(left: 24.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 270.w,
-                              child: getCustomFont(
-                                  hotel?.title ?? "", 18.sp, Colors.white, 2,
-                                  fontWeight: FontWeight.w700,
-                                  txtHeight: 1.3.h),
-                            ),
-                            getVerSpace(4.h),
-                            Row(
-                              children: [
-                                getSvgImage("location.svg",
-                                    width: 20.h, height: 20.h),
-                                getHorSpace(5.h),
-                                Container(
-                                  width: 200.w,
-                                  child: getCustomFont(hotel?.location ?? "",
-                                      15.sp, Colors.white, 1,
-                                      fontWeight: FontWeight.w500,
-                                      txtHeight: 1.5.h),
-                                ),
-                              ],
-                            ),
-                            getVerSpace(10.h),
-                            Container(
-                              width: MediaQuery.of(context).size.width / 1,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  // Row(
-                                  //   children: [
-                                  //     Row(
-                                  //       children: <Widget>[
-                                  //         Icon(
-                                  //           Icons.star,
-                                  //           color: Colors.yellow[600],
-                                  //           size: 15.0,
-                                  //         ),
-                                  //         Icon(
-                                  //           Icons.star,
-                                  //           color: Colors.yellow[600],
-                                  //           size: 15.0,
-                                  //         ),
-                                  //         Icon(
-                                  //           Icons.star,
-                                  //           color: Colors.yellow[600],
-                                  //           size: 15.0,
-                                  //         ),
-                                  //         Icon(
-                                  //           Icons.star,
-                                  //           color: Colors.yellow[600],
-                                  //           size: 15.0,
-                                  //         ),
-                                  //         Icon(
-                                  //           Icons.star_half,
-                                  //           color: Colors.yellow[600],
-                                  //           size: 15.0,
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  // SvgPicture.asset("assets/svg/calender.svg",
-                                  // color: accentColor, width: 16.h, height: 16.h),
-                                  Container(),
-                                  // Text(
-                                  //   "\$ ${  Hotels?[i].price.toString() ?? ""}",
-                                  //   style: TextStyle(
-                                  //       color: Colors.white,
-                                  //       fontSize: 16.5,
-                                  //       fontFamily: "RedHat",
-                                  //       fontWeight: FontWeight.w900),
-                                  //   maxLines: 1,
-                                  //   overflow: TextOverflow.ellipsis,
-                                  // ),
-                                  // getCustomFont(
-                                  //     date.toString() ?? "", 15.sp, greyColor, 1,
-                                  //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                                ],
-                              ),
-                            ),
-                            getVerSpace(10.h),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  getButton(context, accentColor, "Book Now",
-                                      Colors.white, () {}, 14.sp,
-                                      weight: FontWeight.w700,
-                                      buttonHeight: 40.h,
-                                      borderRadius: BorderRadius.circular(14.h),
-                                      buttonWidth: 111.h),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Distance : ',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 13.5.sp,
-                                            fontFamily: "RedHat",
-                                            fontWeight: FontWeight.w600),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        '${hotel?.distance?.toStringAsFixed(2)} KM',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16.5.sp,
-                                            fontFamily: "RedHat",
-                                            fontWeight: FontWeight.w900),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          )),
-    );
+  String getDate(Timestamp? timestamp) {
+    DateTime? dateTime = timestamp?.toDate();
+    if (dateTime == null) {
+      return "";
+    } else {
+      String date = DateFormat('d MMMM, yyyy').format(dateTime);
+      return date;
+    }
   }
-}
-
-class TrendingEventCard3 extends StatelessWidget {
-  final List<DocumentSnapshot>? list;
-
-  const TrendingEventCard3({this.list});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        primary: false,
-        itemCount: list?.length,
-        itemBuilder: (context, i) {
-          final events = list?.map((e) {
-            return EventBaru.fromFirestore(e, 1);
-          }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
-
-          DateTime? dateTime = events![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
-          return SizedBox(
-            height: 309.h,
-            child: GestureDetector(
-              onTap: () {
-                FirebaseFirestore.instance
-                    .collection('event')
-                    .doc(list?[i].id)
-                    .update({'count': FieldValue.increment(1)});
-                Navigator.of(context).push(PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => FeaturedEvent2Detail(
-                          event: events?[i],
-                          // category: category,
-                          // date: date,
-                          // description: description,
-                          // id: id,
-                          // image: image,
-                          // location: location,
-                          // mapsLangLink: mapsLangLink,
-                          // mapsLatLink: mapsLatLink,
-                          // price: price,
-                          // title: title,
-                          // type: type,
-                          // userDesc: userDesc,
-                          // userName: userName,
-                          // userProfile: userProfile,
-                        )));
-              },
-              child: Container(
-                margin:
-                    EdgeInsets.only(right: 20.w, left: 20.w, bottom: 20.0.h),
-                child: Stack(
-                  children: [
-                    // Background image
-                    Container(
-                      width: 210.w,
-                      // height: 400.h,
+      itemCount: list.take(5).length,
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (context, index) {
+        final event = EventBaru.fromFirestore(list[index],1);
+        return  Padding(
+          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+          child: SizedBox(
+              height: 196.h,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    Routes.featuredEventDetailRoute,
+                    arguments: event,
+                  );
+                },
+                child: Hero(
+                  tag: 'hero-tagss-${event?.id}' ?? '',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Container(
+                      width: 374.w,
+                      height: 196.h,
+                      margin: EdgeInsets.only(right: 20.h, left: 20.h),
                       decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 10.0,
-                              spreadRadius: 4.0,
-                              color: Colors.black12.withOpacity(0.035))
-                        ],
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(22.h),
                         image: DecorationImage(
-                          image: NetworkImage(events?[i].image ?? ""),
-                          fit: BoxFit.cover,
-                        ),
+                            image: NetworkImage(event?.image ?? ''),
+                            fit: BoxFit.cover),
                       ),
-                    ),
-                    // Calendar overlay
-
-                    // Bottom info
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(20)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              events?[i].title ?? "",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 2,
-                            ),
-                            Row(
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: 196.h,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(22.h),
+                                gradient: LinearGradient(
+                                    colors: [
+                                      "#000000".toColor().withOpacity(0.0),
+                                      "#000000".toColor().withOpacity(0.88)
+                                    ],
+                                    stops: const [
+                                      0.0,
+                                      1.0
+                                    ],
+                                    begin: Alignment.centerRight,
+                                    end: Alignment.centerLeft)),
+                            padding: EdgeInsets.only(left: 24.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.location_on,
-                                  color: Colors.red,
-                                  size: 17.0,
-                                ),
-                                SizedBox(width: 4),
                                 Container(
-                                  width: 100.w,
-                                  // color: Colors.yellow,
-                                  child: Text(
-                                    events?[i].location ?? "",
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.bold),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
+                                  width: 270.w,
+                                  child: getCustomFont(
+                                      event?.title ?? "", 18.sp, Colors.white, 2,
+                                      fontWeight: FontWeight.w700,
+                                      txtHeight: 1.3.h),
                                 ),
-                                Spacer(),
+                                getVerSpace(4.h),
                                 Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 3, horizontal: 10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    "\$${events[i].price}",
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  width: 200.w,
+                                  child: getCustomFont(getDate(event?.date),
+                                      15.sp, Colors.white, 1,
+                                      fontWeight: FontWeight.w500,
+                                      txtHeight: 1.5.h),
+                                ),
+                                getVerSpace(10.h),
+                                Container(
+                                  width: MediaQuery.of(context).size.width / 1,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      // Row(
+                                      //   children: [
+                                      //     Row(
+                                      //       children: <Widget>[
+                                      //         Icon(
+                                      //           Icons.star,
+                                      //           color: Colors.yellow[600],
+                                      //           size: 15.0,
+                                      //         ),
+                                      //         Icon(
+                                      //           Icons.star,
+                                      //           color: Colors.yellow[600],
+                                      //           size: 15.0,
+                                      //         ),
+                                      //         Icon(
+                                      //           Icons.star,
+                                      //           color: Colors.yellow[600],
+                                      //           size: 15.0,
+                                      //         ),
+                                      //         Icon(
+                                      //           Icons.star,
+                                      //           color: Colors.yellow[600],
+                                      //           size: 15.0,
+                                      //         ),
+                                      //         Icon(
+                                      //           Icons.star_half,
+                                      //           color: Colors.yellow[600],
+                                      //           size: 15.0,
+                                      //         ),
+                                      //       ],
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // SvgPicture.asset("assets/svg/calender.svg",
+                                      // color: accentColor, width: 16.h, height: 16.h),
+                                      Container(),
+                                      // Text(
+                                      //   "\$ ${  Hotels?[i].price.toString() ?? ""}",
+                                      //   style: TextStyle(
+                                      //       color: Colors.white,
+                                      //       fontSize: 16.5,
+                                      //       fontFamily: "RedHat",
+                                      //       fontWeight: FontWeight.w900),
+                                      //   maxLines: 1,
+                                      //   overflow: TextOverflow.ellipsis,
+                                      // ),
+                                      // getCustomFont(
+                                      //     date.toString() ?? "", 15.sp, greyColor, 1,
+                                      //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                                    ],
                                   ),
                                 ),
+                                getVerSpace(10.h),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      getButton(context, accentColor, "Book Now",
+                                          Colors.white, () {}, 14.sp,
+                                          weight: FontWeight.w700,
+                                          buttonHeight: 40.h,
+                                          borderRadius: BorderRadius.circular(14.h),
+                                          buttonWidth: 111.h),
+                                      Container(
+                                        color: Colors.black38,
+                                        padding: EdgeInsets.all(4),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            getSvgImage("location.svg",
+                                                width: 20.h, height: 20.h),
+                                            getHorSpace(5.h),
+                                            Container(
+                                              margin: EdgeInsets.only(right: 8),
+                                              child: getCustomFont(event?.location ?? "",
+                                                  15.sp, Colors.white, 1,
+                                                  fontWeight: FontWeight.w500,
+                                                  txtHeight: 1.5.h),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 32.0, left: 295.0, right: 10),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(10.h)),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 3.h, horizontal: 10.h),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.remove_red_eye,
+                                    color: Colors.white,
+                                    size: 15.0,
+                                  ),
+                                  SizedBox(width: 5),
+                                  getCustomFont(event?.count.toString() ?? "",
+                                      13.sp, Colors.white, 1,
+                                      fontWeight: FontWeight.w600, txtHeight: 1.69.h),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-
-                //  Stack(
-                //   alignment: Alignment.topCenter,
-                //   children: [
-                //     Container(
-                //       decoration: BoxDecoration(
-                //           borderRadius: BorderRadius.circular(22.h),
-                //           color: Colors.black12,
-                //           image: DecorationImage(image: NetworkImage(events?[i].image ?? ''), fit: BoxFit.fill)),
-                //       height: 170.h,
-                //       width: 240.0.w,
-                //       padding: EdgeInsets.only(left: 12.w, top: 12.h),
-                //       child: Wrap(
-                //         children: [
-                //           Container(
-                //             decoration:
-                //                 BoxDecoration(color: "#B2000000".toColor(), borderRadius: BorderRadius.circular(10.h)),
-                //             padding: EdgeInsets.symmetric(vertical: 7.h, horizontal: 10.h),
-                //             child: getCustomFont(date.toString() ?? "", 13.sp, Colors.white, 1,
-                //                 fontWeight: FontWeight.w600, txtHeight: 1.69.h),
-                //           ),
-                //         ],
-                //       ),
-                //     ),
-                //     Positioned(
-                //       width: 240.0.w,
-                //       top: 152.h,
-                //       child: Container(
-                //         height: 150.h,
-                //         decoration: BoxDecoration(
-                //             color: Colors.white,
-                //             boxShadow: [BoxShadow(color: shadowColor, blurRadius: 27, offset: const Offset(0, 8))],
-                //             borderRadius: BorderRadius.circular(10.h)),
-                //         padding: EdgeInsets.symmetric(horizontal: 16.h),
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             getVerSpace(16.h),
-                //             Container(
-                //               width: 190.0.w,
-                //               child: getCustomFont(events?[i].title ?? "", 17.5.sp, Colors.black, 2,
-                //                   fontWeight: FontWeight.w700, txtHeight: 1.1.h),
-                //             ),
-                //             getVerSpace(3.h),
-                //             Row(
-                //               children: [
-                //                 getSvg("Location.svg", color: Colors.grey[400], width: 18.h, height: 18.h),
-                //                 getHorSpace(5.h),
-                //                 Container(
-                //                   width: 150.0.w,
-                //                   child: getCustomFont(events?[i].location ?? "", 15.sp, greyColor, 1,
-                //                       fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                //                 )
-                //               ],
-                //             ),
-                //             getVerSpace(10.h),
-                //             Row(
-                //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //               children: [
-                //                 StreamBuilder(
-                //                   stream: FirebaseFirestore.instance
-                //                       .collection("JoinEvent")
-                //                       .doc("user")
-                //                       .collection(events[i].title ?? '')
-                //                       .snapshots(),
-                //                   builder: (BuildContext ctx, AsyncSnapshot<QuerySnapshot> snapshot) {
-                //                     if (snapshot.connectionState == ConnectionState.waiting) {
-                //                       return Center(child: CircularProgressIndicator());
-                //                     }
-
-                //                     if (snapshot.data!.docs.isEmpty) {
-                //                       return Center(child: Container());
-                //                     }
-                //                     if (snapshot.hasError) {
-                //                       return Center(child: Text('Error'));
-                //                     }
-                //                     return snapshot.hasData
-                //                         ? new joinEvents(
-                //                             list: snapshot.data?.docs,
-                //                           )
-                //                         : Container(
-                //                             height: 10.0.h,
-                //                             width: 54.0.w,
-                //                           );
-                //                   },
-                //                 ),
-                //                 if (events[i].price! > 0)
-                //                   Align(
-                //                     alignment: Alignment.bottomRight,
-                //                     child: Padding(
-                //                         padding: const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                //                         child: Container(
-                //                           height: 35.h,
-                //                           width: 80.0.w,
-                //                           decoration: BoxDecoration(
-                //                               color: Colors.black.withOpacity(0.051),
-                //                               borderRadius: BorderRadius.circular(50.h)),
-                //                           child: Center(
-                //                               child: Text(
-                //                             "\$ " + (events?[i].price.toString() ?? ""),
-                //                             style: TextStyle(
-                //                                 color: accentColor,
-                //                                 fontSize: 15.sp,
-                //                                 fontFamily: 'Gilroy',
-                //                                 fontWeight: FontWeight.w700),
-                //                             textAlign: TextAlign.center,
-                //                           )),
-                //                         )),
-                //                   ),
-                //                 if (events[i].price == 0)
-                //                   Align(
-                //                     alignment: Alignment.bottomRight,
-                //                     child: Padding(
-                //                         padding: const EdgeInsets.only(left: 0.0, bottom: 0.0),
-                //                         child: Container(
-                //                           height: 35.h,
-                //                           width: 80.0.w,
-                //                           decoration: BoxDecoration(
-                //                               color: Colors.black.withOpacity(0.051),
-                //                               borderRadius: BorderRadius.circular(50.h)),
-                //                           child: Center(
-                //                               child: Text(
-                //                             ("Free").tr(),
-                //                             style: TextStyle(
-                //                                 color: accentColor,
-                //                                 fontSize: 15.sp,
-                //                                 fontFamily: 'Gilroy',
-                //                                 fontWeight: FontWeight.w700),
-                //                             textAlign: TextAlign.center,
-                //                           )),
-                //                         )),
-                //                   ),
-                //               ],
-                //             ),
-                //             getVerSpace(16.h),
-                //           ],
-                //         ),
-                //         // height: 133.h,
-                //       ),
-                //     )
-                //   ],
-                // ),
-              ),
-            ),
-          );
-        });
+              )),
+        );
+      },
+    );
   }
 }

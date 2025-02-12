@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  handleSignInwithemailPassword() async {
+  handleSignInWithEmailPassword() async {
     final SignInProvider sb =
         Provider.of<SignInProvider>(context, listen: false);
     if (formKey.currentState!.validate()) {
@@ -75,14 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             signInStart = true;
           });
-          sb.signInwithEmailPassword(email, pass).then((_) async {
+          sb.signInWithEmailPassword(email, pass).then((_) async {
             if (sb.hasError == false) {
               sb
-                  .getUserDatafromFirebase(sb.uid)
-                  .then((value) => sb.guestSignout())
-                  .then((value) => sb
-                      .saveDataToSP()
-                      .then((value) => sb.setSignIn().then((value) {
+                  .getUserDataFromFirebase(sb.uid)
+                  .then((value) {
                             setState(() {
                               // signInComplete = true;
                             });
@@ -91,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             // Constant.sendToNext(
                             //     context, Routes.homeScreenRoute);
-                          })));
+                          });
             } else {
               _btnController.reset();
               ScaffoldMessenger.of(context).showSnackBar(
@@ -467,7 +464,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               successColor: accentColor,
                               controller: _btnController,
                               onPressed: () {
-                                handleSignInwithemailPassword();
+                                handleSignInWithEmailPassword();
                               },
                               width: MediaQuery.of(context).size.width * 1.0,
                               color: accentColor.withOpacity(0.9),

@@ -25,6 +25,8 @@ import 'app/provider/search_provider.dart';
 import 'app/provider/sign_in_provider.dart';
 import 'app/provider/theme_provider.dart';
 import 'app/routes/app_pages.dart';
+import 'app/routes/app_routes.dart';
+import 'app/view/featured_event/featured_event_detail.dart';
 import 'app/view/splash_screen.dart';
 
 void main() async {
@@ -175,7 +177,7 @@ class _MyAppState extends State<MyApp> {
               localizationsDelegates: context.localizationDelegates,
 
               debugShowCheckedModeBanner: false,
-              initialRoute: "/SplashScreen",
+              initialRoute: Routes.splashScreen,
               theme: ThemeData(
                 pageTransitionsTheme: PageTransitionsTheme(builders: {
                   TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -190,10 +192,22 @@ class _MyAppState extends State<MyApp> {
                   surfaceTintColor: Colors.transparent,
                 ),
               ),
-              home: const SplashScreen(),
-              // initialRoute:  "/SelectInterestScreen",
-
               routes: AppPages.routes,
+              onGenerateRoute: (settings) {
+                if (settings.name == Routes.featuredEventDetailRoute) {
+                  return PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => FeaturedEventDetail(),
+                    transitionDuration: const Duration(milliseconds: 1000),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return Opacity(
+                        opacity: animation.value,
+                        child: child,
+                      );
+                    },
+                  );
+                }
+                return null;
+              },
             ),
           );
         }));

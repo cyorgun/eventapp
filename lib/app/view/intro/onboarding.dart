@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 
 import '../../../base/color_data.dart';
 import '../../../base/constant.dart';
+import '../../../base/pref_data.dart';
+import '../../routes/app_routes.dart';
 import '../../widget/intro_views_flutter-2.4.0/lib/Models/page_view_model.dart';
 import 'welcome.dart';
 
 class OnBoarding extends StatefulWidget {
+  const OnBoarding({Key? key}) : super(key: key);
   @override
   _OnBoardingState createState() => _OnBoardingState();
 }
@@ -120,8 +123,8 @@ class _OnBoardingState extends State<OnBoarding> {
             letterSpacing: 1.0),
       ),
       onTapDoneButton: () async {
-        Navigator.of(context).push(
-            PageRouteBuilder(pageBuilder: (_, __, ___) => new WelcomePage()));
+        PrefData.setIsFirstTime();
+        Navigator.popAndPushNamed(context, Routes.welcomePage);
         // Get.toNamed(Routes.loginRoute);
       },
     );

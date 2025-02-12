@@ -7,6 +7,7 @@ import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/widget_utils.dart';
 import '../../../provider/bookmark_provider.dart';
+import '../../../provider/sign_in_provider.dart';
 import '../../../widget/card5.dart';
 
 class showCaseFavorite extends StatefulWidget {
@@ -69,7 +70,6 @@ class _TabFavouriteState extends State<TabFavourite> {
         ]);
       }
     });
-
     return KeysToBeInherited(
       notification: _one,
       search: _two,
@@ -79,7 +79,7 @@ class _TabFavouriteState extends State<TabFavourite> {
           Expanded(
             child: Container(
               child: FutureBuilder(
-                future: context.watch<BookmarkProvider>().getArticles(),
+                future: context.watch<BookmarkProvider>().getArticles(context.read<SignInProvider>().uid),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());

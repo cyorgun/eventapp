@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/routes/app_routes.dart';
-import 'package:event_app/app/view/Multiple_Language/Multiple_Language_Screen.dart';
+import 'package:event_app/app/view/Multiple_Language/multiple_language_screen.dart';
 import 'package:event_app/app/view/notification/notification_screen.dart';
 import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:event_app/app/view/setting/privacy_screen.dart';
@@ -163,7 +163,6 @@ class _TabProfileState extends State<TabProfile>
                             Navigator.of(context).push(PageRouteBuilder(
                                 pageBuilder: (_, __, ___) =>
                                     CreateEventScreen()));
-                            // Constant.sendToNext(context, Routes.createEventRoute);
                           }, ("Create Event").tr(), "add.svg"),
                         ),
                         getVerSpace(20.h),
@@ -175,9 +174,6 @@ class _TabProfileState extends State<TabProfile>
                             Navigator.of(context).push(PageRouteBuilder(
                                 pageBuilder: (_, __, ___) =>
                                     NotificationScreen()));
-
-                            // Constant.sendToNext(
-                            //     context, Routes.notificationScreenRoute);
                           }, ("Notification").tr(), "notification-image.svg"),
                         ),
                         getVerSpace(20.h),
@@ -185,10 +181,9 @@ class _TabProfileState extends State<TabProfile>
                         Showcase(
                           key: _five,
                           description: "Click here to setting change language.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    MultipleLanguageScreen()));
+                          child: settingContainer(() async {
+                            await Navigator.pushNamed(context, Routes.multipleLanguageScreen);
+                            setState(() {});
                             // Constant.sendToNext(context, Routes.changeLanguageRoute
                           }, ("Change Language").tr(), "language.svg"),
                         ),
@@ -214,7 +209,7 @@ class _TabProfileState extends State<TabProfile>
                           onTap: () async {
                             await context
                                 .read<SignInProvider>()
-                                .userSignout()
+                                .userSignOut()
                                 .then((value) => context
                                     .read<SignInProvider>()
                                     .afterUserSignOut())

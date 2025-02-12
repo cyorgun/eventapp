@@ -3,29 +3,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PrefData {
   static String prefName = "com.example.event_app";
 
-  static String isIntro = "${prefName}isIntro";
-  static String inSignIn = "${prefName}isSignIn";
   static String isSelect = "${prefName}isSelect";
 
-  static setIsIntro(bool sizes) async {
+  static setIsFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(isIntro, sizes);
+    await prefs.setBool("isFirstTime", false);
   }
 
-  static getIsIntro() async {
+  static isFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool intValue = prefs.getBool(isIntro) ?? true;
+    bool intValue = prefs.getBool("isFirstTime") ?? true;
     return intValue;
-  }
-
-  static getIsSignIn() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(inSignIn) ?? false;
-  }
-
-  static setIsSignIn(bool isFav) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool(inSignIn, isFav);
   }
 
   static getSelectInterest() async {

@@ -31,8 +31,6 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
     sb.saveInterestToFirebase(v);
     Navigator.of(context)
         .pushNamedAndRemoveUntil(Routes.homeScreenRoute, (route) => false);
-    // Constant.sendToNext(
-    //                             context, Routes.homeScreenRoute);
   }
 
   @override
@@ -186,7 +184,8 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
                                 Colors.white, () async {
                               addDataInterest(_selectedInterest);
 
-                              context.read<SignInProvider>().checkSignIn();
+                              //TODO: Is this needed?
+                              context.read<SignInProvider>().checkIfUserIsAuthenticated;
                             }, 18.sp,
                                 weight: FontWeight.w700,
                                 buttonHeight: 60.h,

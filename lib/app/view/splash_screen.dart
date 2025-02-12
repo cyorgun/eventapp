@@ -2,15 +2,15 @@
 
 import 'dart:async';
 
-import 'package:event_app/app/view/home/home_screen.dart';
+import 'package:event_app/app/routes/app_routes.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
+import '../../base/pref_data.dart';
 import '../provider/bookmark_provider.dart';
 import '../provider/sign_in_provider.dart';
-import 'intro/OnBoarding.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -23,56 +23,39 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    afterSplash();
-    // _getIsFirst();
+    _decideRoute();
   }
 
-  afterSplash() {
-    final SignInProvider sb = context.read<SignInProvider>();
-    Future.delayed(Duration(milliseconds: 2500)).then((value) {
-      sb.isSignedIn == true ? gotoHomePage() : gotoSignInPage();
-      // : WelcomePage();
-    });
-  }
-
-  gotoHomePage() {
+  gotoHomePage() async {
     final SignInProvider sb = context.read<SignInProvider>();
     final BookmarkProvider b = context.read<BookmarkProvider>();
     if (sb.isSignedIn == true) {
-      sb.getDataFromSp();
-      b.getDataToSP();
+      await sb.getUserDataFromFirebase(sb.uid);
+      //await b.getInterestDataFromFirebase(sb.uid);
     }
-    Navigator.of(context).pushReplacement(
-        PageRouteBuilder(pageBuilder: (_, __, ___) => new HomeScreen()));
-    // Constant.sendToNext(context, Routes.homeScreenRoute);
+    Timer(const Duration(seconds: 2), () {
+      Navigator.popAndPushNamed(context, Routes.homeScreenRoute);
+    });
   }
 
   Future<PackageInfo> _getPackageInfo() {
     return PackageInfo.fromPlatform();
   }
 
-  gotoSignInPage() {
-    //  Navigator.of(context).push(PageRouteBuilder(pageBuilder: (_,__,___)=>new WelcomePage()));
-    Navigator.of(context).pushReplacement(
-        PageRouteBuilder(pageBuilder: (_, __, ___) => new OnBoarding()));
-  }
-
-/*  _getIsFirst() async {
-    bool isSignIn = await PrefData.getIsSignIn();
-    bool isIntro = await PrefData.getIsIntro();
-    bool isSelect = await PrefData.getSelectInterest();
+  _decideRoute() async {
+    final SignInProvider sb = context.read<SignInProvider>();
+    bool isIntro = await PrefData.isFirstTime();
+    //bool isSelect = await PrefData.getSelectInterest();
     if (isIntro) {
-      Constant.sendToNext(context, Routes.introRoute);
-    } else if (!isSignIn) {
-      Constant.sendToNext(context, Routes.loginRoute);
-    } else if (!isSelect) {
-      Constant.sendToNext(context, Routes.selectInterestRoute);
-    } else {
-      Timer(const Duration(seconds: 3), () {
-        Constant.sendToNext(context, Routes.homeScreenRoute);
-      });
+      Navigator.popAndPushNamed(context, Routes.onboardingPage);
+    } else if (!sb.isSignedIn) {
+      Navigator.popAndPushNamed(context, Routes.welcomePage);
+    } /*else if (!isSelect) {
+      Navigator.pushNamed(context, Routes.selectInterestRoute);
+    } */else {
+      gotoHomePage();
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'package:event_app/app/dialog/delete_dialog.dart';
 import 'package:event_app/app/routes/app_routes.dart';
+import 'package:event_app/app/view/my_card/edit_card_screen.dart';
 import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:evente/evente.dart';
 import 'package:flutter/material.dart';
@@ -191,9 +192,6 @@ class _MyCardScreenState extends State<MyCardScreen> {
                                                       pageBuilder:
                                                           (_, __, ___) =>
                                                               EditProfile()));
-
-                                              // Constant.sendToNext(context,
-                                              //     Routes.editCardScreenRoute);
                                             } else if (value == 1) {
                                               showDialog(
                                                       builder: (context) {
@@ -228,8 +226,8 @@ class _MyCardScreenState extends State<MyCardScreen> {
                         getButton(
                             context, accentColor, "Add New Card", Colors.white,
                             () {
-                          Constant.sendToNext(
-                              context, Routes.editCardScreenRoute);
+                              Navigator.of(context).push(PageRouteBuilder(
+                                  pageBuilder: (_, __, ___) => EditCardScreen()));
                         }, 18.sp,
                             weight: FontWeight.w700,
                             buttonHeight: 60.h,

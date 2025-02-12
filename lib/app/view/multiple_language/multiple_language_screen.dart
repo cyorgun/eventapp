@@ -1,9 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/view/home/home_screen.dart';
+import 'package:event_app/app/view/intro/welcome.dart';
 import 'package:flutter/material.dart';
 
+import '../../../base/constant.dart';
+
 class MultipleLanguageScreen extends StatefulWidget {
-  MultipleLanguageScreen({Key? key}) : super(key: key);
+  const MultipleLanguageScreen();
 
   _MultipleLanguageScreenState createState() => _MultipleLanguageScreenState();
 }
@@ -29,8 +32,7 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
         elevation: 0.0,
         leading: InkWell(
             onTap: () {
-              Navigator.of(context).pushReplacement(new MaterialPageRoute(
-                  builder: (context) => new HomeScreen()));
+              Navigator.pop(context);
             },
             child: Icon(Icons.arrow_back, color: Colors.black)),
       ),
