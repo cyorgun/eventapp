@@ -22,7 +22,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     Future.delayed(Duration(milliseconds: 0))
-        .then((value) => context.read<SearchProvider>().saerchInitialize());
+        .then((value) => context.read<SearchProvider>().searchInitialize());
     super.initState();
   }
 
@@ -83,7 +83,7 @@ class _SearchPageState extends State<SearchPage> {
               color: Theme.of(context).iconTheme.color,
             ),
             onPressed: () {
-              context.read<SearchProvider>().saerchInitialize();
+              context.read<SearchProvider>().searchInitialize();
             },
           ),
         ),

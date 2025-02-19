@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/routes/app_routes.dart';
-import 'package:event_app/app/view/Multiple_Language/multiple_language_screen.dart';
 import 'package:event_app/app/view/notification/notification_screen.dart';
 import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:event_app/app/view/setting/privacy_screen.dart';
@@ -8,30 +7,12 @@ import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../provider/bookmark_provider.dart';
 import '../../../provider/sign_in_provider.dart';
 import '../../create_event/create_event_screen.dart';
 import '../../profile/change_password.dart';
-
-class showCaseProfile extends StatefulWidget {
-  const showCaseProfile({super.key});
-
-  @override
-  State<showCaseProfile> createState() => _showCaseProfileState();
-}
-
-class _showCaseProfileState extends State<showCaseProfile> {
-  @override
-  Widget build(BuildContext context) {
-    return ShowCaseWidget(
-      builder: Builder(builder: (context) => TabProfile()),
-    );
-  }
-}
 
 class TabProfile extends StatefulWidget {
   const TabProfile({Key? key}) : super(key: key);
@@ -44,230 +25,161 @@ class _TabProfileState extends State<TabProfile>
     with AutomaticKeepAliveClientMixin {
   var interestList = {"Art", "Music", "Food", "Technology", "Party"};
 
-  GlobalKey _one = GlobalKey();
-  GlobalKey _two = GlobalKey();
-  GlobalKey _three = GlobalKey();
-  GlobalKey _four = GlobalKey();
-  GlobalKey _five = GlobalKey();
-  GlobalKey _six = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
-    SharedPreferences preferences;
-
-    displayShowcase() async {
-      preferences = await SharedPreferences.getInstance();
-      bool? showcaseVisibilityStatus =
-          preferences.getBool("profileShowcasesssss");
-
-      if (showcaseVisibilityStatus == null) {
-        preferences.setBool("profileShowcasesssss", false).then((bool success) {
-          if (success)
-            print("Successfull in writing showshoexase");
-          else
-            print("some bloody problem occured");
-        });
-
-        return true;
-      }
-
-      return false;
-    }
-
-    displayShowcase().then((status) {
-      if (status) {
-        ShowCaseWidget.of(context).startShowCase([
-          _one,
-          _two,
-        ]);
-      }
-    });
-
     super.build(context);
     final sb = context.watch<SignInProvider>();
-    return KeysToBeInherited(
-      notification: _one,
-      search: _two,
-      notification1: _three,
-      search2: _four,
-      notification3: _five,
-      search4: _six,
-      child: Column(
-        children: [
-          AppBar(
-            iconTheme: IconThemeData(color: Colors.transparent),
-            backgroundColor: Colors.white,
-            toolbarHeight: 73.h,
-            elevation: 0,
-            title: getCustomFont(("Profile").tr(), 24.sp, Colors.black, 1,
-                fontWeight: FontWeight.w700),
-            centerTitle: true,
-            actions: [
-              // GestureDetector(
-              //     onTap: () {
-              //       Constant.sendToNext(context, Routes.settingRoute);
-              //     },
-              //     child: getSvgImage("setting.svg", height: 24.h, width: 24.h)),
-              // getHorSpace(20.h)
-            ],
-          ),
-          Divider(color: dividerColor, thickness: 1.h, height: 1.h),
-          Expanded(
-              flex: 1,
-              child: ListView(
-                primary: true,
-                shrinkWrap: true,
-                children: [
-                  buildProfileSection(),
-                  getVerSpace(5.h),
-                  getPaddingWidget(
-                    EdgeInsets.symmetric(horizontal: 20.h),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getVerSpace(20.h),
-                        getCustomFont(
-                            ("Account Settings").tr(), 16.sp, greyColor, 1,
-                            fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                        getVerSpace(12.h),
+    return Column(
+      children: [
+        AppBar(
+          iconTheme: IconThemeData(color: Colors.transparent),
+          backgroundColor: Colors.white,
+          toolbarHeight: 73.h,
+          elevation: 0,
+          title: getCustomFont(("Profile").tr(), 24.sp, Colors.black, 1,
+              fontWeight: FontWeight.w700),
+          centerTitle: true,
+          actions: [
+            // GestureDetector(
+            //     onTap: () {
+            //       Constant.sendToNext(context, Routes.settingRoute);
+            //     },
+            //     child: getSvgImage("setting.svg", height: 24.h, width: 24.h)),
+            // getHorSpace(20.h)
+          ],
+        ),
+        Divider(color: dividerColor, thickness: 1.h, height: 1.h),
+        Expanded(
+            flex: 1,
+            child: ListView(
+              primary: true,
+              shrinkWrap: true,
+              children: [
+                buildProfileSection(),
+                getVerSpace(5.h),
+                getPaddingWidget(
+                  EdgeInsets.symmetric(horizontal: 20.h),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      getVerSpace(20.h),
+                      getCustomFont(
+                          ("Account Settings").tr(), 16.sp, greyColor, 1,
+                          fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                      getVerSpace(12.h),
 
-                        Showcase(
-                          key: _one,
-                          description: "Click here to edit profil.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => EditProfile()));
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => EditProfile()));
 
-                            // Constant.sendToNext(context, Routes.editProfileRoute);
-                          }, ("Edit Profile").tr(), "edit_profile.svg"),
-                        ),
-                        getVerSpace(20.h),
+                        // Constant.sendToNext(context, Routes.editProfileRoute);
+                      }, ("Edit Profile").tr(), "edit_profile.svg"),
+                      getVerSpace(20.h),
 
-                        Showcase(
-                          key: _two,
-                          description: "Click here to setting change password.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => ChangePassword()));
-                          }, ("Change Password").tr(), "change_password.svg"),
-                        ),
-                        // getVerSpace(30.h),
-                        // getCustomFont("Preferences", 16.sp, greyColor, 1,
-                        //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                        getVerSpace(20.h),
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => ChangePassword()));
+                      }, ("Change Password").tr(), "change_password.svg"),
+                      // getVerSpace(30.h),
+                      // getCustomFont("Preferences", 16.sp, greyColor, 1,
+                      //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                      getVerSpace(20.h),
 
-                        Showcase(
-                          key: _three,
-                          description: "Click here to setting create event.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    CreateEventScreen()));
-                          }, ("Create Event").tr(), "add.svg"),
-                        ),
-                        getVerSpace(20.h),
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) =>
+                                CreateEventScreen()));
+                      }, ("Create Event").tr(), "add.svg"),
+                      getVerSpace(20.h),
 
-                        Showcase(
-                          key: _four,
-                          description: "Click here to see notification.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) =>
-                                    NotificationScreen()));
-                          }, ("Notification").tr(), "notification-image.svg"),
-                        ),
-                        getVerSpace(20.h),
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) =>
+                                NotificationScreen()));
+                      }, ("Notification").tr(), "notification-image.svg"),
+                      getVerSpace(20.h),
 
-                        Showcase(
-                          key: _five,
-                          description: "Click here to setting change language.",
-                          child: settingContainer(() async {
-                            await Navigator.pushNamed(context, Routes.multipleLanguageScreen);
-                            setState(() {});
-                            // Constant.sendToNext(context, Routes.changeLanguageRoute
-                          }, ("Change Language").tr(), "language.svg"),
-                        ),
-                        getVerSpace(20.h),
-                        // settingContainer(() {
-                        //   Constant.sendToNext(context, Routes.myCardScreenRoute);
-                        // }, "My Cards", "card.svg"),
-                        // getVerSpace(20.h),
+                      settingContainer(() async {
+                        await Navigator.pushNamed(context, Routes.multipleLanguageScreen);
+                        setState(() {});
+                        // Constant.sendToNext(context, Routes.changeLanguageRoute
+                      }, ("Change Language").tr(), "language.svg"),
+                      getVerSpace(20.h),
+                      // settingContainer(() {
+                      //   Constant.sendToNext(context, Routes.myCardScreenRoute);
+                      // }, "My Cards", "card.svg"),
+                      // getVerSpace(20.h),
 
-                        Showcase(
-                          key: _six,
-                          description: "Click here to see privacy.",
-                          child: settingContainer(() {
-                            Navigator.of(context).push(PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => PrivacyScreen()));
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => PrivacyScreen()));
 
-                            // Constant.sendToNext(context, Routes.privacyScreenRoute);
-                          }, ("Privacy").tr(), "privacy.svg"),
-                        ),
-                        getVerSpace(20.h),
+                        // Constant.sendToNext(context, Routes.privacyScreenRoute);
+                      }, ("Privacy").tr(), "privacy.svg"),
+                      getVerSpace(20.h),
 
-                        GestureDetector(
-                          onTap: () async {
-                            await context
-                                .read<SignInProvider>()
-                                .userSignOut()
-                                .then((value) => context
-                                    .read<SignInProvider>()
-                                    .afterUserSignOut())
-                                .then((value) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  Routes.welcomePage, (route) => false);
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(22.h),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: shadowColor,
-                                      offset: const Offset(0, 8),
-                                      blurRadius: 27)
-                                ]),
-                            padding: EdgeInsets.only(
-                                bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      height: 54.h,
-                                      width: 54.h,
-                                      decoration: BoxDecoration(
-                                          color: dividerColor,
-                                          borderRadius:
-                                              BorderRadius.circular(22.h)),
-                                      padding: EdgeInsets.all(15.h),
-                                      child: getSvg("Logout.svg",
-                                          width: 24.h,
-                                          height: 24.h,
-                                          color: accentColor),
-                                    ),
-                                    getHorSpace(16.h),
-                                    getCustomFont(
-                                        ("Logout").tr(), 16.sp, Colors.black, 1,
-                                        fontWeight: FontWeight.w500)
-                                  ],
-                                ),
-                                getSvgImage("arrow_right.svg",
-                                    height: 24.h, width: 24.h)
-                              ],
-                            ),
+                      GestureDetector(
+                        onTap: () async {
+                          await context
+                              .read<SignInProvider>()
+                              .userSignOut()
+                              .then((value) => context
+                                  .read<SignInProvider>()
+                                  .afterUserSignOut())
+                              .then((value) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                Routes.welcomePage, (route) => false);
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(22.h),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: shadowColor,
+                                    offset: const Offset(0, 8),
+                                    blurRadius: 27)
+                              ]),
+                          padding: EdgeInsets.only(
+                              bottom: 3.h, left: 3.h, top: 3.h, right: 18.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 54.h,
+                                    width: 54.h,
+                                    decoration: BoxDecoration(
+                                        color: dividerColor,
+                                        borderRadius:
+                                            BorderRadius.circular(22.h)),
+                                    padding: EdgeInsets.all(15.h),
+                                    child: getSvg("Logout.svg",
+                                        width: 24.h,
+                                        height: 24.h,
+                                        color: accentColor),
+                                  ),
+                                  getHorSpace(16.h),
+                                  getCustomFont(
+                                      ("Logout").tr(), 16.sp, Colors.black, 1,
+                                      fontWeight: FontWeight.w500)
+                                ],
+                              ),
+                              getSvgImage("arrow_right.svg",
+                                  height: 24.h, width: 24.h)
+                            ],
                           ),
                         ),
-                        getVerSpace(50.h),
-                      ],
-                    ),
-                  )
-                ],
-              ))
-        ],
-      ),
+                      ),
+                      getVerSpace(50.h),
+                    ],
+                  ),
+                )
+              ],
+            ))
+      ],
     );
   }
 

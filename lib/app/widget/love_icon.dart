@@ -11,13 +11,13 @@ import '../provider/sign_in_provider.dart';
 class BuildLoveIcon extends StatelessWidget {
   final String collectionName;
   final String? uid;
-  final String? timestamp;
+  final String? eventId;
 
   const BuildLoveIcon(
       {Key? key,
       required this.collectionName,
       required this.uid,
-      required this.timestamp})
+      required this.eventId})
       : super(key: key);
 
   @override
@@ -35,7 +35,7 @@ class BuildLoveIcon extends StatelessWidget {
         Map<String, dynamic>? userData = snap.data!.data();
         if (userData == null) return LoveIcon().normal;
         List d = userData[_type] ?? [];
-        if (d.contains(timestamp)) {
+        if (d.contains(eventId)) {
           return getSvg("hearth.svg",
               width: 27.h, height: 27.h, color: accentColor);
         } else {

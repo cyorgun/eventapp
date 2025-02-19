@@ -12,15 +12,15 @@ import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 
-import '../../chat_logic/pages/chat_page.dart';
+import '../../chatroom_logic/pages/chatroom_page.dart';
 import '../../provider/bookmark_provider.dart';
 import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
 import '../../widget/empty_screen.dart';
+import '../../widget/join_number_widget.dart';
 import '../../widget/love_icon.dart';
 import '../../widget/map_sheet.dart';
 import '../home/tab/tab_home.dart';
-import 'buy_ticket.dart';
 
 class FeaturedEventDetail extends StatefulWidget {
   const FeaturedEventDetail({
@@ -40,19 +40,18 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
+  
+  bool isJoined(String? uid) {
+    if (uid == null) {
+      return false;
+    }
+    return event.joinEvent?.contains(uid) ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
     event = ModalRoute.of(context)?.settings.arguments as EventBaru;
     final sb = context.watch<SignInProvider>();
-// event.joinEvent!.forEach((id, data) {
-//     String name = data['name'];
-//     String photoProfile = data['photoProfile'];
-//     String id = data['id'];
-//     print('Name: $name');
-//     print('Name: $photoProfile');
-//     print('Name: $id');
-//   });
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -105,11 +104,11 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                       SizedBox(
                         width: 20.0,
                       ),
-                      Center(
+                      isJoined(sb.uid) ? Center(
                         child: Container(
                           height: 55.h,
                           width: 55.h,
-                          margin: EdgeInsets.only(top: 0.h, right: 20.h),
+                          margin: EdgeInsets.only(top: 0.h, right: 10.h),
                           padding: EdgeInsets.symmetric(
                               vertical: 13.h, horizontal: 13.h),
                           decoration: BoxDecoration(
@@ -120,9 +119,10 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ChatPage(
+                                    builder: (context) => ChatroomPage(
                                       arguments: ChatPageArguments(
-                                        peerId: event.title ?? '',
+                                        peerName: event.title ?? '',
+                                        peerId: event.id ?? '',
                                         peerAvatar: sb.imageUrl ?? '',
                                         peerNickname: sb.name ?? '',
                                       ),
@@ -135,16 +135,39 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                                   height: 24.h,
                                   width: 24.h)),
                         ),
+                      ) : Container(),
+                      Center(
+                        child: Container(
+                          height: 55.h,
+                          width: 55.h,
+                          margin: EdgeInsets.only(top: 0.h, right: 10.h),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 13.h, horizontal: 13.h),
+                          decoration: BoxDecoration(
+                              color: accentColor.withOpacity(0.09),
+                              borderRadius: BorderRadius.circular(22.h)),
+                          child: GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, Routes.chatRoute, arguments: {
+                                  'userId': sb.uid,
+                                  'eventId': event.id,
+                                });
+                              },
+                              child: Icon(Icons.message, color: accentColor,)),
+                        ),
                       ),
-                      getButton(context, accentColor, ("Buy Ticket").tr(),
-                          Colors.white, () {
-                        Navigator.pushNamed(context, Routes.buyTicketRoute, arguments: event);
-                      }, 18.sp,
-                          weight: FontWeight.w700,
-                          buttonHeight: 60.h,
-                          buttonWidth:
-                              MediaQuery.of(context).size.width - 148.h,
-                          borderRadius: BorderRadius.circular(22.h)),
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 20.0),
+                          child: getButton(context, accentColor, ("Buy Ticket").tr(),
+                              Colors.white, () {
+                            Navigator.pushNamed(context, Routes.buyTicketRoute, arguments: event);
+                          }, 18.sp,
+                              weight: FontWeight.w700,
+                              buttonHeight: 60.h,
+                              borderRadius: BorderRadius.circular(22.h)),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -157,7 +180,7 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
 
   handleLoveClick() {
     final SignInProvider sb = context.read<SignInProvider>();
-    context.read<BookmarkProvider>().onBookmarkIconClick(event.title, sb.uid);
+    context.read<BookmarkProvider>().onBookmarkIconClick(event.id, sb.uid);
   }
 
   Widget buildFollowWidget(BuildContext context) {
@@ -270,8 +293,6 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
               height: 327.h,
               width: double.infinity,
               decoration: BoxDecoration(
-                  // borderRadius:
-                  //     BorderRadius.vertical(bottom: Radius.circular(22.h)),
                   image: DecorationImage(
                       image: NetworkImage(event.image ?? ''),
                       fit: BoxFit.cover)),
@@ -322,7 +343,7 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                             icon: BuildLoveIcon(
                                 collectionName: 'event',
                                 uid: sb.uid,
-                                timestamp: event.title),
+                                eventId: event.id),
                             onPressed: () {
                               handleLoveClick();
                             }),
@@ -396,12 +417,6 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                   )
                 ],
               ),
-
-//               Text(
-//   event.joinEvent != null && event.joinEvent!.isNotEmpty
-//       ? event.joinEvent!.values.first['name']
-//       : 'Tidak ada data joinEvent',
-// ),
               getCustomFont(event.title ?? '', 27.sp, Colors.black, 1,
                   fontWeight: FontWeight.w700, txtHeight: 1.5.h),
               getVerSpace(10.h),
@@ -474,76 +489,9 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                 ],
               ),
 
-              // Row(
-              //   children: [
-              //     getSvg("Location.svg",
-              //         height: 20.h, width: 20.h, color: accentColor),
-              //     getHorSpace(5.h),
-              //     Container(
-              //       width: 300.w,
-              //       child: getCustomFont(
-              //         event.location ?? '',
-              //         17.sp,
-              //         greyColor,
-              //         1,
-              //         fontWeight: FontWeight.w500,
-              //       ),
-              //     )
-              //   ],
-              // ),
-
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Row(
-              //       children: [
-              //         getSvg(
-              //           "calender.svg",
-              //           width: 20.h,
-              //           height: 20.h,
-              //           color: accentColor,
-              //         ),
-              //         getHorSpace(5.h),
-              //         getCustomFont(
-              //           date ?? '',
-              //           17.sp,
-              //           greyColor,
-              //           1,
-              //           fontWeight: FontWeight.w500,
-              //         )
-              //       ],
-              //     ),
-              //     Row(
-              //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //       children: [
-              //         Row(
-              //           children: [
-              //             getSvg("time.svg",
-              //                 width: 19.h,
-              //                 height: 19.h,
-              //                 color: accentColor),
-              //             getHorSpace(5.h),
-              //             getCustomFont(
-              //               event.time ?? '',
-              //               17.sp,
-              //               greyColor,
-              //               1,
-              //               fontWeight: FontWeight.w500,
-              //             )
-              //           ],
-              //         ),
-              //         Container(
-              //           width: 100.w,
-              //           height: 30.h,
-              //         ),
-              //       ],
-              //     ),
-              //   ],
-              // ),
-
               getVerSpace(20.h),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   getCustomFont(
                     ('People Joined :').tr(),
@@ -552,29 +500,30 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                     1,
                     fontWeight: FontWeight.w500,
                   ),
-                  Container(
-                    width: 20.w,
-                    height: 30.h,
+                  SizedBox(
+                    width: 10.w,
                   ),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("JoinEvent")
-                        .doc("user")
-                        .collection(event.title ?? '')
-                        .snapshots(),
-                    builder: (BuildContext ctx,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      return snapshot.hasData
-                          ? new joinEvents(
-                              list: snapshot.data?.docs,
-                            )
-                          : Container();
-                    },
-                  ),
+                  NumberWidget(count: event.joinEvent?.length),
                 ],
               ),
               getVerSpace(15.h),
-
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  getCustomFont(
+                    ('Capacity :').tr(),
+                    17.sp,
+                    Colors.black,
+                    1,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  SizedBox(
+                    width: 10.w,
+                  ),
+                  NumberWidget(count: event.capacity, isExactNumber: true),
+                ],
+              ),
+              getVerSpace(15.h),
               buildTicketPrice(),
 
               getVerSpace(20.h),
@@ -607,10 +556,6 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                       color: accentColor),
                 ),
               ),
-
-              // getVerSpace(20.h),
-              // buildFollowWidget(context),
-              // getVerSpace(20.h),
 
               getVerSpace(45.h),
               Stack(
@@ -711,8 +656,8 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                   ),
                 ],
               ),
-              getVerSpace(45.h),
-              getPaddingWidget(
+              getVerSpace(80.h),
+              /*getPaddingWidget(
                 EdgeInsets.only(right: 20.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -725,9 +670,6 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                         Navigator.of(context).push(PageRouteBuilder(
                             pageBuilder: (_, __, ___) =>
                                 FeaturedEventDetail()));
-
-                        // Constant.sendToNext(
-                        //     context, Routes.featureEventListRoute);
                       },
                       child: getCustomFont(
                           ("View All").tr(), 15.sp, greyColor, 1,
@@ -770,64 +712,10 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                   },
                 ),
               ),
-              getVerSpace(16.h),
+              getVerSpace(16.h),*/
             ],
           ),
         ),
-
-        // Align(
-        //   alignment: Alignment.bottomCenter,
-        //   child: getPaddingWidget(
-        //     EdgeInsets.symmetric(horizontal: 20.h),
-        //     Container(
-        //       color: Colors.white,
-        //       child: Row(
-        //         children: [
-        //           Center(
-        //             child: Container(
-        //               height: 55.h,
-        //               width: 55.h,
-        //               margin: EdgeInsets.only(top: 0.h, right: 20.h),
-        //               padding: EdgeInsets.symmetric(
-        //                   vertical: 13.h, horizontal: 13.h),
-        //               decoration: BoxDecoration(
-        //                   color: accentColor.withOpacity(0.09),
-        //                   borderRadius: BorderRadius.circular(22.h)),
-        //               child: GestureDetector(
-        //                   onTap: () {
-        //                     Navigator.push(
-        //                       context,
-        //                       MaterialPageRoute(
-        //                         builder: (context) => ChatPage(
-        //                           arguments: ChatPageArguments(
-        //                             peerId: event.title ?? '',
-        //                             peerAvatar: sb.imageUrl ?? '',
-        //                             peerNickname: sb.name ?? '',
-        //                           ),
-        //                         ),
-        //                       ),
-        //                     );
-        //                   },
-        //                   child: getSvg("message.svg",
-        //                       color: accentColor, height: 24.h, width: 24.h)),
-        //             ),
-        //           ),
-        //           getButton(context, accentColor, "Buy Ticket", Colors.white,
-        //               () {
-        //             Navigator.of(context).push(PageRouteBuilder(
-        //                 pageBuilder: (_, __, ___) => new BuyTicket(
-        //                       event: event,
-        //                     )));
-        //           }, 18.sp,
-        //               weight: FontWeight.w700,
-        //               buttonHeight: 60.h,
-        //               buttonWidth: MediaQuery.of(context).size.width - 148.h,
-        //               borderRadius: BorderRadius.circular(22.h)),
-        //         ],
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
@@ -906,76 +794,3 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
 //     );
 //   }
 // }
-
-class joinEvents extends StatelessWidget {
-  joinEvents({this.list});
-
-  final List<DocumentSnapshot>? list;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Container(
-              height: 25.0,
-              width: 54.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-                itemCount: list!.length > 3 ? 3 : list?.length,
-                itemBuilder: (context, i) {
-                  String? _title = list?[i]['name'].toString();
-                  String? _uid = list?[i]['uid'].toString();
-                  String? _img = list?[i]['photoProfile'].toString();
-
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 0.0),
-                    child: Container(
-                      height: 24.0,
-                      width: 24.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
-                          image: DecorationImage(
-                              image: NetworkImage(_img ?? ''),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
-                },
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            left: 0.0,
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 32.h,
-                width: 32.h,
-                decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(30.h),
-                    border: Border.all(color: Colors.white, width: 1.5.h)),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    getCustomFont(
-                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                    getCustomFont(" +", 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}

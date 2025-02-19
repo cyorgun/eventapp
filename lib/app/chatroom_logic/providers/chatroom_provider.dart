@@ -6,11 +6,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../constants/firestore_constants.dart';
 import '../models/message_chat.dart';
 
-class ChatProvider {
+class ChatroomProvider {
   final FirebaseFirestore firebaseFirestore;
   final FirebaseStorage firebaseStorage;
 
-  ChatProvider(
+  ChatroomProvider(
       {required this.firebaseFirestore, required this.firebaseStorage});
 
   UploadTask uploadFile(File image, String fileName) {

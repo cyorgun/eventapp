@@ -133,21 +133,6 @@ class buildFeatureEventList2 extends StatelessWidget {
         final events = list?.map((e) {
           return EventBaru.fromFirestore(e, 1);
         }).toList();
-        //  String? category = list?[i]['category'].toString();
-        // String? date = list?[i]['date'].toString();
-        // String? image = list?[i]['image'].toString();
-        // String? description = list?[i]['description'].toString();
-        // String? id = list?[i]['id'].toString();
-        // String? location = list?[i]['location'].toString();
-        // double? mapsLangLink = list?[i]['mapsLangLink'];
-        // double? mapsLatLink = list?[i]['mapsLatLink'];
-        // int? price = list?[i]['price'];
-        // String? title = list?[i]['title'].toString();
-        // String? type = list?[i]['type'].toString();
-        // String? userDesc = list?[i]['userDesc'].toString();
-        // String? userName = list?[i]['userName'].toString();
-        // String? userProfile = list?[i]['userProfile'].toString();
-
         return InkWell(
           onTap: () {
             Navigator.pushNamed(context, Routes.featuredEventDetailRoute, arguments: events?[i]);

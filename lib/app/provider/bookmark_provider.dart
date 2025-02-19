@@ -13,7 +13,6 @@ class BookmarkProvider extends ChangeNotifier {
     String _collectionName = 'event';
     String _fieldName = 'bookmarked items';
 
-
     final DocumentReference ref =
         FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot snap = await ref.get();
@@ -27,7 +26,7 @@ class BookmarkProvider extends ChangeNotifier {
         bookmarkedList.length <= 10) {
       await FirebaseFirestore.instance
           .collection(_collectionName)
-          .where('title', whereIn: bookmarkedList)
+          .where('id', whereIn: bookmarkedList)
           .get()
           .then((QuerySnapshot snap) {
         d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
@@ -47,14 +46,14 @@ class BookmarkProvider extends ChangeNotifier {
 
       await FirebaseFirestore.instance
           .collection(_collectionName)
-          .where('title', whereIn: chunks[0])
+          .where('id', whereIn: chunks[0])
           .get()
           .then((QuerySnapshot snap) {
         d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e,1)).toList());
       }).then((value) async {
         await FirebaseFirestore.instance
             .collection(_collectionName)
-            .where('title', whereIn: chunks[1])
+            .where('id', whereIn: chunks[1])
             .get()
             .then((QuerySnapshot snap) {
           d.addAll(
@@ -74,14 +73,14 @@ class BookmarkProvider extends ChangeNotifier {
 
       await FirebaseFirestore.instance
           .collection(_collectionName)
-          .where('title', whereIn: chunks[0])
+          .where('id', whereIn: chunks[0])
           .get()
           .then((QuerySnapshot snap) {
         d.addAll(snap.docs.map((e) => EventBaru.fromFirestore(e, 1)).toList());
       }).then((value) async {
         await FirebaseFirestore.instance
             .collection(_collectionName)
-            .where('title', whereIn: chunks[1])
+            .where('id', whereIn: chunks[1])
             .get()
             .then((QuerySnapshot snap) {
           d.addAll(
@@ -90,7 +89,7 @@ class BookmarkProvider extends ChangeNotifier {
       }).then((value) async {
         await FirebaseFirestore.instance
             .collection(_collectionName)
-            .where('title', whereIn: chunks[2])
+            .where('id', whereIn: chunks[2])
             .get()
             .then((QuerySnapshot snap) {
           d.addAll(
@@ -117,11 +116,6 @@ class BookmarkProvider extends ChangeNotifier {
     return interestItem;
   }
 
-  Future saveDataToSP(list) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-    await sp.setStringList('interestIten', list!);
-  }
-
   Future getInterestDataFromFirebase(uid) async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -135,13 +129,10 @@ class BookmarkProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future saveInterestToFirebase(value) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
-
-    String? _uid = sp.getString('uid');
+  Future saveInterestToFirebase(value, String? uid) async {
     String _fieldName = 'interest_items';
     final DocumentReference ref =
-        FirebaseFirestore.instance.collection('users').doc(_uid);
+        FirebaseFirestore.instance.collection('users').doc(uid);
     DocumentSnapshot snap = await ref.get();
 
     // value = snap[_fieldName];
@@ -149,7 +140,7 @@ class BookmarkProvider extends ChangeNotifier {
     await ref.update({_fieldName: FieldValue.arrayUnion(value)});
     this._list = value;
     print("test" + value.toString());
-    print("test uid " + _uid.toString());
+    print("test uid " + uid.toString());
     print("test" + value.toString());
     notifyListeners();
   }
@@ -171,58 +162,4 @@ class BookmarkProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  Future onLoveIconClick(String? timestamp, String? uid) async {
-    final String _collectionName = 'event';
-    String _fieldName = 'loved items';
-
-    final DocumentReference ref =
-        FirebaseFirestore.instance.collection('users').doc(uid);
-    final DocumentReference ref1 =
-        FirebaseFirestore.instance.collection(_collectionName).doc(timestamp);
-
-    DocumentSnapshot snap = await ref.get();
-    DocumentSnapshot snap1 = await ref1.get();
-    List d = snap[_fieldName];
-    int? _loves = snap1['loves'];
-
-    if (d.contains(timestamp)) {
-      List a = [timestamp];
-      await ref.update({_fieldName: FieldValue.arrayRemove(a)});
-      //  ref1.update({'loves': _loves! - 1});
-    } else {
-      d.add(timestamp);
-      await ref.update({_fieldName: FieldValue.arrayUnion(d)});
-      //  ref1.update({'loves': _loves! + 1});
-    }
-  }
-
-// Future<List> getArticles() async {
-
-//   String _collectionName = 'event';
-//   String _fieldName = 'bookmarked items';
-//   List<EventBaru> data = [];
-//   List<DocumentSnapshot> _snap = [];
-
-//   SharedPreferences sp = await SharedPreferences.getInstance();
-//   String? _uid = sp.getString('uid');
-
-//   final DocumentReference ref = FirebaseFirestore.instance.collection('users').doc(_uid);
-//   DocumentSnapshot snap = await ref.get();
-//   List bookmarkedList = snap[_fieldName];
-//   print('mainList: $bookmarkedList');
-//   // List d = snap[_fieldName];
-
-//   List d = [];
-//   if(d.isNotEmpty){
-//     QuerySnapshot rawData = await FirebaseFirestore.instance.collection(_collectionName)
-//     // .where('timestamp', whereIn: d)
-//     .get();
-//     _snap.addAll(rawData.docs);
-//     data = _snap.map((e) => EventBaru.fromFirestore(e,1)).toList();
-//   }
-
-//   return data;
-
-// }
 }

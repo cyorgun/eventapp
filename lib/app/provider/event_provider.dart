@@ -101,6 +101,20 @@ class EventProvider extends ChangeNotifier {
     return null;
   }
 
+  Future<bool> isUserJoinedEvent(String eventId, String userId) async {
+    DocumentSnapshot<Map<String, dynamic>> eventDoc = await FirebaseFirestore.instance
+        .collection("event")
+        .doc(eventId)
+        .get();
+
+    if (eventDoc.exists) {
+      List<dynamic> joinedUsers = eventDoc.data()?["joinEvent"] ?? [];
+      return joinedUsers.contains(userId);
+    }
+
+    return false;
+  }
+
   setLoading(bool isloading) {
     _isLoading = isloading;
     notifyListeners();

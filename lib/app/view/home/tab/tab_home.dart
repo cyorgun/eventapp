@@ -1,14 +1,10 @@
 import 'dart:math' as math;
 
-import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/home/filtering_screen.dart';
-import 'package:event_app/app/view/home/tab/tab_maps.dart';
-import 'package:event_app/app/view/popular_event/popular_event_list.dart';
 import 'package:event_app/base/color_data.dart';
-import 'package:event_app/base/constant.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:evente/evente.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,33 +16,14 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:showcaseview/showcaseview.dart';
 
-import '../../../dialog/loading_cards.dart';
 import '../../../provider/event_provider.dart';
 import '../../../provider/sign_in_provider.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widget/empty_screen.dart';
 import '../../category/category_screen.dart';
-import '../../featured_event/featured_event_detail.dart';
 import '../../notification/notification_screen.dart';
 import '../search_screen.dart';
-
-class showCaseHome extends StatefulWidget {
-  const showCaseHome({super.key});
-
-  @override
-  State<showCaseHome> createState() => _showCaseHomeState();
-}
-
-class _showCaseHomeState extends State<showCaseHome> {
-  @override
-  Widget build(BuildContext context) {
-    return ShowCaseWidget(
-      builder: Builder(builder: (context) => TabHome()),
-    );
-  }
-}
 
 class TabHome extends StatefulWidget {
   const TabHome({Key? key}) : super(key: key);
@@ -280,354 +257,303 @@ class _TabHomeState extends State<TabHome> {
     final startOfMonth = getStartOfMonth();
     final endOfMonth = getEndOfMonth();
 
-    SharedPreferences preferences;
-
-    displayShowcase() async {
-      preferences = await SharedPreferences.getInstance();
-      bool? showcaseVisibilityStatus = preferences.getBool("homeShowcasesssss");
-
-      if (showcaseVisibilityStatus == null) {
-        preferences.setBool("homeShowcasesssss", false).then((bool success) {
-          if (success)
-            print("Successfull in writing showshoexase");
-          else
-            print("some bloody problem occured");
-        });
-
-        return true;
-      }
-
-      return false;
-    }
-
-    displayShowcase().then((status) {
-      if (status) {
-        ShowCaseWidget.of(context).startShowCase([
-          _one,
-          _two,
-          _three,
-          _four,
-          _five,
-        ]);
-      }
-    });
-
     final cb = context.watch<EventProvider>();
     final sb = context.watch<SignInProvider>();
     setStatusBarColor(Colors.white);
-    return KeysToBeInherited(
-      notification: _one,
-      search: _two,
-      filter: _three,
-      nearby: _four,
-      country: _five,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Column(
-          children: [
-            Expanded(
-                flex: 1,
-                child: ListView(
-                  primary: true,
-                  shrinkWrap: true,
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage(
-                                      'assets/images/background.jpg',
-                                    ),
-                                    fit: BoxFit.cover)),
-                            child: Column(children: [
-                              const SizedBox(
-                                height: 35.0,
-                              ),
-                              getPaddingWidget(
-                                EdgeInsets.only(left: 20.h, right: 20.0),
-                                Row(
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            // ignore: prefer_const_constructors
-                                            Text(
-                                              ('Welcome Back!').tr(),
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  fontFamily: 'Gilroy',
-                                                  color: Colors.white),
-                                            ),
-                                            SizedBox(
-                                              width: 10.0,
-                                            ),
-                                            SvgPicture.asset(
-                                              'assets/images/ic_waving_hand.svg',
-                                              width: 15.0,
-                                              height: 15.0,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 5.0,
-                                        ),
-                                        Text(
-                                          sb.name ?? '',
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontFamily: 'Gilroy',
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
-                                        ),
-                                      ],
-                                    ),
-                                    Spacer(),
-                                    Showcase(
-                                      key: _one,
-                                      description:
-                                          "Information all notifications",
-                                      child: Container(
-                                        height: 50.h,
-                                        width: 50.h,
-                                        margin: EdgeInsets.only(
-                                            top: 18.h, right: 20.h),
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 13.h, horizontal: 13.h),
-                                        decoration: BoxDecoration(
-                                            color: lightColor,
-                                            borderRadius:
-                                                BorderRadius.circular(22.h)),
-                                        child: GestureDetector(
-                                            onTap: () {
-                                              Navigator.of(context).push(
-                                                  PageRouteBuilder(
-                                                      pageBuilder: (_, __,
-                                                              ___) =>
-                                                          NotificationScreen()));
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          Expanded(
+              flex: 1,
+              child: ListView(
+                primary: true,
+                shrinkWrap: true,
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                    'assets/images/background.jpg',
+                                  ),
+                                  fit: BoxFit.cover)),
+                          child: Column(children: [
+                            const SizedBox(
+                              height: 35.0,
+                            ),
+                            getPaddingWidget(
+                              EdgeInsets.only(left: 20.h, right: 20.0),
+                              Row(
+                                children: [
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          // ignore: prefer_const_constructors
+                                          Text(
+                                            ('Welcome Back!').tr(),
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                fontFamily: 'Gilroy',
+                                                color: Colors.white),
+                                          ),
+                                          SizedBox(
+                                            width: 10.0,
+                                          ),
+                                          SvgPicture.asset(
+                                            'assets/images/ic_waving_hand.svg',
+                                            width: 15.0,
+                                            height: 15.0,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 5.0,
+                                      ),
+                                      Text(
+                                        sb.name ?? '',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontFamily: 'Gilroy',
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  Container(
+                                    height: 50.h,
+                                    width: 50.h,
+                                    margin: EdgeInsets.only(
+                                        top: 18.h, right: 20.h),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 13.h, horizontal: 13.h),
+                                    decoration: BoxDecoration(
+                                        color: lightColor,
+                                        borderRadius:
+                                            BorderRadius.circular(22.h)),
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              PageRouteBuilder(
+                                                  pageBuilder: (_, __,
+                                                          ___) =>
+                                                      NotificationScreen()));
 
-                                              // Constant.sendToNext(context, Routes.notificationScreenRoute);
-                                            },
-                                            child: getSvg("notification.svg",
-                                                height: 24.h, width: 24.h)),
+                                          // Constant.sendToNext(context, Routes.notificationScreenRoute);
+                                        },
+                                        child: getSvg("notification.svg",
+                                            height: 24.h, width: 24.h)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            getVerSpace(63.h),
+                            getVerSpace(4.h),
+                          ])),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 130.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: getPaddingWidget(
+                                  EdgeInsets.symmetric(horizontal: 20.h),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          PageRouteBuilder(
+                                              pageBuilder: (_, __, ___) =>
+                                                  SearchPage()));
+                                      // FilterScreen
+                                    },
+                                    child: Container(
+                                      height: 50.0,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30.0)),
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey
+                                                .withOpacity(0.2),
+                                            spreadRadius: 1,
+                                            blurRadius: 7,
+                                            offset: Offset(0,
+                                                3), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          getHorSpace(18.h),
+                                          getSvg("search.svg",
+                                              height: 24.h, width: 24.h),
+                                          getHorSpace(18.h),
+                                          Text(
+                                            "Search events",
+                                            style: TextStyle(
+                                                fontSize: 16.sp,
+                                                fontFamily: 'Gilroy'),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  ],
+                                  )),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 15.0),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                          pageBuilder: (_, __, ___) =>
+                                              FilterScreen()));
+                                },
+                                child: Container(
+                                  height: 47.0,
+                                  width: 47.0,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(50.0)),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey
+                                            .withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 7,
+                                        offset: Offset(0,
+                                            3), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: getSvg("filter.svg",
+                                        height: 24.h, width: 24.h),
+                                  ),
                                 ),
                               ),
-                              getVerSpace(63.h),
-                              getVerSpace(4.h),
-                            ])),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 130.0),
-                          child: Showcase(
-                              key: _two,
-                              description: "Click here to search hotels",
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: getPaddingWidget(
-                                        EdgeInsets.symmetric(horizontal: 20.h),
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                                PageRouteBuilder(
-                                                    pageBuilder: (_, __, ___) =>
-                                                        SearchPage()));
-                                            // FilterScreen
-                                          },
-                                          child: Container(
-                                            height: 50.0,
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30.0)),
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.2),
-                                                  spreadRadius: 1,
-                                                  blurRadius: 7,
-                                                  offset: Offset(0,
-                                                      3), // changes position of shadow
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                getHorSpace(18.h),
-                                                getSvg("search.svg",
-                                                    height: 24.h, width: 24.h),
-                                                getHorSpace(18.h),
-                                                Text(
-                                                  "Search events",
-                                                  style: TextStyle(
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'Gilroy'),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        )),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 15.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            PageRouteBuilder(
-                                                pageBuilder: (_, __, ___) =>
-                                                    FilterScreen()));
-                                      },
-                                      child: Showcase(
-                                        key: _three,
-                                        description: 'Filter event by category',
-                                        child: Container(
-                                          height: 47.0,
-                                          width: 47.0,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(50.0)),
-                                            color: Colors.white,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.2),
-                                                spreadRadius: 1,
-                                                blurRadius: 7,
-                                                offset: Offset(0,
-                                                    3), // changes position of shadow
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: getSvg("filter.svg",
-                                                height: 24.h, width: 24.h),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              )),
+                            )
+                          ],
                         ),
+                      ),
+                    ],
+                  ),
+                  getVerSpace(30.h),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.0.w, right: 20.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        getCustomFont(
+                            ("Featured Events").tr(), 20.sp, Colors.black, 1,
+                            fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                        /*InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    TrendingScreen()));
+                          },
+                          child: getCustomFont(
+                              ("View All").tr(), 15.sp, greyColor, 1,
+                              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                        )*/
                       ],
                     ),
-                    getVerSpace(30.h),
-                    Padding(
-                      padding: EdgeInsets.only(left: 20.0.w, right: 20.w),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          getCustomFont(
-                              ("Featured Events").tr(), 20.sp, Colors.black, 1,
-                              fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                          /*InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                  pageBuilder: (_, __, ___) =>
-                                      TrendingScreen()));
-                            },
-                            child: getCustomFont(
-                                ("View All").tr(), 15.sp, greyColor, 1,
-                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                          )*/
-                        ],
-                      ),
-                    ),
-                    getVerSpace(10.h),
-                    /*Container(
-                      height: 198.h,
-                      child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("event")
-                            .where('type', isEqualTo: "company")
-                            .limit(7)
-                            .snapshots(),
-                        builder: (BuildContext ctx,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return LoadingCard(
-                              height: 200.0,
-                            );
-                          }
-
-                          else if (snapshot.data!.docs.isEmpty) {
-                            return Center(child: EmptyScreen());
-                          }
-                          else if (snapshot.hasError) {
-                            return Center(child: Text('Error'));
-                          }
-                          else {
-                            var eventsSnapshot = snapshot.data?.docs ?? [];
-                            return eventsSnapshot.isNotEmpty
-                              ? buildFeaturedEventList(list: eventsSnapshot)
-                              : Container();}
-                        },
-                      ),
-                    ),*/
-                    Center(child: Text("Very soon!".tr()),),
-                    getVerSpace(20.h),
-                    getPaddingWidget(
-                      EdgeInsets.symmetric(horizontal: 20.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          getCustomFont(
-                              ("User Events").tr(), 20.sp, Colors.black, 1,
-                              fontWeight: FontWeight.w700, txtHeight: 1.5.h),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(PageRouteBuilder(
-                                  pageBuilder: (_, __, ___) =>
-                                      CategoryScreen()));
-                            },
-                            child: getCustomFont(
-                                ("View All").tr(), 15.sp, greyColor, 1,
-                                fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                          )
-                        ],
-                      ),
-                    ),
-                    getVerSpace(12.h),
-                    StreamBuilder(
+                  ),
+                  getVerSpace(10.h),
+                  /*Container(
+                    height: 198.h,
+                    child: StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection("event")
-                          .where('type', isEqualTo: 'user')
+                          .where('type', isEqualTo: "company")
                           .limit(7)
                           .snapshots(),
                       builder: (BuildContext ctx,
                           AsyncSnapshot<QuerySnapshot> snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return loadingCard(context);
+                          return LoadingCard(
+                            height: 200.0,
+                          );
                         }
 
-                        if (snapshot.data!.docs.isEmpty) {
+                        else if (snapshot.data!.docs.isEmpty) {
                           return Center(child: EmptyScreen());
                         }
-                        if (snapshot.hasError) {
+                        else if (snapshot.hasError) {
                           return Center(child: Text('Error'));
                         }
-                        return snapshot.hasData
-                            ? buildUserEventList(
-                                list: snapshot.data?.docs,
-                              )
-                            : Container();
+                        else {
+                          var eventsSnapshot = snapshot.data?.docs ?? [];
+                          return eventsSnapshot.isNotEmpty
+                            ? buildFeaturedEventList(list: eventsSnapshot)
+                            : Container();}
                       },
                     ),
-                    getVerSpace(10.h),
-                  ],
-                ))
-          ],
-        ),
+                  ),*/
+                  Center(child: Text("Very soon!".tr()),),
+                  getVerSpace(20.h),
+                  getPaddingWidget(
+                    EdgeInsets.symmetric(horizontal: 20.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        getCustomFont(
+                            ("User Events").tr(), 20.sp, Colors.black, 1,
+                            fontWeight: FontWeight.w700, txtHeight: 1.5.h),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    CategoryScreen()));
+                          },
+                          child: getCustomFont(
+                              ("View All").tr(), 15.sp, greyColor, 1,
+                              fontWeight: FontWeight.w500, txtHeight: 1.5.h),
+                        )
+                      ],
+                    ),
+                  ),
+                  getVerSpace(12.h),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("event")
+                        .where('type', isEqualTo: 'user')
+                        .limit(7)
+                        .snapshots(),
+                    builder: (BuildContext ctx,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return loadingCard(context);
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(child: EmptyScreen());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error'));
+                      }
+                      return snapshot.hasData
+                          ? buildUserEventList(
+                              list: snapshot.data?.docs,
+                            )
+                          : Container();
+                    },
+                  ),
+                  getVerSpace(10.h),
+                ],
+              ))
+        ],
       ),
     );
   }
@@ -680,27 +606,23 @@ class _TabHomeState extends State<TabHome> {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (_, __, ___) => FilterScreen()));
             },
-            child: Showcase(
-              key: _three,
-              description: 'Filter event by category',
-              child: Container(
-                height: 47.0,
-                width: 47.0,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: getSvg("filter.svg", height: 24.h, width: 24.h),
-                ),
+            child: Container(
+              height: 47.0,
+              width: 47.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: Center(
+                child: getSvg("filter.svg", height: 24.h, width: 24.h),
               ),
             ),
           ),
@@ -753,25 +675,21 @@ class _TabHomeState extends State<TabHome> {
             ],
           ),
           Spacer(),
-          Showcase(
-            key: _one,
-            description: "Information all notifications",
-            child: Container(
-              height: 50.h,
-              width: 50.h,
-              margin: EdgeInsets.only(top: 18.h, right: 20.h),
-              padding: EdgeInsets.symmetric(vertical: 13.h, horizontal: 13.h),
-              decoration: BoxDecoration(
-                  color: lightColor, borderRadius: BorderRadius.circular(22.h)),
-              child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(PageRouteBuilder(
-                        pageBuilder: (_, __, ___) => NotificationScreen()));
+          Container(
+            height: 50.h,
+            width: 50.h,
+            margin: EdgeInsets.only(top: 18.h, right: 20.h),
+            padding: EdgeInsets.symmetric(vertical: 13.h, horizontal: 13.h),
+            decoration: BoxDecoration(
+                color: lightColor, borderRadius: BorderRadius.circular(22.h)),
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => NotificationScreen()));
 
-                    // Constant.sendToNext(context, Routes.notificationScreenRoute);
-                  },
-                  child: getSvg("notification.svg", height: 24.h, width: 24.h)),
-            ),
+                  // Constant.sendToNext(context, Routes.notificationScreenRoute);
+                },
+                child: getSvg("notification.svg", height: 24.h, width: 24.h)),
           ),
         ],
       ),
@@ -817,7 +735,7 @@ class buildUserEventList extends StatelessWidget {
               child: Stack(
                 children: [
                   Container(
-                    height: 130.0,
+                    height: 100.0,
                     decoration: BoxDecoration(
                         color: Colors.white,
                         boxShadow: [
@@ -881,45 +799,6 @@ class buildUserEventList extends StatelessWidget {
                             ],
                           ),
                           getVerSpace(7.h),
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                            children: [
-                              StreamBuilder(
-                                stream: FirebaseFirestore.instance
-                                    .collection("JoinEvent")
-                                    .doc("user")
-                                    .collection(events[i].title ?? '')
-                                    .snapshots(),
-                                builder: (BuildContext ctx,
-                                    AsyncSnapshot<QuerySnapshot>
-                                        snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return Center(
-                                        child:
-                                            CircularProgressIndicator());
-                                  }
-
-                                  if (snapshot.data!.docs.isEmpty) {
-                                    return Center(child: Container());
-                                  }
-                                  if (snapshot.hasError) {
-                                    return Center(child: Text('Error'));
-                                  }
-                                  return snapshot.hasData
-                                      ? Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 20.0),
-                                          child: new joinEvents(
-                                            list: snapshot.data?.docs,
-                                          ),
-                                        )
-                                      : Container();
-                                },
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),
@@ -1182,21 +1061,6 @@ class TrendingEventCard extends StatelessWidget {
           final events = list?.map((e) {
             return EventBaru.fromFirestore(e, 1);
           }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
-
           DateTime? dateTime = events![i].date?.toDate();
           String date = DateFormat('d MMMM, yyyy').format(dateTime!);
           return SizedBox(
@@ -1286,36 +1150,6 @@ class TrendingEventCard extends StatelessWidget {
                               ],
                             ),
                             getVerSpace(10.h),
-                            // Expanded(
-                            //   child: StreamBuilder(
-                            //     stream: FirebaseFirestore.instance
-                            //         .collection("JoinEvent")
-                            //         .doc("user")
-                            //         .collection(events[i].title ?? '')
-                            //         .snapshots(),
-                            //     builder: (BuildContext ctx,
-                            //         AsyncSnapshot<QuerySnapshot> snapshot) {
-                            //       if (snapshot.connectionState ==
-                            //           ConnectionState.waiting) {
-                            //         return Center(
-                            //             child: CircularProgressIndicator());
-                            //       }
-
-                            //       if (snapshot.data!.docs.isEmpty) {
-                            //         return Center(child: Container());
-                            //       }
-                            //       if (snapshot.hasError) {
-                            //         return Center(child: Text('Error'));
-                            //       }
-                            //       return snapshot.hasData
-                            //           ? new joinEvents(
-                            //               list: snapshot.data?.docs,
-                            //             )
-                            //           : Container();
-                            //     },
-                            //   ),
-                            // ),
-
                             if (events[i].price! > 0)
                               Align(
                                 alignment: Alignment.bottomRight,
@@ -1400,21 +1234,6 @@ class TrendingEventCard2 extends StatelessWidget {
           final events = list?.map((e) {
             return EventBaru.fromFirestore(e, 1);
           }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
-
           DateTime? dateTime = events![i].date?.toDate();
           String date = DateFormat('d MMMM, yyyy').format(dateTime!);
           return SizedBox(
@@ -1503,33 +1322,6 @@ class TrendingEventCard2 extends StatelessWidget {
                               ],
                             ),
                             getVerSpace(10.h),
-                            StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection("JoinEvent")
-                                  .doc("user")
-                                  .collection(events[i].title ?? '')
-                                  .snapshots(),
-                              builder: (BuildContext ctx,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                }
-
-                                if (snapshot.data!.docs.isEmpty) {
-                                  return Center(child: Container());
-                                }
-                                if (snapshot.hasError) {
-                                  return Center(child: Text('Error'));
-                                }
-                                return snapshot.hasData
-                                    ? new joinEvents(
-                                        list: snapshot.data?.docs,
-                                      )
-                                    : Container();
-                              },
-                            ),
                             if (events[i].price! > 0)
                               Align(
                                 alignment: Alignment.bottomRight,
@@ -1595,79 +1387,6 @@ class TrendingEventCard2 extends StatelessWidget {
             ),
           );
         });
-  }
-}
-
-class joinEvents extends StatelessWidget {
-  joinEvents({this.list});
-
-  final List<DocumentSnapshot>? list;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Container(
-              height: 25.0,
-              width: 54.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-                itemCount: list!.length > 3 ? 3 : list?.length,
-                itemBuilder: (context, i) {
-                  String? _title = list?[i]['name'].toString();
-                  String? _uid = list?[i]['uid'].toString();
-                  String? _img = list?[i]['photoProfile'].toString();
-
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 0.0),
-                    child: Container(
-                      height: 24.0,
-                      width: 24.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
-                          image: DecorationImage(
-                              image: NetworkImage(_img ?? ''),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
-                },
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            left: 0.0,
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 32.h,
-                width: 32.h,
-                decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(30.h),
-                    border: Border.all(color: Colors.white, width: 1.5.h)),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    getCustomFont(
-                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                    getCustomFont(" +", 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-    );
   }
 }
 

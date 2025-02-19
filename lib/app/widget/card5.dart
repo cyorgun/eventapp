@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:event_app/app/widget/join_number_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +28,7 @@ class Card5 extends StatelessWidget {
     String date = DateFormat('d MMMM, yyyy').format(dateTime!);
 
     handleLoveClick() {
-      context.read<BookmarkProvider>().onBookmarkIconClick(events.title, context.read<SignInProvider>().uid);
+      context.read<BookmarkProvider>().onBookmarkIconClick(events.id, context.read<SignInProvider>().uid);
     }
 
     return InkWell(
@@ -56,17 +57,6 @@ class Card5 extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(22.h),
-                // gradient: LinearGradient(
-                //     colors: [
-                //       "#000000".toColor().withOpacity(0.0),
-                //       "#000000".toColor().withOpacity(0.88)
-                //     ],
-                //     stops: const [
-                //       0.0,
-                //       1.0
-                //     ],
-                //     begin: Alignment.centerRight,
-                //     end: Alignment.centerLeft)
               ),
               padding: EdgeInsets.only(left: 24.h),
               child: Row(
@@ -116,7 +106,7 @@ class Card5 extends StatelessWidget {
                                       icon: BuildLoveIcon(
                                           collectionName: 'event',
                                           uid: sb.uid,
-                                          timestamp: events.title),
+                                          eventId: events.id),
                                       onPressed: () {
                                         handleLoveClick();
                                       }),
@@ -154,35 +144,7 @@ class Card5 extends StatelessWidget {
                           ],
                         ),
                         getVerSpace(7.h),
-                        Expanded(
-                          child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("JoinEvent")
-                                .doc("user")
-                                .collection(events.title ?? '')
-                                .snapshots(),
-                            builder: (BuildContext ctx,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              }
-
-                              if (snapshot.data!.docs.isEmpty) {
-                                return Center(child: Container());
-                              }
-                              if (snapshot.hasError) {
-                                return Center(child: Text('Error'));
-                              }
-                              return snapshot.hasData
-                                  ? new joinEvents(
-                                      list: snapshot.data?.docs,
-                                    )
-                                  : Container();
-                            },
-                          ),
-                        ),
+                        NumberWidget(count: events.joinEvent?.length)
                       ],
                     ),
                   ),
@@ -214,79 +176,6 @@ class Card5 extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class joinEvents extends StatelessWidget {
-  joinEvents({this.list});
-
-  final List<DocumentSnapshot>? list;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Container(
-              height: 25.0,
-              width: 54.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-                itemCount: list!.length > 3 ? 3 : list?.length,
-                itemBuilder: (context, i) {
-                  String? _title = list?[i]['name'].toString();
-                  String? _uid = list?[i]['uid'].toString();
-                  String? _img = list?[i]['photoProfile'].toString();
-
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 0.0),
-                    child: Container(
-                      height: 24.0,
-                      width: 24.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
-                          image: DecorationImage(
-                              image: NetworkImage(_img ?? ''),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
-                },
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            left: 0.0,
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 32.h,
-                width: 32.h,
-                decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(30.h),
-                    border: Border.all(color: Colors.white, width: 1.5.h)),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    getCustomFont(
-                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                    getCustomFont(" +", 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
     );
   }
 }

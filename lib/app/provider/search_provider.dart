@@ -66,7 +66,7 @@ class SearchProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  saerchInitialize() {
+  searchInitialize() {
     _textFieldCtrl.clear();
     _searchStarted = false;
     notifyListeners();

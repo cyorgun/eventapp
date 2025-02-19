@@ -47,11 +47,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   final List<Widget> _widgetOptions = [
-    const showCaseHome(),
-    showCaseFavorite(),
-    showCaseMaps(),
-    const showCaseTicket(),
-    const showCaseProfile()
+    const TabHome(),
+    TabFavourite(),
+    MapsScreenT1(),
+    const TabTicket(),
+    const TabProfile()
   ];
 
   @override

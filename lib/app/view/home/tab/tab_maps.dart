@@ -1,34 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:event_app/app/widget/join_number_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../base/color_data.dart';
 import '../../../../base/widget_utils.dart';
 import '../../../routes/app_routes.dart';
-import '../../featured_event/featured_event_detail.dart';
-
-class showCaseMaps extends StatefulWidget {
-  const showCaseMaps({super.key});
-
-  @override
-  State<showCaseMaps> createState() => _showCaseMapsState();
-}
-
-class _showCaseMapsState extends State<showCaseMaps> {
-  @override
-  Widget build(BuildContext context) {
-    return ShowCaseWidget(
-      builder: Builder(builder: (context) => MapsScreenT1()),
-    );
-  }
-}
 
 class MapsScreenT1 extends StatefulWidget {
   MapsScreenT1({Key? key}) : super(key: key);
@@ -61,27 +43,6 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
   @override
   void initState() {
     // TODO: implement initState
-    // rootBundle.loadString('assets/Template1/map_style.txt').then((string) {
-    //   _mapStyle = string;
-    // });
-    // FirebaseFirestore.instance.collection('event')
-    // .get()
-    // .then((querySnapshot) {
-    //   querySnapshot.docs.forEach((doc) {
-    //     Map<String, dynamic> data = doc.data();
-
-    //     allMarkers.add(Marker(
-    //       icon:
-    //           BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-    //       markerId: MarkerId(data['title']),
-    //       draggable: false,
-    //       infoWindow:
-    //           InfoWindow(title: data['title'], snippet: data['location']),
-    //       position: LatLng(data['mapsLangLink'].latitude as double,
-    //           data['mapsLatLink'].longitude as double),
-    //     ));
-    //   });
-    // });
     FirebaseFirestore.instance.collection('event').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         Map<String, dynamic> data = doc.data();
@@ -174,173 +135,139 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
   @override
   Widget build(BuildContext context) {
-    SharedPreferences preferences;
-
-    displayShowcase() async {
-      preferences = await SharedPreferences.getInstance();
-      bool? showcaseVisibilityStatus = preferences.getBool("mapsShowcasesssss");
-
-      if (showcaseVisibilityStatus == null) {
-        preferences.setBool("mapsShowcasesssss", false).then((bool success) {
-          if (success)
-            print("Successfull in writing showshoexase");
-          else
-            print("some bloody problem occured");
-        });
-
-        return true;
-      }
-
-      return false;
-    }
-
-    displayShowcase().then((status) {
-      if (status) {
-        ShowCaseWidget.of(context).startShowCase([
-          _one,
-        ]);
-      }
-    });
 
     // if (isMapCreated) {
     //   getJsonFile("assets/nightmode.json").then(setMapStyle);
     // }
 
-    return KeysToBeInherited(
-      notification: _one,
-      child: Scaffold(
-          body: Stack(
-        children: <Widget>[
-          if (currentPosition == null) CircularProgressIndicator(),
-          if (currentPosition != null)
-            Showcase(
-              key: _one,
-              description: "Here to set maps location.",
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: GoogleMap(
-                  mapType: MapType.normal,
-                  initialCameraPosition: CameraPosition(
-                    target: currentPosition!,
-                    zoom: 15,
-                  ),
-                  // markers: markers,
-                  onTap: (pos) {
-                    print(pos);
-                    Marker m = Marker(
-                        markerId: MarkerId('1'),
-                        icon: customIcon!,
-                        position: pos);
-                    setState(() {
-                      markers.add(m);
-                    });
-                  },
-                  markers: Set.from(markers),
-                  //                {
-                  // Marker(
-                  //   markerId: const MarkerId("marker1"),
-                  //   position:  LatLng(40.7078523, -74.008981),
-                  //   draggable: true,
-                  //   onDragEnd: (value) {
-                  //     // value is the new position
-                  //   },
-                  //   // To do: custom marker icon
-                  // ),},
+    return Scaffold(
+        body: Stack(
+      children: <Widget>[
+        if (currentPosition == null) CircularProgressIndicator(),
+        if (currentPosition != null)
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: GoogleMap(
+              mapType: MapType.normal,
+              initialCameraPosition: CameraPosition(
+                target: currentPosition!,
+                zoom: 15,
+              ),
+              // markers: markers,
+              onTap: (pos) {
+                print(pos);
+                Marker m = Marker(
+                    markerId: MarkerId('1'),
+                    icon: customIcon!,
+                    position: pos);
+                setState(() {
+                  markers.add(m);
+                });
+              },
+              markers: Set.from(markers),
+              //                {
+              // Marker(
+              //   markerId: const MarkerId("marker1"),
+              //   position:  LatLng(40.7078523, -74.008981),
+              //   draggable: true,
+              //   onDragEnd: (value) {
+              //     // value is the new position
+              //   },
+              //   // To do: custom marker icon
+              // ),},
 
-                  onMapCreated: (GoogleMapController controller) {
-                    _controller = controller;
-                  },
+              onMapCreated: (GoogleMapController controller) {
+                _controller = controller;
+              },
+            ),
+          ),
+        dataList.length == 0
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 200.0,
+                  width: MediaQuery.of(context).size.width,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: dataList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return cardMaps(index);
+                    },
+                  ),
                 ),
               ),
-            ),
-          dataList.length == 0
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 200.0,
-                    width: MediaQuery.of(context).size.width,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: dataList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return cardMaps(index);
-                      },
-                    ),
-                  ),
+        Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 27.0),
+              child: Container(
+                height: 55.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
                 ),
-          Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 27.0),
-                child: Container(
-                  height: 55.0,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 20.0, right: 20.0, top: 0.0),
-                        child: Center(
-                          child: Text(
-                            ("Locations").tr(),
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontFamily: "Gilroy",
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22.0,
-                            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20.0, right: 20.0, top: 0.0),
+                      child: Center(
+                        child: Text(
+                          ("Locations").tr(),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Gilroy",
+                            fontWeight: FontWeight.w700,
+                            fontSize: 22.0,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 15.0),
-                        child: InkWell(
-                            onTap: () {
-                              if (currentPosition != null &&
-                                  _controller != null) {
-                                _controller!.animateCamera(
-                                  CameraUpdate.newLatLng(currentPosition!),
-                                );
-                              }
-                            },
-                            child: Icon(
-                              Icons.my_location_outlined,
-                              size: 21,
-                              color: Colors.grey[800],
-                            )),
-                      )
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15.0),
+                      child: InkWell(
+                          onTap: () {
+                            if (currentPosition != null &&
+                                _controller != null) {
+                              _controller!.animateCamera(
+                                CameraUpdate.newLatLng(currentPosition!),
+                              );
+                            }
+                          },
+                          child: Icon(
+                            Icons.my_location_outlined,
+                            size: 21,
+                            color: Colors.grey[800],
+                          )),
+                    )
+                  ],
                 ),
               ),
-              Container(
-                height: 40.0,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: <Color>[
-                      Colors.white.withOpacity(0.1),
-                      Colors.white.withOpacity(0.6),
-                      Colors.white,
-                    ],
-                  ),
+            ),
+            Container(
+              height: 40.0,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: <Color>[
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.6),
+                    Colors.white,
+                  ],
                 ),
               ),
-            ],
-          ),
-        ],
-      )),
-    );
+            ),
+          ],
+        ),
+      ],
+    ));
   }
 
   moveCamera() {
@@ -380,6 +307,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
               price: data['price'],
               title: data['title'],
               type: data['type'],
+              joinEvent: data['joinEvent'],
               userDesc: data['userDesc'],
               userName: data['userName'],
               userProfile: data['userProfile'],
@@ -402,7 +330,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                 }
                 return Center(
                   child: SizedBox(
-                    height: Curves.easeInOut.transform(value) * 125.0,
+                    height: Curves.easeInOut.transform(value) * 150.0,
                     width: Curves.easeInOut.transform(value) * 350.0,
                     child: widget,
                   ),
@@ -513,67 +441,20 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                             fontWeight: FontWeight.w500, txtHeight: 1.5.h),
                       ],
                     ),
-
-                    Expanded(
-                      child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("JoinEvent")
-                            .doc("user")
-                            .collection(lokasiList[i].title ?? '')
-                            .snapshots(),
-                        builder: (BuildContext ctx,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-
-                          if (snapshot.data!.docs.isEmpty) {
-                            return Center(
-                                child: Text(
-                              ("No one has joined yet").tr(),
-                              style: TextStyle(
-                                  color: greyColor,
-                                  fontSize: 12.5,
-                                  fontFamily: "Gilroy",
-                                  fontWeight: FontWeight.w500),
-                            ));
-                          }
-                          if (snapshot.hasError) {
-                            return Center(child: Text('Error'));
-                          }
-                          return snapshot.hasData
-                              ? Row(
-                                  children: [
-                                    Text(
-                                      ("People Join :").tr(),
-                                      style: TextStyle(
-                                          color: greyColor,
-                                          fontSize: 12.5,
-                                          fontFamily: "Gilroy",
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    new joinEvents(
-                                      list: snapshot.data?.docs,
-                                    ),
-                                  ],
-                                )
-                              : Container();
-                        },
-                      ),
-                    ),
-                    // Container(
-                    //   height: 35.0,
-                    //   width: 80.0,
-                    //   decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                    //       color: accentColor),
-                    //   child: Center(
-                    //       child: Text(
-                    //     lokasiList[i].category ?? '',
-                    //     style: TextStyle(color: Colors.white),
-                    //   )),
-                    // )
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          ("People Join : ").tr(),
+                          style: TextStyle(
+                              color: greyColor,
+                              fontSize: 12.5,
+                              fontFamily: "Gilroy",
+                              fontWeight: FontWeight.w500),
+                        ),
+                        NumberWidget(count: lokasiList[i].joinEvent?.length)
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -582,96 +463,5 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
         ),
       ),
     );
-  }
-}
-
-class joinEvents extends StatelessWidget {
-  joinEvents({this.list});
-
-  final List<DocumentSnapshot>? list;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Container(
-              height: 25.0,
-              width: 54.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-                itemCount: list!.length > 3 ? 3 : list?.length,
-                itemBuilder: (context, i) {
-                  String? _title = list?[i]['name'].toString();
-                  String? _uid = list?[i]['uid'].toString();
-                  String? _img = list?[i]['photoProfile'].toString();
-
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 0.0),
-                    child: Container(
-                      height: 24.0,
-                      width: 24.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
-                          image: DecorationImage(
-                              image: NetworkImage(_img ?? ''),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
-                },
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            left: 0.0,
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 32.h,
-                width: 32.h,
-                decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(30.h),
-                    border: Border.all(color: Colors.white, width: 1.5.h)),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    getCustomFont(
-                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                    getCustomFont(" +", 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class KeysToBeInherited extends InheritedWidget {
-  final GlobalKey notification;
-
-  KeysToBeInherited({
-    required this.notification,
-    required Widget child,
-  }) : super(child: child);
-
-  static KeysToBeInherited? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<KeysToBeInherited>();
-  }
-
-  @override
-  bool updateShouldNotify(InheritedWidget oldWidget) {
-    return true;
   }
 }

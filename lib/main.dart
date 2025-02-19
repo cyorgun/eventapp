@@ -16,9 +16,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'app/chat_logic/providers/chat_provider.dart';
-import 'app/chat_logic/providers/home_provider.dart';
-import 'app/chat_logic/providers/setting_provider.dart';
+import 'app/chatroom_logic/providers/chatroom_provider.dart';
+import 'app/chatroom_logic/providers/home_provider.dart';
+import 'app/chatroom_logic/providers/setting_provider.dart';
 import 'app/provider/bookmark_provider.dart';
 import 'app/provider/event_provider.dart';
 import 'app/provider/search_provider.dart';
@@ -164,8 +164,8 @@ class _MyAppState extends State<MyApp> {
                   firebaseFirestore: this.firebaseFirestore,
                 ),
               ),
-              Provider<ChatProvider>(
-                create: (_) => ChatProvider(
+              Provider<ChatroomProvider>(
+                create: (_) => ChatroomProvider(
                   firebaseFirestore: this.firebaseFirestore,
                   firebaseStorage: this.firebaseStorage,
                 ),

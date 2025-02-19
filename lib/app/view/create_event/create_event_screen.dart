@@ -62,6 +62,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   var descCtrl = TextEditingController();
   var locCtrl = TextEditingController();
   var priceCtrl = TextEditingController();
+  var capacityCtrl = TextEditingController();
   var titleCtrl = TextEditingController();
   var typeCtrl = TextEditingController();
   var timeCtrl = TextEditingController();
@@ -170,7 +171,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void markersgm(MarkerId markerId, Marker updateMarker) {
+  void markerSgm(MarkerId markerId, Marker updateMarker) {
     markers[markerId] = updateMarker;
     print(markers);
     setState(() {
@@ -203,7 +204,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Future uploadPicture() async {
-    final SignInProvider sb = context.read<SignInProvider>();
     Reference storageReference = FirebaseStorage.instance
         .ref()
         .child('Profile Pictures/${DateTime.now()}');
@@ -220,9 +220,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   handleUpdateData() async {
     final sb = context.read<SignInProvider>();
-
     DateTime chosenDate = DateFormat('dd/MM/yyyy').parse(dateCtrl.text);
     Timestamp timestamp = Timestamp.fromDate(chosenDate);
+
     await AppService().checkInternet().then((hasInternet) async {
       if (hasInternet == false) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -234,104 +234,60 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             ),
           ),
         );
-      } else {
-        if (formKey.currentState!.validate()) {
-          formKey.currentState!.save();
-          setState(() => loading = true);
+        return;
+      }
 
-          imageFile == null
-              ? await FirebaseFirestore.instance
-                  .runTransaction((Transaction transaction) async {
-                  SharedPreferences prefs;
-                  prefs = await SharedPreferences.getInstance();
-                  FirebaseFirestore.instance.collection("event").add({
-                    "category": dropdownvalue.toString(),
-                    "date": timestamp,
-                    "time": timeCtrl.text,
-                    "description": descCtrl.text,
-                    "id": sb.name ?? '' + titleCtrl.text,
-                    "image": imageUrl,
-                    "location": locCtrl.text,
-                    "latLng": GeoPoint(
-                        double.tryParse(_controllerLatitude.text) ?? 0.0,
-                        double.tryParse(_controllerLongitude.text) ?? 0.0),
-                    'createdAt': FieldValue.serverTimestamp(),
-                    "loves": "",
-                    "mapsLangLink":
-                        num.tryParse(_controllerLongitude.text) ?? 0.0,
-                    "mapsLatLink":
-                        num.tryParse(_controllerLatitude.text) ?? 0.0,
-                    'count': 0,
-                    "price": int.tryParse(priceCtrl.text) ?? 0,
-                    "title": titleCtrl.text,
-                    "type": dropdownvalue2.toString(),
-                    "userDesc": "Organizer",
-                    "userName": sb.name,
-                    "userProfile": sb.imageUrl
-                  });
-                }).then((value) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.redAccent,
-                      content: Text(
-                        ('uploadSuccess').tr(),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
+      if (formKey.currentState!.validate()) {
+        formKey.currentState!.save();
+        setState(() => loading = true);
 
-                  setState(() => loading = false);
-                })
-              : await uploadPicture().then((value) => FirebaseFirestore.instance
-                      .runTransaction((Transaction transaction) async {
-                    SharedPreferences prefs;
-                    prefs = await SharedPreferences.getInstance();
-                    FirebaseFirestore.instance.collection("event").add({
-                      "category": dropdownvalue.toString(),
-                      "date": timestamp,
-                      "time": timeCtrl.text,
-                      'createdAt': FieldValue.serverTimestamp(),
-                      "description": descCtrl.text,
-                      "id": sb.name ?? '' + DateTime.now().toString(),
-                      "image": imageUrl,
-                      "location": locCtrl.text,
-                      "loves": "",
-                      'count': 0,
-                      "mapsLangLink": double.tryParse(
-                              double.tryParse(_controllerLongitude.text)!
-                                  .toStringAsFixed(2)) ??
-                          '0.00',
-                      "mapsLatLink": double.tryParse(
-                              double.tryParse(_controllerLatitude.text)!
-                                  .toStringAsFixed(2)) ??
-                          '0.00',
-                      "price": int.tryParse(priceCtrl.text) ?? 0,
-                      "title": titleCtrl.text,
-                      "type": dropdownvalue2.toString(),
-                      "userDesc": "Organizer",
-                      "userName": sb.name,
-                      "userProfile": sb.imageUrl
-                    });
-                  }).then((_) {
-                    //        ScaffoldMessenger.of(context).showSnackBar(
-                    //   SnackBar(
-                    //     backgroundColor: Colors.blue,
-                    //     content: Text(
-                    //       'Update Success',
-                    //       textAlign: TextAlign.center,
-                    //     ),
-                    //   ),
-                    // );
-                    sendNotification(("newEvent").tr(), titleCtrl.text);
-                    Navigator.of(context).pop();
-                    showDialog(
-                        builder: (context) {
-                          return const EventpublishDialog();
-                        },
-                        context: context);
-                    setState(() => loading = false);
-                  }));
-        }
+        final eventRef = FirebaseFirestore.instance.collection("event").doc(); // Otomatik ID oluştur
+        final eventId = eventRef.id; // ID'yi al
+
+        Map<String, dynamic> eventData = {
+          "category": dropdownvalue.toString(),
+          "date": timestamp,
+          "time": timeCtrl.text,
+          "description": descCtrl.text,
+          "id": eventId, // Firestore'un ID'si burada saklanıyor
+          "image": imageFile == null ? imageUrl : await uploadPicture(),
+          "location": locCtrl.text,
+          "latLng": GeoPoint(
+              double.tryParse(_controllerLatitude.text) ?? 0.0,
+              double.tryParse(_controllerLongitude.text) ?? 0.0),
+          'createdAt': FieldValue.serverTimestamp(),
+          "mapsLangLink": num.tryParse(_controllerLongitude.text) ?? 0.0,
+          "mapsLatLink": num.tryParse(_controllerLatitude.text) ?? 0.0,
+          'count': 0,
+          "price": int.tryParse(priceCtrl.text) ?? 0,
+          "capacity": int.tryParse(capacityCtrl.text) ?? 0,
+          "title": titleCtrl.text,
+          "type": dropdownvalue2.toString(),
+          "userDesc": "Organizer",
+          "userName": sb.name,
+          "userProfile": sb.imageUrl
+        };
+
+        await eventRef.set(eventData).then((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text(
+                ('uploadSuccess').tr(),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+
+          sendNotification(("newEvent").tr(), titleCtrl.text);
+          Navigator.of(context).pop();
+          showDialog(
+            builder: (context) => const EventpublishDialog(),
+            context: context,
+          );
+
+          setState(() => loading = false);
+        });
       }
     });
   }
@@ -358,14 +314,13 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         descCtrl.text == "" ||
         locCtrl.text == "" ||
         priceCtrl.text == "" ||
+        capacityCtrl.text == "" ||
         dateCtrl.text == "" ||
         timeCtrl.text == "" ||
         _controllerLatitude.text == "" ||
         _controllerLongitude.text == "") {
       isButtonDisabled = true;
     }
-    // int? intValue = int.tryParse(_controllerLatitude.text);
-    //
 
     num intValue = num.tryParse(_controllerLatitude.text) ?? 0.0;
     return Scaffold(
@@ -374,12 +329,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         key: formKey,
         child: Column(
           children: [
-            //   if(intValue==null)Text("null"),
-
-            // Text("Latitude: $intValue"??''),
-
-            // Text("Latitude2:" + num.tryParse(_controllerLatitude.text).toString()??''),
-
             Divider(color: dividerColor, thickness: 1.h, height: 1.h),
             Expanded(
                 flex: 1,
@@ -506,77 +455,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     getDefaultTextFiledWithLabel(
                         context, ("enterDescription").tr(), descCtrl,
                         isEnable: false, height: 60.h, minLines: true),
-                    // getVerSpace(20.h),
-                    // getCustomFont("Event Type", 16.sp, Colors.black, 1,
-                    //     fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                    // getVerSpace(4.h),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //         child: GestureDetector(
-                    //       onTap: () {
-                    //         controller.onChange(0.obs);
-                    //       },
-                    //       child: Container(
-                    //         height: 60.h,
-                    //         decoration: BoxDecoration(
-                    //             color: Colors.white,
-                    //             border: Border.all(color: borderColor, width: 1.h),
-                    //             borderRadius: BorderRadius.circular(22.h)),
-                    //         padding: EdgeInsets.only(left: 18.h),
-                    //         child: Row(
-                    //           children: [
-                    //             GetX<CreateEventController>(
-                    //               builder: (controller) => getSvgImage(
-                    //                   controller.select.value == 0
-                    //                       ? "checkRadio.svg"
-                    //                       : "uncheckRadio.svg",
-                    //                   width: 24.h,
-                    //                   height: 24.h),
-                    //               init: CreateEventController(),
-                    //             ),
-                    //             getHorSpace(10.h),
-                    //             getCustomFont(
-                    //                 "Private event", 16.sp, Colors.black, 1,
-                    //                 fontWeight: FontWeight.w500)
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     )),
-                    //     getHorSpace(20.h),
-                    //     Expanded(
-                    //         child: GestureDetector(
-                    //       onTap: () {
-                    //         controller.onChange(1.obs);
-                    //       },
-                    //       child: Container(
-                    //         height: 60.h,
-                    //         decoration: BoxDecoration(
-                    //             color: Colors.white,
-                    //             border: Border.all(color: borderColor, width: 1.h),
-                    //             borderRadius: BorderRadius.circular(22.h)),
-                    //         padding: EdgeInsets.only(left: 18.h),
-                    //         child: Row(
-                    //           children: [
-                    //             GetX<CreateEventController>(
-                    //               builder: (controller) => getSvgImage(
-                    //                   controller.select.value == 1
-                    //                       ? "checkRadio.svg"
-                    //                       : "uncheckRadio.svg",
-                    //                   width: 24.h,
-                    //                   height: 24.h),
-                    //               init: CreateEventController(),
-                    //             ),
-                    //             getHorSpace(10.h),
-                    //             getCustomFont(
-                    //                 "Public event", 16.sp, Colors.black, 1,
-                    //                 fontWeight: FontWeight.w500)
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ))
-                    //   ],
-                    // ),
 
                     getVerSpace(20.h),
                     getCustomFont(("price").tr(), 16.sp, Colors.black, 1,
@@ -647,9 +525,71 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       //   });
                       // },
                     ),
-                    // getDefaultTextFiledWithLabel(
-                    //     context, "Enter price", priceCtrl,
-                    //     isEnable: false, height: 60.h),
+                    TextFormField(
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16.sp,
+                          fontFamily: Constant.fontsFamily),
+                      decoration: InputDecoration(
+                          hintText: ('enterCapacity').tr(),
+                          labelText: ("capacity").tr(),
+                          counter: Container(),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20),
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white,
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: borderColor, width: 1.h)),
+                          disabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: borderColor, width: 1.h)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: accentColor, width: 1.h)),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: errorColor, width: 1.h)),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: errorColor, width: 1.h)),
+                          errorStyle: TextStyle(
+                              color: Colors.red,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w500,
+                              height: 1.5.h,
+                              fontFamily: Constant.fontsFamily),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22.h),
+                              borderSide:
+                              BorderSide(color: borderColor, width: 1.h)),
+                          suffixIconConstraints: BoxConstraints(
+                            maxHeight: 24.h,
+                          ),
+                          hintStyle: TextStyle(
+                              color: greyColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.sp,
+                              fontFamily: Constant.fontsFamily)),
+                      controller: capacityCtrl,
+                      keyboardType: TextInputType.number,
+                      validator: (String? value) {
+                        if (value!.isEmpty) return ('capacityCant').tr();
+                        return null;
+                      },
+                      // onChanged: (String value){
+                      //   setState(() {
+                      //     email = value;
+                      //   });
+                      // },
+                    ),
                     getVerSpace(20.h),
                     getCustomFont(("date").tr(), 16.sp, Colors.black, 1,
                         fontWeight: FontWeight.w600, txtHeight: 1.5.h),
@@ -786,7 +726,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                   positionParam: position.target,
                                 );
                                 setState(() {
-                                  markersgm(markerId, updatedMarker);
+                                  markerSgm(markerId, updatedMarker);
                                 });
                               }
                             },

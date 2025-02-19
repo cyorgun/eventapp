@@ -27,10 +27,10 @@ class _SelectInterestScreenState extends State<SelectInterestScreen> {
   Future addDataInterest(List v) async {
     final BookmarkProvider sb =
         Provider.of<BookmarkProvider>(context, listen: false);
-    sb.saveDataToSP(v);
-    sb.saveInterestToFirebase(v);
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil(Routes.homeScreenRoute, (route) => false);
+    final SignInProvider sp =
+    Provider.of<SignInProvider>(context, listen: false);
+    sb.saveInterestToFirebase(v, sp.uid);
+    Navigator.popAndPushNamed(context, Routes.homeScreenRoute);
   }
 
   @override

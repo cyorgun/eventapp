@@ -10,6 +10,7 @@ abstract class Routes {
   static const signUpRoute = Paths.signUpPath;
   static const verifyRoute = Paths.verifyPath;
   static const selectInterestRoute = Paths.selectInterestPath;
+  static const chatRoute = Paths.chatRoute;
   static const trendingScreenRoute = Paths.trendingScreenPath;
   static const featuredEventDetailRoute = Paths.featuredEventDetailPath;
   static const buyTicketRoute = Paths.buyTicketPath;
@@ -30,6 +31,7 @@ abstract class Routes {
 }
 
 abstract class Paths {
+  static const chatRoute = "/ChatScreen";
   static const multipleLanguagePath = "/MultipleLanguageScreen";
   static const onboardingPage = "/OnboardingPage";
   static const splashScreen = "/SplashScreen";

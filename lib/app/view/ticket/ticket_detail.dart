@@ -205,7 +205,7 @@ class _TicketDetailState extends State<TicketDetail> {
                                 image: DecorationImage(
                                     image:
                                         NetworkImage(widget.event?.image ?? ''),
-                                    fit: BoxFit.fill)),
+                                    fit: BoxFit.contain)),
                           ),
                         ),
                       ),

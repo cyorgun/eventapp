@@ -28,7 +28,8 @@ class BuyTicket extends StatefulWidget {
 
 class _BuyTicketState extends State<BuyTicket> {
   late EventBaru event;
-  int _itemCount = 1;
+  late SignInProvider sb;
+  int itemCount = 1;
 
   Map<String, dynamic>? paymentIntent;
 
@@ -36,121 +37,22 @@ class _BuyTicketState extends State<BuyTicket> {
   int? prices;
   int? totalPrice;
 
-
   void initVariables() {
     prices = event.price ?? 0;
-    totalPrice = event.price ?? 0;
+    totalPrice = prices;
   }
 
   @override
   Widget build(BuildContext context) {
     event = ModalRoute.of(context)?.settings.arguments as EventBaru;
+    sb = context.watch<SignInProvider>();
     initVariables();
-    final sb = context.watch<SignInProvider>();
-    void addData() {
-      FirebaseFirestore.instance
-          .runTransaction((Transaction transaction) async {
-        FirebaseFirestore.instance
-            .collection("JoinEvent")
-            .doc("user")
-            .collection(event.title ?? '')
-            .doc(sb.uid)
-            .set({"name": sb.name, "uid": sb.uid, "photoProfile": sb.imageUrl});
-      });
-    }
-
-    void addEvent() {
-      FirebaseFirestore.instance.runTransaction((transaction) async {
-        final eventDocRef = FirebaseFirestore.instance
-            .collection("event")
-            .doc(event.id ?? '');
-        final snapshot = await transaction.get(eventDocRef);
-
-        if (snapshot.exists) {
-          final existingData = snapshot.data();
-          final newData = {
-            "name": sb.name,
-            "uid": sb.uid,
-            "photoProfile": sb.imageUrl,
-          };
-
-          if (existingData != null && existingData.containsKey("joinEvent")) {
-            final joinEventData =
-                Map<String, dynamic>.from(existingData["joinEvent"]);
-            FirebaseFirestore.instance
-                .collection('event')
-                .doc(event.id)
-                .update({'join': FieldValue.increment(1)});
-            if (!joinEventData.containsKey(sb.uid)) {
-              joinEventData[sb.uid ?? ''] = newData;
-            } else {
-              // Jika user sudah ada, update field yang sesuai
-              joinEventData[sb.uid]["name"] = sb.name;
-              joinEventData[sb.uid]["uid"] = sb.uid;
-              joinEventData[sb.uid]["photoProfile"] = sb.imageUrl;
-            }
-
-            transaction.update(eventDocRef, {"joinEvent": joinEventData});
-            FirebaseFirestore.instance
-                .collection('event')
-                .doc(event.id)
-                .update({'join': FieldValue.increment(1)});
-            // transaction.update(eventDocRef, {"paymentType": "COD"});
-          } else {
-            transaction.update(eventDocRef, {
-              "joinEvent": {sb.uid: newData}
-            });
-            FirebaseFirestore.instance
-                .collection('event')
-                .doc(event.id)
-                .update({'join': FieldValue.increment(1)});
-            // transaction.update(eventDocRef, {"paymentType": "COD"});
-          }
-        }
-      }).then((value) {
-        print('Data map dengan array berhasil ditambahkan ke joinEvent.');
-      }).catchError((error) {
-        print('Error: $error');
-      });
-    }
-
-    void userSaved() {
-      FirebaseFirestore.instance
-          .runTransaction((Transaction transaction) async {
-        SharedPreferences prefs;
-        prefs = await SharedPreferences.getInstance();
-        FirebaseFirestore.instance
-            .collection("users")
-            .doc(sb.uid)
-            .collection('Join Event')
-            .add({
-          "uid": sb.uid,
-          "user": sb.name,
-          "category": event.category,
-          "date": event.date,
-          "description": event.description,
-          "id": event.id,
-          "image": event.image,
-          "location": event.location,
-          "mapsLangLink": event.mapsLangLink,
-          "mapsLatLink": event.mapsLatLink,
-          "price": totalPrice,
-          "title": event.title,
-          "type": event.type,
-          "userDesc": event.userDesc,
-          "userName": event.userName,
-          "userProfile": event.userProfile,
-          "ticket": _itemCount
-        });
-      });
-      Navigator.pop(context);
-    }
-
     setStatusBarColor(Colors.white);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: getToolBar(
-        () {
+            () {
           Navigator.of(context).pop();
         },
         title: getCustomFont(("buyTicket").tr(), 24.sp, Colors.black, 1,
@@ -185,7 +87,7 @@ class _BuyTicketState extends State<BuyTicket> {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(22.h),
                                 border:
-                                    Border.all(color: borderColor, width: 1.h)),
+                                Border.all(color: borderColor, width: 1.h)),
                             padding: EdgeInsets.symmetric(
                                 horizontal: 18.h, vertical: 18.h),
                             child: Row(
@@ -193,15 +95,6 @@ class _BuyTicketState extends State<BuyTicket> {
                               children: [
                                 Row(
                                   children: [
-                                    // GetX<BuyTicketController>(
-                                    //   builder: (controller) => getSvgImage(
-                                    //       controller.select.value == 0
-                                    //           ? "checkRadio.svg"
-                                    //           : "uncheckRadio.svg",
-                                    //       width: 24.h,
-                                    //       height: 24.h),
-                                    //   init: BuyTicketController(),
-                                    // ),
                                     getHorSpace(10.h),
                                     getCustomFont(("ticketPrice").tr(), 16.sp,
                                         Colors.black, 1,
@@ -218,42 +111,6 @@ class _BuyTicketState extends State<BuyTicket> {
                           ),
                         ),
                         getVerSpace(20.h),
-                        // GestureDetector(
-                        //   onTap: () {
-                        //     controller.onChange(1.obs);
-                        //   },
-                        //   child: Container(
-                        //     margin: EdgeInsets.symmetric(horizontal: 20.h),
-                        //     decoration: BoxDecoration(
-                        //         color: Colors.white,
-                        //         borderRadius: BorderRadius.circular(22.h),
-                        //         border: Border.all(color: borderColor, width: 1.h)),
-                        //     padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-                        //     child: Row(
-                        //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //       children: [
-                        //         Row(
-                        //           children: [
-                        //             GetX<BuyTicketController>(
-                        //               builder: (controller) => getSvgImage(
-                        //                   controller.select.value == 1
-                        //                       ? "checkRadio.svg"
-                        //                       : "uncheckRadio.svg",
-                        //                   width: 24.h,
-                        //                   height: 24.h),
-                        //               init: BuyTicketController(),
-                        //             ),
-                        //             getHorSpace(10.h),
-                        //             getCustomFont("Economy", 16.sp, Colors.black, 1,
-                        //                 fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-                        //           ],
-                        //         ),
-                        //         getCustomFont("\$21.00", 18.sp, Colors.black, 1,
-                        //             fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                     getVerSpace(30.h),
@@ -267,25 +124,13 @@ class _BuyTicketState extends State<BuyTicket> {
                               ("quantitySeat").tr(), 16.sp, Colors.black, 1,
                               fontWeight: FontWeight.w600, txtHeight: 1.5.h),
                         ),
-                        // getPaddingWidget(
-                        //   EdgeInsets.symmetric(horizontal: 20.h),
-                        //   Row(
-                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //     children: [
-                        //       getCustomFont("64", 16.sp, Colors.black, 1,
-                        //           fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                        //       getCustomFont("People joined", 15.sp, greyColor, 1,
-                        //           fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-                        //     ],
-                        //   ),
-                        // ),
                         getVerSpace(10.h),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 20.h),
                           decoration: BoxDecoration(
                               color: Colors.white,
                               border:
-                                  Border.all(color: borderColor, width: 1.h),
+                              Border.all(color: borderColor, width: 1.h),
                               borderRadius: BorderRadius.circular(22.h)),
                           padding: EdgeInsets.symmetric(
                               horizontal: 6.h, vertical: 6.h),
@@ -297,7 +142,7 @@ class _BuyTicketState extends State<BuyTicket> {
                                   decoration: BoxDecoration(
                                       color: accentColor,
                                       borderRadius:
-                                          BorderRadius.circular(18.h)),
+                                      BorderRadius.circular(18.h)),
                                   height: 68.h,
                                   width: 68.h,
                                   padding: EdgeInsets.all(22.h),
@@ -307,37 +152,35 @@ class _BuyTicketState extends State<BuyTicket> {
                                       height: 24.h),
                                 ),
                                 onTap: () {
-                                  if (_itemCount == 1) {
+                                  if (itemCount == 1) {
                                   } else {
-                                    _itemCount--;
+                                    itemCount--;
                                     setState(() {
                                       // totalPrice = controller.count.value * widget.price;
                                       var prices = event.price ?? 0;
-                                      totalPrice = _itemCount * prices;
+                                      totalPrice = itemCount * prices;
                                     });
                                     //  controller.countChange(controller.count.obs.value--);
                                   }
                                 },
                               ),
                               getCustomFont(
-                                  _itemCount.toString(), 22.sp, Colors.black, 1,
+                                  itemCount.toString(), 22.sp, Colors.black, 1,
                                   fontWeight: FontWeight.w700,
                                   txtHeight: 1.5.h),
                               GestureDetector(
                                 onTap: () {
-                                  _itemCount++;
-                                  // controller.countChange(controller.count.obs.value++);
+                                  itemCount++;
                                   setState(() {
                                     var prices = event.price ?? 0;
-                                    // totalPrice = controller.count.value * widget.price;
-                                    totalPrice = _itemCount * prices;
+                                    totalPrice = itemCount * prices;
                                   });
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
                                       color: accentColor,
                                       borderRadius:
-                                          BorderRadius.circular(18.h)),
+                                      BorderRadius.circular(18.h)),
                                   height: 68.h,
                                   width: 68.h,
                                   padding: EdgeInsets.all(22.h),
@@ -348,35 +191,6 @@ class _BuyTicketState extends State<BuyTicket> {
                                 ),
                               )
                             ],
-                          ),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, top: 40.0),
-                          child: getCustomFont(
-                              ("WhoJoinsevent").tr() + (event.title ?? ""),
-                              16.sp,
-                              Colors.black,
-                              1,
-                              fontWeight: FontWeight.w600,
-                              txtHeight: 1.5.h),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                          child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("JoinEvent")
-                                .doc("user")
-                                .collection(event.title ?? '')
-                                .snapshots(),
-                            builder: (BuildContext ctx,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              return snapshot.hasData
-                                  ? new joinEvents(
-                                      list: snapshot.data?.docs,
-                                    )
-                                  : Container();
-                            },
                           ),
                         ),
                       ],
@@ -402,25 +216,24 @@ class _BuyTicketState extends State<BuyTicket> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      getButton(context, accentColor, ("Checkout COD").tr(),
+                      getButton(context, accentColor, ("Payment Deneme").tr(),
                           Colors.white,
                           buttonWidth: MediaQuery.of(context).size.width / 2.5,
-                          () async {
-                        Navigator.pushNamed(context, Routes.paymentRoute);
-                        showDialog(
-                            builder: (context) {
-                              return const TicketConfirmDialog();
-                            },
-                            context: context);
-                        userSaved();
-                        addEvent();
-                        addData();
+                              () async {
+                            Navigator.pushNamed(context, Routes.paymentRoute, arguments: {"event": event, "itemCount": itemCount, "totalPrice": totalPrice});
+                            showDialog(
+                                builder: (context) {
+                                  return const TicketConfirmDialog();
+                                },
+                                context: context);
+                            userSaved("deneme");
+                            addEvent();
 
-                        Navigator.of(context).pushReplacement(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) => TicketDetail(
+                            Navigator.of(context).pushReplacement(PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => TicketDetail(
                                   event: event,
                                 )));
-                      }, 18.sp,
+                          }, 18.sp,
                           weight: FontWeight.w700,
                           buttonHeight: 60.h,
                           borderRadius: BorderRadius.circular(22.h)),
@@ -430,12 +243,9 @@ class _BuyTicketState extends State<BuyTicket> {
                             ("Checkout Payment").tr(), Colors.white,
                             buttonWidth: MediaQuery.of(context).size.width /
                                 2.5, () async {
-                          Navigator.of(context).push(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => PaymentScreen(
-                                    event: event,
-                                  )));
-                          // await makePayment();
-                        }, 18.sp,
+                              Navigator.pushNamed(context, Routes.paymentRoute, arguments: {"event": event, "itemCount": itemCount, "totalPrice": totalPrice});
+                              // await makePayment();
+                            }, 18.sp,
                             weight: FontWeight.w700,
                             buttonHeight: 60.h,
                             borderRadius: BorderRadius.circular(22.h)),
@@ -445,21 +255,20 @@ class _BuyTicketState extends State<BuyTicket> {
                             Colors.white,
                             buttonWidth: MediaQuery.of(context).size.width /
                                 2.5, () async {
-                          userSaved();
-                          addData();
-                          Navigator.of(context).push(PageRouteBuilder(
-                              pageBuilder: (_, __, ___) => PaymentScreen()));
-                          showDialog(
-                              builder: (context) {
-                                return const TicketConfirmDialog();
-                              },
-                              context: context);
-                          Navigator.of(context)
-                              .pushReplacement(PageRouteBuilder(
+                              userSaved("deneme");
+                              addEvent();
+                              Navigator.pushNamed(context, Routes.paymentRoute, arguments: {"event": event, "itemCount": itemCount, "totalPrice": totalPrice});
+                              showDialog(
+                                  builder: (context) {
+                                    return const TicketConfirmDialog();
+                                  },
+                                  context: context);
+                              Navigator.of(context)
+                                  .pushReplacement(PageRouteBuilder(
                                   pageBuilder: (_, __, ___) => TicketDetail(
-                                        event: event,
-                                      )));
-                        }, 18.sp,
+                                    event: event,
+                                  )));
+                            }, 18.sp,
                             weight: FontWeight.w700,
                             buttonHeight: 60.h,
                             borderRadius: BorderRadius.circular(22.h)),
@@ -475,258 +284,67 @@ class _BuyTicketState extends State<BuyTicket> {
     );
   }
 
-  Future<void> makePayment() async {
+  void addEvent() async {
+    final eventDocRef = FirebaseFirestore.instance.collection("event").doc(event.id);
+
     try {
-      paymentIntent = await createPaymentIntent(totalPrice.toString(), 'USD');
+      final snapshot = await eventDocRef.get();
 
-      //STEP 2: Initialize Payment Sheet
-      await Stripe.instance
-          .initPaymentSheet(
-              paymentSheetParameters: SetupPaymentSheetParameters(
-                  paymentIntentClientSecret: paymentIntent![
-                      'client_secret'], //Gotten from payment intent
-                  style: ThemeMode.dark,
-                  merchantDisplayName: 'Ikay'))
-          .then((value) {});
+      if (!snapshot.exists) return;
 
-      //STEP 3: Display Payment sheet
-      displayPaymentSheet();
-    } catch (err) {
-      throw Exception(err);
-      print(err);
+      // Mevcut joinEvent listesini al, yoksa boş bir liste oluştur
+      List<String> joinEventList = List<String>.from(snapshot.data()?["joinEvent"] ?? []);
+
+      // Eğer kullanıcı zaten listede yoksa ekle ve join değerini artır
+      if (!joinEventList.contains(sb.uid)) {
+        joinEventList.add(sb.uid!);
+
+        await eventDocRef.update({
+          "join": FieldValue.increment(1),
+          "joinEvent": joinEventList,
+        });
+
+        print('UID başarıyla joinEvent listesine eklendi.');
+      } else {
+        print('Kullanıcı zaten etkinliğe katılmış.');
+      }
+    } catch (error) {
+      print('Error: $error');
     }
   }
 
-  displayPaymentSheet() async {
+  void userSaved(String paymentMethod) async {
+    final userEventsRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(sb.uid)
+        .collection("joinEvent");
+
     try {
-      await Stripe.instance.presentPaymentSheet().then((value) {
-        showDialog(
-            context: context,
-            builder: (_) => AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green,
-                        size: 100.0,
-                      ),
-                      SizedBox(height: 10.0),
-                      Text(("Payment Successful!").tr()),
-                    ],
-                  ),
-                ));
+      // Kullanıcının daha önce bu etkinliğe katılıp katılmadığını kontrol et
+      var querySnapshot = await userEventsRef
+          .where("eventId", isEqualTo: event.id)
+          .limit(1)
+          .get();
 
-        paymentIntent = null;
-      }).onError((error, stackTrace) {
-        throw Exception(error);
-      });
-    } on StripeException catch (e) {
-      print('Error is:---> $e');
-      AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.cancel,
-                  color: Colors.red,
-                ),
-                Text(("Payment Failed").tr()),
-              ],
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      print('$e');
+      if (querySnapshot.docs.isEmpty) {
+        // Eğer kullanıcı bu etkinliğe daha önce katılmamışsa kaydet
+        await userEventsRef.add({
+          "eventId": event.id,
+          "eventTitle": event.title,
+          "price": totalPrice,
+          "ticketCount": itemCount,
+          "paymentMethod": paymentMethod,
+          "timestamp": FieldValue.serverTimestamp(),
+        });
+
+        print("Etkinliğe başarıyla katılındı.");
+      } else {
+        print("Kullanıcı zaten bu etkinliğe katılmış.");
+      }
+    } catch (error) {
+      print("Hata oluştu: $error");
     }
-  }
 
-  createPaymentIntent(String amount, String currency) async {
-    try {
-      //Request body
-      Map<String, dynamic> body = {
-        'amount': calculateAmount(amount),
-        'currency': currency,
-      };
-
-      //Make post request to Stripe
-      var response = await http.post(
-        Uri.parse('https://api.stripe.com/v1/payment_intents'),
-        headers: {
-          'Authorization': 'Bearer ${dotenv.env['STRIPE_SECRET']}',
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: body,
-      );
-      return json.decode(response.body);
-    } catch (err) {
-      throw Exception(err.toString());
-    }
-  }
-
-  calculateAmount(String amount) {
-    final calculatedAmout = (int.parse(amount)) * 100;
-    return calculatedAmout.toString();
-  }
-}
-// Column buildTicketTypeWidget() {
-//   return Column(
-//     children: [
-//       getPaddingWidget(
-//         EdgeInsets.symmetric(horizontal: 20.h),
-//         getCustomFont("Ticket Type", 16.sp, Colors.black, 1,
-//             fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-//       ),
-//       getVerSpace(10.h),
-//       GestureDetector(
-//         onTap: () {
-//           controller.onChange(0.obs);
-//         },
-//         child: Container(
-//           margin: EdgeInsets.symmetric(horizontal: 20.h),
-//           decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(22.h),
-//               border: Border.all(color: borderColor, width: 1.h)),
-//           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Row(
-//                 children: [
-//                   GetX<BuyTicketController>(
-//                     builder: (controller) => getSvgImage(
-//                         controller.select.value == 0
-//                             ? "checkRadio.svg"
-//                             : "uncheckRadio.svg",
-//                         width: 24.h,
-//                         height: 24.h),
-//                     init: BuyTicketController(),
-//                   ),
-//                   getHorSpace(10.h),
-//                   getCustomFont("VIP", 16.sp, Colors.black, 1,
-//                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-//                 ],
-//               ),
-//               getCustomFont("\$28.00", 18.sp, Colors.black, 1,
-//                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-//             ],
-//           ),
-//         ),
-//       ),
-//       getVerSpace(20.h),
-//       GestureDetector(
-//         onTap: () {
-//           controller.onChange(1.obs);
-//         },
-//         child: Container(
-//           margin: EdgeInsets.symmetric(horizontal: 20.h),
-//           decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(22.h),
-//               border: Border.all(color: borderColor, width: 1.h)),
-//           padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 18.h),
-//           child: Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Row(
-//                 children: [
-//                   GetX<BuyTicketController>(
-//                     builder: (controller) => getSvgImage(
-//                         controller.select.value == 1
-//                             ? "checkRadio.svg"
-//                             : "uncheckRadio.svg",
-//                         width: 24.h,
-//                         height: 24.h),
-//                     init: BuyTicketController(),
-//                   ),
-//                   getHorSpace(10.h),
-//                   getCustomFont("Economy", 16.sp, Colors.black, 1,
-//                       fontWeight: FontWeight.w500, txtHeight: 1.5.h)
-//                 ],
-//               ),
-//               getCustomFont("\$21.00", 18.sp, Colors.black, 1,
-//                   fontWeight: FontWeight.w600, txtHeight: 1.5.h)
-//             ],
-//           ),
-//         ),
-//       ),
-//     ],
-//   );
-// }
-
-class joinEvents extends StatelessWidget {
-  joinEvents({this.list});
-
-  final List<DocumentSnapshot>? list;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 0.0),
-          child: Container(
-              height: 25.0,
-              width: 54.0,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-                itemCount: list!.length > 3 ? 3 : list?.length,
-                itemBuilder: (context, i) {
-                  String? _title = list?[i]['name'].toString();
-                  String? _uid = list?[i]['uid'].toString();
-                  String? _img = list?[i]['photoProfile'].toString();
-
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 0.0),
-                    child: Container(
-                      height: 24.0,
-                      width: 24.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(70.0)),
-                          image: DecorationImage(
-                              image: NetworkImage(_img ?? ''),
-                              fit: BoxFit.cover)),
-                    ),
-                  );
-                },
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 3.0,
-            left: 0.0,
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 32.h,
-                width: 32.h,
-                decoration: BoxDecoration(
-                    color: accentColor,
-                    borderRadius: BorderRadius.circular(30.h),
-                    border: Border.all(color: Colors.white, width: 1.5.h)),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    getCustomFont(
-                        list?.length.toString() ?? '', 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                    getCustomFont(" +", 12.sp, Colors.white, 1,
-                        fontWeight: FontWeight.w600),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
-    );
+    Navigator.pop(context);
   }
 }

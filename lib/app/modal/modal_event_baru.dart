@@ -17,12 +17,11 @@ class EventBaru {
   String? time;
   String? userProfile;
   String? image;
-  int? ticket;
   int? count;
-  int? joined;
+  int? capacity;
   int? join;
   LatLng? latLng;
-  Map<String, dynamic>? joinEvent;
+  List<dynamic>? joinEvent;
   String? typePayment;
   double? distance;
 
@@ -38,18 +37,17 @@ class EventBaru {
       this.mapsLatLink,
       this.typePayment,
       this.price,
-      this.joined,
       this.title,
       this.type,
       this.userDesc,
-      this.ticket,
       this.userName,
       this.join,
       this.image,
       this.count,
       this.latLng,
       this.distance,
-      this.userProfile});
+      this.userProfile,
+      this.capacity});
 
   factory EventBaru.fromFirestore(DocumentSnapshot snapshot, double distance) {
     Map data = snapshot.data() as Map<dynamic, dynamic>;
@@ -71,13 +69,12 @@ class EventBaru {
         price: data['price'],
         title: data['title'],
         type: data['type'],
-        ticket: data['ticket'],
-        joined: data['joined'],
         join: data['join'],
         userDesc: data['userDesc'],
         userName: data['userName'],
         userProfile: data['userProfile'],
-        joinEvent: data['joinEvent'] ?? {},
+        capacity: data['capacity'],
+        joinEvent: data['joinEvent'] ?? [],
         distance: distance);
   }
 }

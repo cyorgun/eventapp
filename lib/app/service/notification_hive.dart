@@ -113,7 +113,7 @@ class NotificationService {
     await bookmarkedList.clear();
   }
 
-  Future<bool> handleFcmSubscribtion() async {
+  Future<bool> handleFcmSubscription() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
     bool _subscription = sp.getBool('subscribed') ?? true;
     if (_subscription == true) {

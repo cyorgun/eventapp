@@ -237,7 +237,6 @@ class SignInProvider extends ChangeNotifier {
       'image url': _imageUrl,
       'role': _role,
       'timestamp': timestamp,
-      'loved items': [],
       'bookmarked items': [],
       'interest_items': []
     };

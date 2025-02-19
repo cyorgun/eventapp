@@ -73,8 +73,7 @@ class _WelcomePageState extends State<WelcomePage> {
             );
           } else {
             sb.checkUserExists().then((value) {
-              openSnacbar(
-                  scaffoldKey, (value.toString()));
+              print(value.toString()+"1");
               if (value == true) {
                 sb
                     .getUserDataFromFirebase(sb.uid)
@@ -83,8 +82,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               handleAfterSignIn();
                             });
               } else {
-                openSnacbar(
-                    scaffoldKey, (value.toString() + "2"));
+                print(value.toString()+"2");
                 sb.getTimestamp().then((value) => sb
                     .saveToFirebase()
                     .then((value) {
@@ -281,8 +279,7 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   gotoNextScreen() {
-    Navigator.of(context).push(
-        PageRouteBuilder(pageBuilder: (_, __, ___) => SelectInterestScreen()));
+    Navigator.popAndPushNamed(context, Routes.selectInterestRoute);
   }
 
   @override

@@ -21,6 +21,7 @@ import 'package:event_app/app/view/splash_screen.dart';
 import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:flutter/material.dart';
 
+import '../chat/views/chat_screen.dart';
 import '../view/category/category_screen.dart';
 import '../view/intro/welcome.dart';
 import '../view/login/login_screens.dart';
@@ -38,6 +39,7 @@ class AppPages {
     Routes.resetPasswordRoute: (context) => const ResetPassword(),
     Routes.signUpRoute: (context) => const SignUpScreen(),
     Routes.multipleLanguageScreen: (context) => MultipleLanguageScreen(),
+    Routes.chatRoute: (context) => const ChatScreen(),
     Routes.verifyRoute: (context) => const VerifyScreen(),
     Routes.selectInterestRoute: (context) => const SelectInterestScreen(),
     Routes.trendingScreenRoute: (context) => const CategoryScreen(),

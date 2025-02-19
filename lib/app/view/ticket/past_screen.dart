@@ -34,7 +34,7 @@ class _PastScreenState extends State<PastScreen> {
                 stream: FirebaseFirestore.instance
                     .collection("users")
                     .doc(sb.uid)
-                    .collection('Join Event')
+                    .collection('joinEvent')
                     .where("status", isEqualTo: "past")
                     .snapshots(),
                 builder: (
@@ -184,21 +184,6 @@ class itemData extends StatelessWidget {
           final events = list?.map((e) {
             return EventBaru.fromFirestore(e, 1);
           }).toList();
-          // String? category = list?[i]['category'].toString();
-          // String? date = list?[i]['date'].toString();
-          // String? image = list?[i]['image'].toString();
-          // String? description = list?[i]['description'].toString();
-          // String? id = list?[i]['id'].toString();
-          // String? location = list?[i]['location'].toString();
-          // double? mapsLangLink = list?[i]['mapsLangLink'];
-          // double? mapsLatLink = list?[i]['mapsLatLink'];
-          // int? price = list?[i]['price'];
-          // String? title = list?[i]['title'].toString();
-          // String? type = list?[i]['type'].toString();
-          // String? userDesc = list?[i]['userDesc'].toString();
-          // String? userName = list?[i]['userName'].toString();
-          // String? ticket = list?[i]['ticket'].toString();
-          // String? userProfile = list?[i]['userProfile'].toString();
           String? code = events?[i].title;
           String? codes = sb.name;
           return Padding(
@@ -260,14 +245,6 @@ class itemData extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    getCustomFont(
-                                        ("Ticket :").tr() +
-                                            "${events?[i].ticket}",
-                                        15.sp,
-                                        Colors.black,
-                                        1,
-                                        fontWeight: FontWeight.w500,
-                                        txtHeight: 1.46.h),
                                     Container(
                                       decoration: BoxDecoration(
                                         color: lightAccent,

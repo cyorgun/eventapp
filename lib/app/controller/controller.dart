@@ -348,21 +348,6 @@ class TrendingController extends GetxController {
   }
 }
 
-class BuyTicketController extends GetxController {
-  RxInt select = 0.obs;
-  RxInt count = 1.obs;
-
-  countChange(RxInt value) {
-    count.value = value.value;
-    update();
-  }
-
-  onChange(RxInt value) {
-    select.value = value.value;
-    update();
-  }
-}
-
 class PaymentController extends GetxController {
   RxInt select = 0.obs;
 

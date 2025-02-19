@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:event_app/app/chat_logic/models/message_chat.dart';
-import 'package:event_app/app/chat_logic/pages/full_photo_page.dart';
+import 'package:event_app/app/chatroom_logic/models/message_chat.dart';
+import 'package:event_app/app/chatroom_logic/pages/full_photo_page.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -16,19 +16,19 @@ import 'package:provider/provider.dart';
 import '../../provider/sign_in_provider.dart';
 import '../constants/color_constants.dart';
 import '../constants/firestore_constants.dart';
-import '../providers/chat_provider.dart';
+import '../providers/chatroom_provider.dart';
 import '../widgets/widgets.dart';
 
-class ChatPage extends StatefulWidget {
-  ChatPage({Key? key, required this.arguments}) : super(key: key);
+class ChatroomPage extends StatefulWidget {
+  ChatroomPage({Key? key, required this.arguments}) : super(key: key);
 
   final ChatPageArguments arguments;
 
   @override
-  ChatPageState createState() => ChatPageState();
+  ChatroomPageState createState() => ChatroomPageState();
 }
 
-class ChatPageState extends State<ChatPage> {
+class ChatroomPageState extends State<ChatroomPage> {
   late String currentUserId = sb.uid!;
 
   List<QueryDocumentSnapshot> listMessage = [];
@@ -45,13 +45,13 @@ class ChatPageState extends State<ChatPage> {
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
 
-  late ChatProvider chatProvider;
+  late ChatroomProvider chatProvider;
   late SignInProvider sb;
 
   @override
   void initState() {
     super.initState();
-    chatProvider = context.read<ChatProvider>();
+    chatProvider = context.read<ChatroomProvider>();
     sb = context.read<SignInProvider>();
 
     focusNode.addListener(onFocusChange);
@@ -850,7 +850,7 @@ class ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.white,
         elevation: 0.0,
         title: Text(
-          this.widget.arguments.peerId,
+          this.widget.arguments.peerName,
           // ignore: prefer_const_constructors
           style: TextStyle(
               color: ColorConstants.primaryColor,
@@ -1141,12 +1141,13 @@ class ChatPageState extends State<ChatPage> {
 }
 
 class ChatPageArguments {
+  final String peerName;
   final String peerId;
   final String peerAvatar;
   final String peerNickname;
 
   ChatPageArguments(
-      {required this.peerId,
+      {required this.peerName, required this.peerId,
       required this.peerAvatar,
       required this.peerNickname});
 }
