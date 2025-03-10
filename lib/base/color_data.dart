@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 Color accentColor = "#FF725E".toColor();
+Color fadedAccentColor = "#66FF725E".toColor();
 Color bgColor = "#F5F9F9".toColor();
 Color greyColor = "#7C8788".toColor();
 Color borderColor = "#BCCCCD".toColor();

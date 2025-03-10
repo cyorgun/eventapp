@@ -1,13 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 
 import '../../base/color_data.dart';
 import '../../base/widget_utils.dart';
 import '../routes/app_routes.dart';
-import '../view/featured_event/featured_event_detail.dart';
 
 class Card4 extends StatelessWidget {
   final EventBaru events;
@@ -19,7 +17,7 @@ class Card4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime? dateTime = events!.date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
     return InkWell(
         child: Container(
           height: 150.0,

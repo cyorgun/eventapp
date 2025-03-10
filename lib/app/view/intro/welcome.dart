@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart';
 
 import '../../../base/constant.dart';
-import '../../dialog/snacbar copy.dart';
+import '../../dialog/snacbar.dart';
 import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
 import '../Multiple_Language/multiple_language_screen.dart';

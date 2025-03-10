@@ -3,6 +3,8 @@ import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../modal/users_model.dart';
+
 class SearchProvider with ChangeNotifier {
   SearchProvider() {
     getRecentSearchList();
@@ -57,6 +59,27 @@ class SearchProvider with ChangeNotifier {
         u['description'].toLowerCase().contains(_searchText.toLowerCase()))));
     data = _snap.map((e) => EventBaru.fromFirestore(e, 1)).toList();
     return data;
+  }
+
+  Future<List> getDataUser() async {
+
+    List<UserModel> data = [];
+    QuerySnapshot rawData = await firestore
+        .collection('users')
+        .get();
+
+    List<DocumentSnapshot> _snap = [];
+    _snap.addAll(rawData.docs
+        .where((u) => (
+
+        u['name'].toLowerCase().contains(_searchText.toLowerCase()) ||
+            u['email'].toLowerCase().contains(_searchText.toLowerCase())
+
+    )));
+    data = _snap.map((e) => UserModel.fromFirestore(e)).toList();
+    return data;
+
+
   }
 
   setSearchText(value) {

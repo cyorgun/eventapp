@@ -69,7 +69,7 @@ class AuthProvider extends ChangeNotifier {
             .get();
         final List<DocumentSnapshot> documents = result.docs;
         if (documents.length == 0) {
-          // Writing data to server because here is a new user
+          // Writing data to server because here is a new admin_specific
           firebaseFirestore
               .collection(FirestoreConstants.pathUserCollection)
               .doc(firebaseUser.uid)

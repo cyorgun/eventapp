@@ -1,10 +1,16 @@
 abstract class Routes {
+  static const searchPage = Paths.searchPage;
+  static const eventListScreen = Paths.eventListScreen;
+  static const userListScreen = Paths.userListScreen;
+  static const createUserScreen = Paths.createUserScreen;
   static const onboardingPage = Paths.onboardingPage;
   static const splashScreen = Paths.splashScreen;
   static const homeRoute = Paths.homePath;
   static const introRoute = Paths.introPath;
   static const loginRoute = Paths.loginPath;
   static const homeScreenRoute = Paths.homeScreenPath;
+  static const adminHomeScreenRoute = Paths.adminHomeScreenPath;
+  static const createNotificationScreen = Paths.createNotificationScreen;
   static const forgotPasswordRoute = Paths.forgotPasswordPath;
   static const resetPasswordRoute = Paths.resetPasswordPath;
   static const signUpRoute = Paths.signUpPath;
@@ -31,6 +37,11 @@ abstract class Routes {
 }
 
 abstract class Paths {
+  static const searchPage = "/SearchPage";
+  static const eventListScreen = "/EventListScreen";
+  static const userListScreen = "/UserListScreen";
+  static const createUserScreen = "/CreateUserScreen";
+  static const createNotificationScreen = "/CreateNotificationScreen";
   static const chatRoute = "/ChatScreen";
   static const multipleLanguagePath = "/MultipleLanguageScreen";
   static const onboardingPage = "/OnboardingPage";
@@ -40,6 +51,7 @@ abstract class Paths {
   static const introPath = "/IntroScreen";
   static const loginPath = "/LoginScreen";
   static const homeScreenPath = "/HomeScreen";
+  static const adminHomeScreenPath = "/AdminHomeScreen";
   static const forgotPasswordPath = "/ForgotPassword";
   static const resetPasswordPath = "/ResetPassword";
   static const signUpPath = "/SignUpScreen";

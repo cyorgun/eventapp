@@ -32,6 +32,13 @@ dependencies:
   evente:
     git:
       url: https://github.com/JipauDev/evente.git
+
+  visibility_detector: ^0.4.0+2
+  firebase_analytics:
+  #charts_flutter:
+  syncfusion_flutter_charts:
+  flutter_barcode_listener: ^0.1.3
+  qr_code_scanner: ^1.0.1
   get: 
   flutter_screenutil: 
   share_plus:
@@ -40,6 +47,7 @@ dependencies:
   shared_preferences: 
   # pinput: 
   convex_bottom_bar: ^3.2.0
+  intl_phone_field: ^3.1.0
   nb_utils: ^6.0.0
   readmore: 
   the_apple_sign_in: ^1.1.1
@@ -93,6 +101,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_localizations:
     sdk: flutter
+  lucide_icons: ^0.257.0
+  in_app_purchase: ^3.2.1
+  cloud_functions: ^4.4.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
@@ -143,6 +154,8 @@ flutter:
     - assets/Lang/hi-IN.json
     - assets/Lang/zh-CN.json
     - assets/Lang/fr-CH.json
+    - assets/Lang/tr-TR.json
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

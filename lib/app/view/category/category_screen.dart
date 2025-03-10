@@ -27,7 +27,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
     setStatusBarColor(Colors.white);
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -58,7 +57,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           ]),
       body: SafeArea(
         child: DefaultTabController(
-          length: 13,
+          length: 14,
           child: Scaffold(
             backgroundColor: Colors.white,
             appBar: PreferredSize(
@@ -259,7 +258,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ),
                       ),
-
                       Tab(
                         child: Container(
                           height: 47.h,
@@ -299,7 +297,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ),
                       ),
-
                       Tab(
                         child: Container(
                           height: 47.h,
@@ -339,7 +336,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ),
                       ),
-
                       Tab(
                         child: Container(
                           height: 47.h,
@@ -496,7 +492,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ),
                       ),
-
                       Tab(
                         child: Container(
                           height: 47.h,
@@ -575,6 +570,44 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ),
                         ),
                       ),
+                      Tab(
+                        child: Container(
+                          height: 47.h,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2.0, bottom: 2.0),
+                                    child: Container(
+                                      height: 44.h,
+                                      width: 44.h,
+                                      decoration: BoxDecoration(
+                                          color: lightAccent,
+                                          borderRadius:
+                                          BorderRadius.circular(20.h)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 9.h, vertical: 9.h),
+                                      child: Icon(Icons.more_horiz)
+                                    ),
+                                  ),
+                                  getHorSpace(6.h),
+                                ],
+                              ),
+                              Text(
+                                ("Other").tr(),
+                                style: TextStyle(
+                                    fontFamily: Constant.fontsFamily,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              getHorSpace(6.h)
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   )),
             ),
@@ -584,7 +617,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 children: [
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection("event")
+                        .collection("event").where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -609,7 +642,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'swimming')
+                        .where('category', isEqualTo: 'swimming').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -638,7 +671,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'game')
+                        .where('category', isEqualTo: 'game').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -662,7 +695,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'football')
+                        .where('category', isEqualTo: 'football').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -686,7 +719,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'comedy')
+                        .where('category', isEqualTo: 'comedy').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -710,7 +743,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'konser')
+                        .where('category', isEqualTo: 'konser').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -734,7 +767,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'trophy')
+                        .where('category', isEqualTo: 'trophy').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -758,7 +791,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'tour')
+                        .where('category', isEqualTo: 'tour').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -782,7 +815,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'festival')
+                        .where('category', isEqualTo: 'festival').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -806,7 +839,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'study')
+                        .where('category', isEqualTo: 'study').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -830,7 +863,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'party')
+                        .where('category', isEqualTo: 'party').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -854,7 +887,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'olympic')
+                        .where('category', isEqualTo: 'olympic').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -878,7 +911,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("event")
-                        .where('category', isEqualTo: 'culture')
+                        .where('category', isEqualTo: 'culture').where('type', isEqualTo: 'user')
                         .snapshots(),
                     builder: (BuildContext ctx,
                         AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -896,6 +929,30 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           ? TrendingEventCard(
                               list: snapshot.data?.docs,
                             )
+                          : Container();
+                    },
+                  ),
+                  StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("event")
+                        .where('category', isEqualTo: 'other').where('type', isEqualTo: 'user')
+                        .snapshots(),
+                    builder: (BuildContext ctx,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(child: EmptyScreen());
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error'));
+                      }
+                      return snapshot.hasData
+                          ? TrendingEventCard(
+                        list: snapshot.data?.docs,
+                      )
                           : Container();
                     },
                   ),

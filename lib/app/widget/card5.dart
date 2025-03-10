@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/widget/join_number_widget.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class Card5 extends StatelessWidget {
   Widget build(BuildContext context) {
     final sb = context.watch<SignInProvider>();
     DateTime? dateTime = events!.date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
 
     handleLoveClick() {
       context.read<BookmarkProvider>().onBookmarkIconClick(events.id, context.read<SignInProvider>().uid);

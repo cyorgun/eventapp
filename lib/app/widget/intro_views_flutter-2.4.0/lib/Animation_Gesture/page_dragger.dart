@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 import '../Models/slide_update_model.dart';
 
-/// This class is used to get user gesture and work according to it.
+/// This class is used to get admin_specific gesture and work according to it.
 
 class PageDragger extends StatefulWidget {
-  //These bool variables are used to check whether user can drag left or right or none.
+  //These bool variables are used to check whether admin_specific can drag left or right or none.
   final bool? canDragLeftToRight;
   final bool? canDragRightToLeft;
   final double fullTransitionPX;
@@ -34,12 +34,12 @@ class _PageDraggerState extends State<PageDragger> {
   SlideDirection? slideDirection;
   double slidePercent = 0.0;
 
-  // This methods executes when user starts dragging.
+  // This methods executes when admin_specific starts dragging.
   onDragStart(DragStartDetails details) {
     dragStart = details.globalPosition;
   }
 
-  // This methods executes while user is dragging.
+  // This methods executes while admin_specific is dragging.
   onDragUpdate(DragUpdateDetails details) {
     if (dragStart != null) {
       //Getting new position details
@@ -70,7 +70,7 @@ class _PageDraggerState extends State<PageDragger> {
     }
   }
 
-  // This method executes when user ends dragging.
+  // This method executes when admin_specific ends dragging.
   onDragEnd(DragEndDetails details) {
     // Adding to slideUpdateStream
     widget.slideUpdateStream!.add(SlideUpdate(

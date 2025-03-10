@@ -1,6 +1,17 @@
 {
-  "@@locale": "en", 
+  "@@locale": "hi-IN",
   "language": "हिंदी",
+
+  "Chat": "चैट",
+  "Type a message": "संदेश टाइप करें",
+  "No messages yet": "अभी तक कोई संदेश नहीं",
+  "other": "अन्य",
+  "Featured Events": "विशेष कार्यक्रम",
+  "User Events": "उपयोगकर्ता कार्यक्रम",
+  "Very soon!": "बहुत जल्द!",
+  "Capacity": "क्षमता",
+  "turkish": "तुर्की",
+
   "changeLanguage": "भाषा बदलें",
   "contohKata": "विभिन्न भाषाओं को दिखाने के लिए पाठ का उदाहरण",
   "english": "अंग्रेज़ी",

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,8 @@ import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_apple_sign_in/the_apple_sign_in.dart';
+
+import '../dialog/snacbar.dart';
 
 class SignInProvider extends ChangeNotifier {
   SignInProvider() {
@@ -50,6 +53,14 @@ class SignInProvider extends ChangeNotifier {
 
   String? get uid => _uid;
 
+  bool _isSubscriptionActive = false;
+
+  bool get isSubscriptionActive => _isSubscriptionActive;
+
+  String? _subscriptionPlan;
+
+  String? get subscriptionPlan => _subscriptionPlan;
+
   String? _email;
 
   String? get email => _email;
@@ -78,11 +89,39 @@ class SignInProvider extends ChangeNotifier {
 
   final GoogleSignIn _googleSignIn = new GoogleSignIn();
 
-  void initPackageInfo() async {
+  Future initPackageInfo() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _appVersion = packageInfo.version;
     _packageName = packageInfo.packageName;
     notifyListeners();
+  }
+
+  Future<void> verifyUserSubscription() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print("Kullanıcı giriş yapmamış.");
+      return;
+    }
+
+    // Kullanıcının Firebase Authentication ID Token'ını al
+    String? idToken = await user.getIdToken();
+    print("Flutter'dan Gönderilen ID Token: $idToken");
+
+    try {
+      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'us-central1')
+          .httpsCallable('verifyUserSubscription');
+
+      // ID Token'ı bir JSON objesi içinde gönderiyoruz
+      final result = await callable.call({"idToken": idToken});
+
+      print("Cloud Function Cevabı: ${result.data}");
+    } catch (e) {
+      print("Cloud Function Hatası: $e");
+    }
+    try {
+      await checkSubscription();
+    } catch (e) {
+    }
   }
 
   Future signInWithApple() async {
@@ -131,7 +170,7 @@ class SignInProvider extends ChangeNotifier {
   }
 
   Future signUpWithEmailPassword(
-      userName, userEmail, userPassword, userPhone)
+      userName, userEmail, userPassword, isOrganization)
   async {
     try {
       final User? user = (await _firebaseAuth.createUserWithEmailAndPassword(
@@ -145,8 +184,7 @@ class SignInProvider extends ChangeNotifier {
       this._uid = user.uid;
       this._imageUrl = defaultUserImageUrl;
       this._email = user.email;
-      this._phone = userPhone;
-      this._role = "user";
+      this._role = isOrganization? "admin_specific" : "user";
       this._signInProvider = 'email';
 
       _isSignedIn = true;
@@ -221,9 +259,13 @@ class SignInProvider extends ChangeNotifier {
       print('User Exists');
       return true;
     } else {
-      print('new user');
+      print('new admin_specific');
       return false;
     }
+  }
+
+  getCurrentUser() {
+    return _firebaseAuth.currentUser;
   }
 
   Future saveToFirebase() async {
@@ -238,7 +280,8 @@ class SignInProvider extends ChangeNotifier {
       'role': _role,
       'timestamp': timestamp,
       'bookmarked items': [],
-      'interest_items': []
+      'interest_items': [],
+      'eventCount': _role == "admin_specific" ? 2 : 1
     };
     await ref.set(userData);
   }
@@ -314,9 +357,15 @@ class SignInProvider extends ChangeNotifier {
     }).catchError((err) {});
   }
 
+  Future addPhone(String newPhone) async {
+    FirebaseFirestore.instance.collection('users').doc(_uid).set({
+      'phone': newPhone,
+    }, SetOptions(merge: true));
+    _phone = newPhone;
+  }
+
   Future updateUserProfile(
       String newName, String newImageUrl, String newPhone) async {
-    final SharedPreferences sp = await SharedPreferences.getInstance();
 
     FirebaseFirestore.instance.collection('users').doc(_uid).update({
       'name': newName,
@@ -324,13 +373,45 @@ class SignInProvider extends ChangeNotifier {
       'phone': newPhone,
     });
 
-    sp.setString('name', newName);
-    sp.setString('image_url', newImageUrl);
-    sp.setString('phone', newPhone);
     _name = newName;
     _imageUrl = newImageUrl;
     _phone = newPhone;
 
+    //TODO: may need to also add these firebaseauth user too
+
     notifyListeners();
+  }
+
+  Future<bool> isUserVerified() async {
+      // Eğer kullanıcı giriş yapmamışsa, false döndür
+      if (_firebaseAuth.currentUser == null) {
+        return false;
+      } else {
+        // Eğer phoneNumber null değilse, kullanıcı doğrulama yapmıştır
+        return _firebaseAuth.currentUser!.phoneNumber != null;
+      }
+  }
+
+  Future signInWithCredential(PhoneAuthCredential credential) async {
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  Future checkSubscription() async {
+    User? user = FirebaseAuth.instance.currentUser;  // Şu anki kullanıcıyı al
+    if (user == null) {
+      return;
+    }
+    final DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+
+    if (userDoc.exists && userDoc.data() != null) {
+      final subscription = userDoc['subscription'];
+      if (subscription != null) {
+        Timestamp endDate = subscription['endDate'];
+        Timestamp now = Timestamp.now();
+        _isSubscriptionActive = now.seconds < endDate.seconds;
+        _subscriptionPlan = subscription['plan'];
+        notifyListeners();
+      }
+    }
   }
 }

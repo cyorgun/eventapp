@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_app/app/chat/providers/chat_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,7 @@ class ChatScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ChatProvider(userId: userId, otherUserId: otherUserId),
       child: Scaffold(
-        appBar: AppBar(title: Text("Chat"), iconTheme: IconThemeData(
+        appBar: AppBar(title: Text("Chat".tr()), iconTheme: IconThemeData(
           color: accentColor,
         ),),
         body: ChatBody(),
@@ -41,7 +42,7 @@ class ChatBody extends StatelessWidget {
                 return Center(child: CircularProgressIndicator());
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return Center(child: Text("No messages yet"));
+                return Center(child: Text("No messages yet".tr()));
               }
               return ListView(
                 reverse: true,
@@ -75,7 +76,7 @@ class ChatBody extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: messageController,
-                  decoration: InputDecoration(hintText: "Type a message"),
+                  decoration: InputDecoration(hintText: "Type a message".tr()),
                 ),
               ),
               IconButton(

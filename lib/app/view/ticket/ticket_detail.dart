@@ -117,7 +117,7 @@ class _TicketDetailState extends State<TicketDetail> {
   @override
   Widget build(BuildContext context) {
     DateTime? dateTime = widget.event?.date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
     final sb = context.watch<SignInProvider>();
     setStatusBarColor(Colors.white);
     return Scaffold(

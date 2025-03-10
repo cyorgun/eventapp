@@ -1,7 +1,17 @@
-
 {
-  "@@locale": "en",
+  "@@locale": "zh-CN",
   "language": "中文",
+
+  "Chat": "聊天",
+  "Type a message": "输入消息",
+  "No messages yet": "尚无消息",
+  "other": "其他",
+  "Featured Events": "精选活动",
+  "User Events": "用户活动",
+  "Very soon!": "很快！",
+  "Capacity": "容量",
+  "turkish": "土耳其语",
+
   "changeLanguage": "更改语言",
   "contohKata": "显示多种语言的文本示例",
   "english": "英语",

@@ -1,4 +1,5 @@
 import 'package:event_app/app/view/Multiple_Language/multiple_language_screen.dart';
+import 'package:event_app/app/view/admin_specific/admin_home_screen.dart';
 import 'package:event_app/app/view/create_event/create_event_screen.dart';
 import 'package:event_app/app/view/featured_event/buy_ticket.dart';
 import 'package:event_app/app/view/featured_event/featured_event_detail.dart';
@@ -14,7 +15,6 @@ import 'package:event_app/app/view/profile/edit_profile.dart';
 import 'package:event_app/app/view/select_interest/select_interest_screen.dart';
 import 'package:event_app/app/view/setting/help_screen.dart';
 import 'package:event_app/app/view/setting/privacy_screen.dart';
-import 'package:event_app/app/view/setting/setting_screen.dart';
 import 'package:event_app/app/view/signup/signup_screen.dart';
 import 'package:event_app/app/view/signup/verify_screen.dart';
 import 'package:event_app/app/view/splash_screen.dart';
@@ -22,19 +22,30 @@ import 'package:event_app/app/view/ticket/ticket_detail.dart';
 import 'package:flutter/material.dart';
 
 import '../chat/views/chat_screen.dart';
+import '../view/admin_specific/Create_Notification_Screen.dart';
+import '../view/admin_specific/Create_User_Screen.dart';
+import '../view/admin_specific/Event_List_Screen.dart';
+import '../view/admin_specific/User_List_Screen.dart';
 import '../view/category/category_screen.dart';
+import '../view/home/search_screen.dart';
 import '../view/intro/welcome.dart';
-import '../view/login/login_screens.dart';
+import '../view/login/login_screen.dart';
 import '../view/popular_event/popular_event_list.dart';
 import 'app_routes.dart';
 
 class AppPages {
   static const initialRoute = Routes.homeRoute;
   static Map<String, WidgetBuilder> routes = {
+    Routes.searchPage: (context) => const SearchPage(),
+    Routes.eventListScreen: (context) => const EventListScreen(),
+    Routes.userListScreen: (context) => const UserListScreen(),
+    Routes.createUserScreen: (context) => const CreateUserScreen(),
+    Routes.createNotificationScreen: (context) => const CreateNotificationScreen(),
     Routes.onboardingPage: (context) => const OnBoarding(),
     Routes.splashScreen: (context) => const SplashScreen(),
     Routes.loginRoute: (context) => LoginScreen(),
     Routes.homeScreenRoute: (context) => const HomeScreen(),
+    Routes.adminHomeScreenRoute: (context) => const AdminHomeScreen(),
     Routes.forgotPasswordRoute: (context) => const ForgotPassword(),
     Routes.resetPasswordRoute: (context) => const ResetPassword(),
     Routes.signUpRoute: (context) => const SignUpScreen(),
@@ -48,7 +59,6 @@ class AppPages {
     Routes.paymentRoute: (context) => PaymentScreen(),
     Routes.createEventRoute: (context) => const CreateEventScreen(),
     Routes.ticketDetailRoute: (context) => TicketDetail(),
-    Routes.settingRoute: (context) => const SettingScreen(),
     Routes.featuredEventDetailRoute: (context) => const FeaturedEventDetail(),
     Routes.editProfileRoute: (context) => const EditProfile(),
     Routes.notificationScreenRoute: (context) => const NotificationScreen(),

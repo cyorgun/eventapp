@@ -1,13 +1,14 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:event_app/app/view/home/tab/tab_maps.dart';
+import 'package:event_app/app/view/create_event/create_event_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 // import '../../../base/app_bar/bar.dart';
 // import '../../../base/app_bar/item.dart';
 import '../../../base/color_data.dart';
 import '../../../base/widget_utils.dart';
+import '../../provider/sign_in_provider.dart';
 import 'tab/tab_favourite.dart';
 import 'tab/tab_home.dart';
 import 'tab/tab_profile.dart';
@@ -21,24 +22,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
   @override
   void initState() {
-    // TODO: implement initState
-    getFromSharedPreferences();
     super.initState();
+    final sb = context.read<SignInProvider>();
+    sb.verifyUserSubscription();
   }
-
-  void getFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      role = prefs.getString("role");
-    });
-  }
-
-  String? role;
-
-  int _currentIndex = 0;
 
   void onTabTapped(int index) {
     setState(() {
@@ -48,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _widgetOptions = [
     const TabHome(),
-    TabFavourite(),
-    MapsScreenT1(),
+    const TabFavourite(),
+    const CreateEventScreen(fromAdmin: false),
     const TabTicket(),
     const TabProfile()
   ];
@@ -82,13 +73,13 @@ class _HomeScreenState extends State<HomeScreen> {
         TabItem(
             icon: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: getSvg("map.svg",
+              child: getSvg("add.svg",
                   height: 24.h, width: 24.h, color: Colors.white),
             ),
             activeIcon: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: getSvg("map2.svg",
-                  height: 24.h, width: 24.h, color: Colors.white),
+              child: getSvg("add.svg",
+                  height: 24.h, width: 24.h, color: Colors.lightBlue),
             )),
         TabItem(
             icon: getSvg("ticket.svg", height: 24.h, width: 24.h),

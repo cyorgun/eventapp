@@ -23,7 +23,9 @@ import '../../../base/widget_utils.dart';
 import '../../provider/sign_in_provider.dart';
 
 class CreateEventScreen extends StatefulWidget {
-  const CreateEventScreen({Key? key}) : super(key: key);
+  final bool fromAdmin;
+
+  const CreateEventScreen({Key? key, this.fromAdmin = false}) : super(key: key);
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -31,23 +33,25 @@ class CreateEventScreen extends StatefulWidget {
 
 class _CreateEventScreenState extends State<CreateEventScreen> {
   // CreateEventController controller =Get.put(CreateEventController());
-  String dropdownvalue = ('swimming').tr();
-  String dropdownvalue2 = 'category';
+  String dropdownvalue = ('swimming');
+  // String dropdownvalue2 = 'category'; //trending vs 3 tane formu var.
 
   int _latitude = 0;
+
   var items = [
-    ('swimming').tr(),
-    ('game').tr(),
-    ('football').tr(),
-    ('comedy').tr(),
-    ('konser').tr(),
-    ('trophy').tr(),
-    ('tour').tr(),
-    ('festival').tr(),
-    ('study').tr(),
-    ('party').tr(),
-    ('olympic').tr(),
-    ('culture').tr()
+    ('swimming'),
+    ('game'),
+    ('football'),
+    ('comedy'),
+    ('concert'),
+    ('trophy'),
+    ('tour'),
+    ('festival'),
+    ('study'),
+    ('party'),
+    ('olympic'),
+    ('culture'),
+    ('other'),
   ];
 
   String? imageUrl;
@@ -218,6 +222,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     });
   }
 
+  void resetData() {
+    setState(() {
+      dateCtrl.text = "";
+      timeCtrl.text = "";
+      descCtrl.text = "";
+      imageUrl = "";
+      locCtrl.text = "";
+      _controllerLatitude.text = "";
+      _controllerLongitude.text = "";
+      priceCtrl.text = "";
+      titleCtrl.text = "";
+      dropdownvalue = 'swimming';
+      imageFile = null;
+    });
+  }
+
   handleUpdateData() async {
     final sb = context.read<SignInProvider>();
     DateTime chosenDate = DateFormat('dd/MM/yyyy').parse(dateCtrl.text);
@@ -241,6 +261,45 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         formKey.currentState!.save();
         setState(() => loading = true);
 
+        final userRef = FirebaseFirestore.instance.collection("users").doc(sb.uid);
+        final userDoc = await userRef.get();
+
+        String? userPlan = userDoc.exists && userDoc.data()!.containsKey("subscription")
+            ? userDoc.data()!["subscription"]["plan"]
+            : null;
+        Timestamp? endDate = userDoc.exists && userDoc.data()!.containsKey("subscription")
+            ? userDoc.data()!["subscription"]["endDate"]
+            : null;
+        int? eventCount = userDoc.exists && userDoc.data()!.containsKey("eventCount")
+            ? userDoc.data()!["eventCount"]
+            : 0;
+
+        bool isSubscriptionActive = endDate != null && endDate.toDate().isAfter(DateTime.now());
+
+        if (isSubscriptionActive && (userPlan == "pro_plan_subscription" || userPlan == "premium_plan_subscription")) {
+          // Kullanıcı Pro veya Premium planındaysa eventCount'a bakmadan etkinlik oluşturabilir
+        } else if (!isSubscriptionActive || userPlan == "temel_plan_subscription") {
+          if (eventCount == null || eventCount <= 0) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.redAccent,
+                content: Text("Etkinlik oluşturma hakkınız tükendi."),
+              ),
+            );
+            setState(() => loading = false);
+            return;
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text("Etkinlik oluşturabilmek için aktif bir aboneliğiniz olmalı."),
+            ),
+          );
+          setState(() => loading = false);
+          return;
+        }
+
         final eventRef = FirebaseFirestore.instance.collection("event").doc(); // Otomatik ID oluştur
         final eventId = eventRef.id; // ID'yi al
 
@@ -251,7 +310,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           "description": descCtrl.text,
           "id": eventId, // Firestore'un ID'si burada saklanıyor
           "image": imageFile == null ? imageUrl : await uploadPicture(),
-          "location": locCtrl.text,
+          "location": locCtrl.text.toLowerCase(),
           "latLng": GeoPoint(
               double.tryParse(_controllerLatitude.text) ?? 0.0,
               double.tryParse(_controllerLongitude.text) ?? 0.0),
@@ -262,16 +321,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           "price": int.tryParse(priceCtrl.text) ?? 0,
           "capacity": int.tryParse(capacityCtrl.text) ?? 0,
           "title": titleCtrl.text,
-          "type": dropdownvalue2.toString(),
+          "type": sb.role,
           "userDesc": "Organizer",
           "userName": sb.name,
+          "uid": sb.uid,
           "userProfile": sb.imageUrl
         };
 
-        await eventRef.set(eventData).then((_) {
+        await eventRef.set(eventData).then((_) async {
+          // Eğer kullanıcı temel plan kullanıyorsa veya aboneliği yoksa veya süresi bitmişse eventCount'u azalt
+          if (!isSubscriptionActive || userPlan == "temel_plan_subscription") {
+            await userRef.update({"eventCount": eventCount! - 1});
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              backgroundColor: Colors.redAccent,
+              backgroundColor: Colors.green,
               content: Text(
                 ('uploadSuccess').tr(),
                 textAlign: TextAlign.center,
@@ -280,7 +345,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           );
 
           sendNotification(("newEvent").tr(), titleCtrl.text);
-          Navigator.of(context).pop();
           showDialog(
             builder: (context) => const EventpublishDialog(),
             context: context,
@@ -294,7 +358,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     onMapCreated;
     _onLatitudeTextChanged;
     _controllerLatitude.addListener(_onLatitudeTextChanged);
@@ -306,29 +369,31 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    bool isButtonDisabled = false;
+  bool isButtonDisabled() {
     if (titleCtrl.text == "" ||
-        imageFile == null ||
         descCtrl.text == "" ||
         locCtrl.text == "" ||
-        priceCtrl.text == "" ||
+        (widget.fromAdmin ? priceCtrl.text == "" : false) ||
         capacityCtrl.text == "" ||
         dateCtrl.text == "" ||
         timeCtrl.text == "" ||
         _controllerLatitude.text == "" ||
         _controllerLongitude.text == "") {
-      isButtonDisabled = true;
+      return true;
+    } else {
+      return false;
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     num intValue = num.tryParse(_controllerLatitude.text) ?? 0.0;
     return Scaffold(
-      appBar: buildAppBar(),
       body: Form(
         key: formKey,
         child: Column(
           children: [
+            buildAppBar(),
             Divider(color: dividerColor, thickness: 1.h, height: 1.h),
             Expanded(
                 flex: 1,
@@ -435,7 +500,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         items: items.map((String items) {
                           return DropdownMenuItem(
                             value: items,
-                            child: Text(items),
+                            child: Text(items.tr()),
                           );
                         }).toList(),
                         onChanged: (String? newValue) {
@@ -456,11 +521,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         context, ("enterDescription").tr(), descCtrl,
                         isEnable: false, height: 60.h, minLines: true),
 
-                    getVerSpace(20.h),
-                    getCustomFont(("price").tr(), 16.sp, Colors.black, 1,
-                        fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                    getVerSpace(4.h),
-                    TextFormField(
+                    getVerSpace(widget.fromAdmin ? 20.h : 0.h),
+                    widget.fromAdmin ? getCustomFont(("price").tr(), 16.sp, Colors.black, 1,
+                        fontWeight: FontWeight.w600, txtHeight: 1.5.h) : Container(),
+                    getVerSpace(widget.fromAdmin ? 4.h : 0.h),
+                    widget.fromAdmin ? TextFormField(
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
@@ -524,7 +589,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       //     email = value;
                       //   });
                       // },
-                    ),
+                    ) : Container(),
+                    getVerSpace(20.h),
+                    getCustomFont(("Capacity").tr(), 16.sp, Colors.black, 1,
+                        fontWeight: FontWeight.w600, txtHeight: 1.5.h),
+                    getVerSpace(4.h),
                     TextFormField(
                       style: TextStyle(
                           color: Colors.black,
@@ -532,8 +601,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           fontSize: 16.sp,
                           fontFamily: Constant.fontsFamily),
                       decoration: InputDecoration(
-                          hintText: ('enterCapacity').tr(),
-                          labelText: ("capacity").tr(),
+                          hintText: ('Capacity').tr(),
                           counter: Container(),
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 20, horizontal: 20),
@@ -894,32 +962,21 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
 
                     getVerSpace(30.h),
-                    isButtonDisabled
-                        ? loading == true
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                  backgroundColor: Colors.white,
-                                ),
-                              )
-                            : getButton(
-                                context,
-                                accentColor,
-                                ("pleaseAddData").tr(),
-                                Colors.white,
-                                () {},
-                                18.sp,
-                                weight: FontWeight.w700,
-                                borderRadius: BorderRadius.circular(22.h),
-                                buttonHeight: 60.h)
-                        : loading == true
-                            ? Center(
+                        loading == true
+                        ? Center(
                                 child: CircularProgressIndicator(
                                   backgroundColor: Colors.white,
                                 ),
                               )
                             : getButton(context, accentColor, ("publish").tr(),
                                 Colors.white, () {
-                                handleUpdateData();
+                              if (isButtonDisabled()) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("pleaseAddData".tr())),
+                                );
+                              } else {
+                              handleUpdateData();
+                              }
                               }, 18.sp,
                                 weight: FontWeight.w700,
                                 borderRadius: BorderRadius.circular(22.h),
@@ -933,265 +990,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
   }
 
-  // Column buildImageWidget() {
-  //   return Column(
-  //     children: [
-  //       GestureDetector(
-  //         onTap: () {
-  //           if (controller.image1 == null) {
-  //             _onPictureSelection1();
-  //           }
-  //         },
-  //         child: GetBuilder<CreateEventController>(
-  //           init: CreateEventController(),
-  //           builder: (controller) => controller.image1 == null
-  //               ? Container(
-  //                   height: 155.h,
-  //                   decoration: BoxDecoration(
-  //                       color: lightColor,
-  //                       borderRadius: BorderRadius.circular(22.h)),
-  //                   child: DottedBorder(
-  //                       dashPattern: const [6, 6],
-  //                       color: accentColor,
-  //                       strokeWidth: 1.h,
-  //                       radius: Radius.circular(22.h),
-  //                       borderType: BorderType.RRect,
-  //                       child: Column(
-  //                         mainAxisAlignment: MainAxisAlignment.center,
-  //                         crossAxisAlignment: CrossAxisAlignment.center,
-  //                         children: [
-  //                           Align(
-  //                             alignment: Alignment.topCenter,
-  //                             child: Container(
-  //                               height: 48.h,
-  //                               width: 48.h,
-  //                               padding: EdgeInsets.all(14.h),
-  //                               decoration: BoxDecoration(
-  //                                   color: Colors.white,
-  //                                   border: Border.all(
-  //                                       color: accentColor, width: 1.h),
-  //                                   borderRadius: BorderRadius.circular(13.h)),
-  //                               child: getSvgImage("add.svg",
-  //                                   color: accentColor,
-  //                                   width: 20.h,
-  //                                   height: 20.h),
-  //                             ),
-  //                           ),
-  //                           getVerSpace(10.h),
-  //                           getCustomFont(
-  //                               "Add Cover Image", 15.sp, greyColor, 1,
-  //                               fontWeight: FontWeight.w500, txtHeight: 1.46.h),
-  //                         ],
-  //                       )),
-  //                 )
-  //               : Container(
-  //                   height: 155.h,
-  //                   decoration: BoxDecoration(
-  //                       borderRadius: BorderRadius.circular(22.h),
-  //                       image: DecorationImage(
-  //                           image: FileImage(controller.image1!),
-  //                           fit: BoxFit.fill)),
-  //                 ),
-  //         ),
-  //       ),
-  //       getVerSpace(20.h),
-  //       Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           GestureDetector(
-  //             onTap: () {
-  //               if (controller.image2 == null) {
-  //                 _onPictureSelection2();
-  //               }
-  //             },
-  //             child: GetBuilder<CreateEventController>(
-  //               init: CreateEventController(),
-  //               builder: (controller) => controller.image2 == null
-  //                   ? Container(
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           color: lightColor,
-  //                           borderRadius: BorderRadius.circular(22.h)),
-  //                       child: DottedBorder(
-  //                         dashPattern: const [6, 6],
-  //                         color: accentColor,
-  //                         strokeWidth: 1.h,
-  //                         padding: EdgeInsets.all(27.h),
-  //                         radius: Radius.circular(22.h),
-  //                         borderType: BorderType.RRect,
-  //                         child: getSvgImage("add.svg",
-  //                             color: accentColor, height: 24.h, width: 24.h),
-  //                       ),
-  //                     )
-  //                   : Container(
-  //                       width: 78.w,
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           borderRadius: BorderRadius.circular(22.h),
-  //                           image: DecorationImage(
-  //                               image: FileImage(controller.image2!),
-  //                               fit: BoxFit.fill)),
-  //                       padding: EdgeInsets.only(
-  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-  //                       child: GestureDetector(
-  //                         onTap: () {
-  //                           controller.onImage2Null();
-  //                         },
-  //                         child: getSvgImage("close.svg",
-  //                             width: 18.h, height: 18.h),
-  //                       ),
-  //                     ),
-  //             ),
-  //           ),
-  //           GestureDetector(
-  //             onTap: () {
-  //               if (controller.image3 == null) {
-  //                 controller.getImage3();
-  //               }
-  //             },
-  //             child: GetBuilder<CreateEventController>(
-  //               init: CreateEventController(),
-  //               builder: (controller) => controller.image3 == null
-  //                   ? Container(
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           color: lightColor,
-  //                           borderRadius: BorderRadius.circular(22.h)),
-  //                       child: DottedBorder(
-  //                         dashPattern: const [6, 6],
-  //                         color: accentColor,
-  //                         strokeWidth: 1.h,
-  //                         padding: EdgeInsets.all(27.h),
-  //                         radius: Radius.circular(22.h),
-  //                         borderType: BorderType.RRect,
-  //                         child: getSvgImage("add.svg",
-  //                             color: accentColor, height: 24.h, width: 24.h),
-  //                       ),
-  //                     )
-  //                   : Container(
-  //                       width: 78.w,
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           borderRadius: BorderRadius.circular(22.h),
-  //                           image: DecorationImage(
-  //                               image: FileImage(controller.image3!),
-  //                               fit: BoxFit.fill)),
-  //                       padding: EdgeInsets.only(
-  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-  //                       child: GestureDetector(
-  //                         onTap: () {
-  //                           controller.onImage3Null();
-  //                         },
-  //                         child: getSvgImage("close.svg",
-  //                             width: 18.h, height: 18.h),
-  //                       ),
-  //                     ),
-  //             ),
-  //           ),
-  //           GestureDetector(
-  //             onTap: () {
-  //               if (controller.image4 == null) {
-  //                 controller.getImage4();
-  //               }
-  //             },
-  //             child: GetBuilder<CreateEventController>(
-  //               init: CreateEventController(),
-  //               builder: (controller) => controller.image4 == null
-  //                   ? Container(
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           color: lightColor,
-  //                           borderRadius: BorderRadius.circular(22.h)),
-  //                       child: DottedBorder(
-  //                         dashPattern: const [6, 6],
-  //                         color: accentColor,
-  //                         strokeWidth: 1.h,
-  //                         padding: EdgeInsets.all(27.h),
-  //                         radius: Radius.circular(22.h),
-  //                         borderType: BorderType.RRect,
-  //                         child: getSvgImage("add.svg",
-  //                             color: accentColor, height: 24.h, width: 24.h),
-  //                       ),
-  //                     )
-  //                   : Container(
-  //                       width: 78.w,
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           borderRadius: BorderRadius.circular(22.h),
-  //                           image: DecorationImage(
-  //                               image: FileImage(controller.image4!),
-  //                               fit: BoxFit.fill)),
-  //                       padding: EdgeInsets.only(
-  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-  //                       child: GestureDetector(
-  //                         onTap: () {
-  //                           controller.onImage4Null();
-  //                         },
-  //                         child: getSvgImage("close.svg",
-  //                             width: 18.h, height: 18.h),
-  //                       ),
-  //                     ),
-  //             ),
-  //           ),
-  //           GestureDetector(
-  //             onTap: () {
-  //               if (controller.image5 == null) {
-  //                 controller.getImage5();
-  //               }
-  //             },
-  //             child: GetBuilder<CreateEventController>(
-  //               init: CreateEventController(),
-  //               builder: (controller) => controller.image5 == null
-  //                   ? Container(
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           color: lightColor,
-  //                           borderRadius: BorderRadius.circular(22.h)),
-  //                       child: DottedBorder(
-  //                         dashPattern: const [6, 6],
-  //                         color: accentColor,
-  //                         strokeWidth: 1.h,
-  //                         padding: EdgeInsets.all(27.h),
-  //                         radius: Radius.circular(22.h),
-  //                         borderType: BorderType.RRect,
-  //                         child: getSvgImage("add.svg",
-  //                             color: accentColor, height: 24.h, width: 24.h),
-  //                       ),
-  //                     )
-  //                   : Container(
-  //                       width: 78.w,
-  //                       height: 78.h,
-  //                       decoration: BoxDecoration(
-  //                           borderRadius: BorderRadius.circular(22.h),
-  //                           image: DecorationImage(
-  //                               image: FileImage(controller.image5!),
-  //                               fit: BoxFit.fill)),
-  //                       padding: EdgeInsets.only(
-  //                           top: 8.h, bottom: 52.h, left: 52.h, right: 8.h),
-  //                       child: GestureDetector(
-  //                         onTap: () {
-  //                           controller.onImage5Null();
-  //                         },
-  //                         child: getSvgImage("close.svg",
-  //                             width: 18.h, height: 18.h),
-  //                       ),
-  //                     ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ],
-  //   );
-  // }
-
   AppBar buildAppBar() {
-    return getToolBar(
-      () {
-        Navigator.of(context).pop();
-      },
-      title: getCustomFont(("createEvent").tr(), 24.sp, Colors.black, 1,
-          fontWeight: FontWeight.w700, textAlign: TextAlign.center),
-      leading: true,
-    );
+    return getToolBar(() {},
+        title: getCustomFont(("createEvent").tr(), 24.sp, Colors.black, 1,
+            fontWeight: FontWeight.w700, textAlign: TextAlign.center),
+        leading: false);
   }
 }

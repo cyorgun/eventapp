@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/intro/welcome.dart';
@@ -16,11 +15,9 @@ import '../../chatroom_logic/pages/chatroom_page.dart';
 import '../../provider/bookmark_provider.dart';
 import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
-import '../../widget/empty_screen.dart';
 import '../../widget/join_number_widget.dart';
 import '../../widget/love_icon.dart';
 import '../../widget/map_sheet.dart';
-import '../home/tab/tab_home.dart';
 
 class FeaturedEventDetail extends StatefulWidget {
   const FeaturedEventDetail({
@@ -52,6 +49,7 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
   Widget build(BuildContext context) {
     event = ModalRoute.of(context)?.settings.arguments as EventBaru;
     final sb = context.watch<SignInProvider>();
+    final isOwnEvent = sb.uid == event.uid;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -91,7 +89,7 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                 ),
               ),
             )
-          else
+          else if (!isOwnEvent)
             Align(
               alignment: Alignment.bottomCenter,
               child: getPaddingWidget(
@@ -157,73 +155,48 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
                         ),
                       ),
                       Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 20.0),
-                          child: getButton(context, accentColor, ("Buy Ticket").tr(),
-                              Colors.white, () {
-                            Navigator.pushNamed(context, Routes.buyTicketRoute, arguments: event);
-                          }, 18.sp,
-                              weight: FontWeight.w700,
-                              buttonHeight: 60.h,
-                              borderRadius: BorderRadius.circular(22.h)),
-                        ),
+                        child: buildBuyTicketWidget(context, sb, event),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            )
+          else
+            Container()
         ],
       ),
     );
   }
 
+  Container buildBuyTicketWidget(BuildContext context, SignInProvider sb, EventBaru event) {
+    if (event.joinEvent == null || !event.joinEvent!.contains(sb.uid)) {
+      return Container(
+        margin: const EdgeInsets.only(right: 20.0),
+        child: getButton(context, accentColor, ("Buy Ticket").tr(),
+            Colors.white, () {
+              Navigator.pushNamed(context, Routes.buyTicketRoute, arguments: event);
+            }, 18.sp,
+            weight: FontWeight.w700,
+            buttonHeight: 60.h,
+            borderRadius: BorderRadius.circular(22.h)),
+      );
+    }
+    else {
+      return Container(
+        margin: const EdgeInsets.only(right: 20.0),
+        child: getButton(context, fadedAccentColor, ("You already have this ticket").tr(),
+            Colors.white, () {}, 18.sp,
+            weight: FontWeight.w700,
+            buttonHeight: 60.h,
+            borderRadius: BorderRadius.circular(22.h)),
+      );
+    }
+  }
+
   handleLoveClick() {
     final SignInProvider sb = context.read<SignInProvider>();
     context.read<BookmarkProvider>().onBookmarkIconClick(event.id, sb.uid);
-  }
-
-  Widget buildFollowWidget(BuildContext context) {
-    return getPaddingWidget(
-      EdgeInsets.symmetric(horizontal: 20.h),
-      Container(
-        // decoration: BoxDecoration(
-        //     color: lightGrey, borderRadius: BorderRadius.circular(22.h)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                      backgroundImage: NetworkImage(event.image ?? ''),
-                      radius: 20.0),
-                  // getAssetImage("image.png", width: 58.h, height: 58.h),
-                  getHorSpace(10.h),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      getCustomFont(
-                          event.userName ?? '', 18.sp, Colors.black, 1,
-                          fontWeight: FontWeight.w600, txtHeight: 1.5.h),
-                    ],
-                  )
-                ],
-              ),
-              // getButton(context, Colors.white, "Follow", accentColor, () {}, 14.sp,
-              //     weight: FontWeight.w700,
-              //     buttonHeight: 40.h,
-              //     buttonWidth: 76.h,
-              //     isBorder: true,
-              //     borderColor: accentColor,
-              //     borderWidth: 1.h,
-              //     borderRadius: BorderRadius.circular(14.h))
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   Container buildTicketPrice() {
@@ -282,7 +255,7 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
     final sb = context.watch<SignInProvider>();
 
     DateTime? dateTime = event.date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
     return ListView(
       children: [
         Stack(
@@ -293,9 +266,9 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
               height: 327.h,
               width: double.infinity,
               decoration: BoxDecoration(
-                  image: DecorationImage(
+                  image: event.image != null ? DecorationImage(
                       image: NetworkImage(event.image ?? ''),
-                      fit: BoxFit.cover)),
+                      fit: BoxFit.cover) : null),
               alignment: Alignment.topCenter,
               child: Container(
                 height: 183.h,
@@ -720,77 +693,3 @@ class _FeaturedEventDetailState extends State<FeaturedEventDetail> {
     );
   }
 }
-
-// class joinEvents extends StatelessWidget {
-//   joinEvents({this.list});
-//   final List<DocumentSnapshot>? list;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Row(
-//       children: <Widget>[
-//         Padding(
-//           padding: const EdgeInsets.only(left: 0.0),
-//           child: Container(
-//               height: 25.0,
-//               width: 54.0,
-//               child: ListView.builder(
-//                 scrollDirection: Axis.horizontal,
-//                 padding: EdgeInsets.only(top: 0.0, left: 5.0, right: 5.0),
-//                 itemCount: list!.length > 3 ? 3 : list?.length,
-//                 itemBuilder: (context, i) {
-//                   String? _title = list?[i]['name'].toString();
-//                   String? _uid = list?[i]['uid'].toString();
-//                   String? _img = list?[i]['photoProfile'].toString();
-
-//                   return Padding(
-//                     padding: const EdgeInsets.only(left: 0.0),
-//                     child: Container(
-//                       height: 24.0,
-//                       width: 24.0,
-//                       decoration: BoxDecoration(
-//                           borderRadius:
-//                               BorderRadius.all(Radius.circular(70.0)),
-//                           image: DecorationImage(
-//                               image: NetworkImage(_img ?? ''),
-//                               fit: BoxFit.cover)),
-//                     ),
-//                   );
-//                 },
-//               )),
-//         ),
-//         Padding(
-//           padding: const EdgeInsets.only(
-//             top: 3.0,
-//             left: 0.0,
-//           ),
-//           child: Row(
-//             children: [
-//               Container(
-//                 height: 32.h,
-//                 width: 32.h,
-//                 decoration: BoxDecoration(
-//                                 color: accentColor,
-//                     borderRadius: BorderRadius.circular(30.h),
-//                     border: Border.all(color: Colors.white, width: 1.5.h)),
-//                 alignment: Alignment.center,
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   crossAxisAlignment: CrossAxisAlignment.center,
-//                   children: [
-//                     getCustomFont(list?.length.toString() ?? '', 12.sp,
-//                         Colors.white, 1,
-//                         fontWeight: FontWeight.w600),
-//                     getCustomFont(" +", 12.sp, Colors.white, 1,
-//                         fontWeight: FontWeight.w600),
-//                   ],
-//                 ),
-//               ),
-
-//             ],
-//           ),
-//         )
-//       ],
-//     );
-//   }
-// }

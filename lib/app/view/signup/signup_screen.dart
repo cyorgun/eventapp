@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:event_app/app/view/login/login_screens.dart';
+import 'package:event_app/app/view/login/login_screen.dart';
 import 'package:event_app/app/widget/Rounded_Button.dart';
 import 'package:event_app/base/constant.dart';
 import 'package:evente/evente.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,7 +14,6 @@ import '../../../base/widget_utils.dart';
 import '../../dialog/snacbar.dart';
 import '../../provider/sign_in_provider.dart';
 import '../../routes/app_routes.dart';
-import '../select_interest/select_interest_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -26,7 +26,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
   var emailCtrl = TextEditingController();
   var passCtrl = TextEditingController();
-  var phoneController = TextEditingController();
   var nameCtrl = TextEditingController();
   var formKey = GlobalKey<FormState>();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -36,24 +35,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   late String email;
   late String pass;
-  late String phone;
   String? name;
+  bool isOrganization = false;
 
   void lockPressed() {
     if (offsecureText == true) {
       setState(() {
         offsecureText = false;
-        // lockIcon = LockIcon().open;
       });
     } else {
       setState(() {
         offsecureText = true;
-        // lockIcon = LockIcon().lock;
       });
     }
   }
 
-  Future handleSignUpwithEmailPassword() async {
+  Future handleSignUpWithEmailPassword() async {
     final SignInProvider sb =
         Provider.of<SignInProvider>(context, listen: false);
     if (formKey.currentState!.validate()) {
@@ -63,23 +60,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (hasInternet == false) {
           openSnacbar(_scaffoldKey, ('no internet').tr());
         } else {
-          setState(() {
-            // signUpStarted = true;
-          });
-          sb.signUpWithEmailPassword(name, email, pass, phone).then((_) async {
+          sb.signUpWithEmailPassword(name, email, pass, isOrganization).then((_) async {
             if (sb.hasError == false) {
               sb.getTimestamp().then((value) => sb
                   .saveToFirebase()
                   .then((value) {
-                            setState(() {
-                              // signUpCompleted = true;
-                            });
-                            Navigator.popAndPushNamed(context, Routes.selectInterestRoute);
+                      Navigator.popAndPushNamed(context, Routes.verifyRoute);
                           }));
             } else {
-              setState(() {
-                // signUpStarted = false;
-              });
               _btnController.reset();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -310,55 +298,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                 ),
                                 getVerSpace(24.h),
-                                getCustomFont(("Phone Number").tr(), 16.sp,
-                                    Colors.black, 1,
-                                    fontWeight: FontWeight.w600),
-                                getVerSpace(7.h),
-
-                                getDefaultTextFiledWithLabel2(context,
-                                    ("Phone Number").tr(), phoneController,
-                                    isEnable: false,
-                                    height: 60.h,
-                                    validator: (String? value) {
-                                      if (value!.isEmpty)
-                                        return ("Phone can't be empty").tr();
-                                      return null;
-                                    },
-                                    isprefix: true,
-                                    onChanged: (String value) {
-                                      setState(() {
-                                        phone = value;
-                                      });
-                                    },
-                                    // prefix: GestureDetector(
-                                    //   onTap: () {},
-                                    //   child: Row(
-                                    //     children: [
-                                    //       getHorSpace(18.h),
-                                    //       getHorSpace(12.h),
-                                    //       getCustomFont(
-                                    //           "",
-                                    //           16.sp,
-                                    //           greyColor,
-                                    //           1,
-                                    //           fontWeight:
-                                    //               FontWeight.w500),
-                                    //       getHorSpace(5.h),
-                                    //       getSvgImage("arrow_down.svg",
-                                    //           width: 24.h,
-                                    //           height: 24.h),
-                                    //       getHorSpace(5.h),
-                                    //     ],
-                                    //   ),
-                                    // ),
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.allow(
-                                          RegExp('[0-9.,]')),
-                                    ],
-                                    constraint: BoxConstraints(
-                                        maxWidth: 135.h, maxHeight: 24.h)),
-
-                                getVerSpace(24.h),
                                 getCustomFont(
                                     ("Password").tr(), 16.sp, Colors.black, 1,
                                     fontWeight: FontWeight.w600),
@@ -442,13 +381,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     });
                                   },
                                 ),
-                                getVerSpace(36.h),
+                                getVerSpace(12.h),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Organizasyon musunuz?"),
+                                    Checkbox(
+                                      value: isOrganization,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          isOrganization = value ?? false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                getVerSpace(12.h),
                                 RoundedLoadingButton(
                                   animateOnTap: true,
                                   successColor: accentColor,
                                   controller: _btnController,
                                   onPressed: () {
-                                    handleSignUpwithEmailPassword();
+                                    handleSignUpWithEmailPassword();
                                   },
                                   width:
                                       MediaQuery.of(context).size.width * 1.0,
@@ -474,7 +428,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 //     weight: FontWeight.w700,
                                 //     buttonHeight: 60.h,
                                 //     borderRadius: BorderRadius.circular(22.h)),
-                                getVerSpace(40.h),
+                                getVerSpace(24.h),
                                 GestureDetector(
                                   child: getRichText(
                                       ("Already have an account? / ").tr(),
@@ -496,7 +450,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           )
                         ],
-                      ))
+                      )),
                 ],
               ),
             ],
@@ -505,10 +459,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+}
 
-  Widget getDefaultTextFiledWithLabel2(BuildContext context, String s,
-      TextEditingController textEditingController,
-      {bool withSufix = false,
+Widget getDefaultTextFiledWithLabel2(BuildContext context, String s,
+    TextEditingController textEditingController,
+    {bool withSufix = false,
       bool minLines = false,
       bool isPass = false,
       bool isEnable = true,
@@ -527,85 +482,84 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String obscuringCharacter = '•',
       GestureTapCallback? onTap,
       bool isReadonly = false}) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return TextFormField(
-          readOnly: isReadonly,
-          onTap: onTap,
-          onChanged: onChanged,
-          validator: validator,
-          enabled: true,
-          inputFormatters: inputFormatters,
-          maxLines: (minLines) ? null : 1,
-          controller: textEditingController,
-          obscuringCharacter: obscuringCharacter,
-          autofocus: false,
-          obscureText: isPass,
-          keyboardType: TextInputType.number,
-          showCursor: true,
-          cursorColor: accentColor,
-          maxLength: length,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w500,
-              fontSize: 16.sp,
-              fontFamily: Constant.fontsFamily),
-          decoration: InputDecoration(
-              counter: Container(),
-              contentPadding: EdgeInsets.symmetric(
-                  vertical: vertical.h, horizontal: horizontal.h),
-              isDense: true,
-              filled: true,
-              fillColor: Colors.white,
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: borderColor, width: 1.h)),
-              disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: borderColor, width: 1.h)),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: accentColor, width: 1.h)),
-              errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: errorColor, width: 1.h)),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: errorColor, width: 1.h)),
-              errorStyle: TextStyle(
-                  color: errorColor,
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                  height: 1.5.h,
-                  fontFamily: Constant.fontsFamily),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.h),
-                  borderSide: BorderSide(color: borderColor, width: 1.h)),
-              suffixIconConstraints: BoxConstraints(
-                maxHeight: 24.h,
-              ),
-              suffixIcon: withSufix == true
-                  ? GestureDetector(
-                      onTap: () {
-                        imagefunction;
-                      },
-                      child: getPaddingWidget(
-                        EdgeInsets.only(right: 18.h),
-                        getSvgImage(suffiximage.toString(),
-                            width: 24.h, height: 24.h),
-                      ))
-                  : null,
-              prefixIconConstraints: constraint,
-              prefixIcon: isprefix == true ? prefix : null,
-              hintText: s,
-              hintStyle: TextStyle(
-                  color: greyColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16.sp,
-                  fontFamily: Constant.fontsFamily)),
-        );
-      },
-    );
-  }
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return TextFormField(
+        readOnly: isReadonly,
+        onTap: onTap,
+        onChanged: onChanged,
+        validator: validator,
+        enabled: true,
+        inputFormatters: inputFormatters,
+        maxLines: (minLines) ? null : 1,
+        controller: textEditingController,
+        obscuringCharacter: obscuringCharacter,
+        autofocus: false,
+        obscureText: isPass,
+        keyboardType: TextInputType.number,
+        showCursor: true,
+        cursorColor: accentColor,
+        maxLength: length,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            fontSize: 16.sp,
+            fontFamily: Constant.fontsFamily),
+        decoration: InputDecoration(
+            counter: Container(),
+            contentPadding: EdgeInsets.symmetric(
+                vertical: vertical.h, horizontal: horizontal.h),
+            isDense: true,
+            filled: true,
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: accentColor, width: 1.h)),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: errorColor, width: 1.h)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: errorColor, width: 1.h)),
+            errorStyle: TextStyle(
+                color: errorColor,
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w500,
+                height: 1.5.h,
+                fontFamily: Constant.fontsFamily),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(22.h),
+                borderSide: BorderSide(color: borderColor, width: 1.h)),
+            suffixIconConstraints: BoxConstraints(
+              maxHeight: 24.h,
+            ),
+            suffixIcon: withSufix == true
+                ? GestureDetector(
+                onTap: () {
+                  imagefunction;
+                },
+                child: getPaddingWidget(
+                  EdgeInsets.only(right: 18.h),
+                  getSvgImage(suffiximage.toString(),
+                      width: 24.h, height: 24.h),
+                ))
+                : null,
+            prefixIconConstraints: constraint,
+            prefixIcon: isprefix == true ? prefix : null,
+            hintText: s,
+            hintStyle: TextStyle(
+                color: greyColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 16.sp,
+                fontFamily: Constant.fontsFamily)),
+      );
+    },
+  );
 }

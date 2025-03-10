@@ -1,7 +1,17 @@
-
 {
-  "@@locale": "en",
+  "@@locale": "es-ES",
   "language": "Español",
+
+  "Chat": "Chat",
+  "Type a message": "Escribe un mensaje",
+  "No messages yet": "Aún no hay mensajes",
+  "other": "Otro",
+  "Featured Events": "Eventos destacados",
+  "User Events": "Eventos de usuario",
+  "Very soon!": "¡Muy pronto!",
+  "Capacity": "Capacidad",
+  "turkish": "Turco",
+
   "changeLanguage": "Cambiar idioma",
   "contohKata": "Ejemplo de texto para mostrar múltiples idiomas",
   "english": "Inglés",
@@ -14,7 +24,7 @@
   "game": "Juegos",
   "football": "Fútbol",
   "comedy": "Comedia",
-  "konser": "Concierto",
+  "concert": "Concierto",
   "trophy": "Trofeos",
   "tour": "Gira",
   "festival": "Festival",
@@ -79,7 +89,7 @@
   "Game": "Juegos",
   "Football": "Fútbol",
   "Comedy": "Comedia",
-  "Konser": "Concierto",
+  "Concert": "Concierto",
   "Trophy": "Trofeos",
   "Tour": "Gira",
   "Festival": "Festival",

@@ -11,8 +11,8 @@ import 'package:provider/provider.dart';
 import '../../../../base/color_data.dart';
 import '../../../provider/bookmark_provider.dart';
 import '../../../provider/sign_in_provider.dart';
-import '../../create_event/create_event_screen.dart';
 import '../../profile/change_password.dart';
+import '../../subscription/subscription_screen.dart';
 
 class TabProfile extends StatefulWidget {
   const TabProfile({Key? key}) : super(key: key);
@@ -23,8 +23,6 @@ class TabProfile extends StatefulWidget {
 
 class _TabProfileState extends State<TabProfile>
     with AutomaticKeepAliveClientMixin {
-  var interestList = {"Art", "Music", "Food", "Technology", "Party"};
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -39,14 +37,6 @@ class _TabProfileState extends State<TabProfile>
           title: getCustomFont(("Profile").tr(), 24.sp, Colors.black, 1,
               fontWeight: FontWeight.w700),
           centerTitle: true,
-          actions: [
-            // GestureDetector(
-            //     onTap: () {
-            //       Constant.sendToNext(context, Routes.settingRoute);
-            //     },
-            //     child: getSvgImage("setting.svg", height: 24.h, width: 24.h)),
-            // getHorSpace(20.h)
-          ],
         ),
         Divider(color: dividerColor, thickness: 1.h, height: 1.h),
         Expanded(
@@ -70,6 +60,14 @@ class _TabProfileState extends State<TabProfile>
 
                       settingContainer(() {
                         Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (_, __, ___) => SubscriptionScreen()));
+
+                        // Constant.sendToNext(context, Routes.editProfileRoute);
+                      }, ("Subscribe").tr(), "bookmark2.svg"),
+                      getVerSpace(20.h),
+
+                      settingContainer(() {
+                        Navigator.of(context).push(PageRouteBuilder(
                             pageBuilder: (_, __, ___) => EditProfile()));
 
                         // Constant.sendToNext(context, Routes.editProfileRoute);
@@ -83,13 +81,6 @@ class _TabProfileState extends State<TabProfile>
                       // getVerSpace(30.h),
                       // getCustomFont("Preferences", 16.sp, greyColor, 1,
                       //     fontWeight: FontWeight.w500, txtHeight: 1.5.h),
-                      getVerSpace(20.h),
-
-                      settingContainer(() {
-                        Navigator.of(context).push(PageRouteBuilder(
-                            pageBuilder: (_, __, ___) =>
-                                CreateEventScreen()));
-                      }, ("Create Event").tr(), "add.svg"),
                       getVerSpace(20.h),
 
                       settingContainer(() {

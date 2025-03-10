@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:event_app/app/modal/modal_event_baru.dart';
 import 'package:event_app/app/view/home/filtering_screen.dart';
+import 'package:event_app/app/view/home/tab/tab_maps.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:evente/evente.dart';
@@ -85,7 +86,6 @@ class _TabHomeState extends State<TabHome> {
     super.initState();
 
     getToken();
-    getFromSharedPreferences();
     if (this.mounted) {
       context.read<EventProvider>().data.isNotEmpty
           ? print('data already loaded')
@@ -237,14 +237,6 @@ class _TabHomeState extends State<TabHome> {
     return startOfNextMonth.subtract(Duration(days: 1));
   }
 
-  void getFromSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      role = prefs.getString("role");
-    });
-  }
-
   String? role;
   GlobalKey _one = GlobalKey();
   GlobalKey _two = GlobalKey();
@@ -363,7 +355,7 @@ class _TabHomeState extends State<TabHome> {
                           children: [
                             Expanded(
                               child: getPaddingWidget(
-                                  EdgeInsets.symmetric(horizontal: 20.h),
+                                  EdgeInsets.only(left: 20, right: 10),
                                   InkWell(
                                     onTap: () {
                                       Navigator.of(context).push(
@@ -390,25 +382,64 @@ class _TabHomeState extends State<TabHome> {
                                           ),
                                         ],
                                       ),
-                                      child: Row(
-                                        children: [
-                                          getHorSpace(18.h),
-                                          getSvg("search.svg",
-                                              height: 24.h, width: 24.h),
-                                          getHorSpace(18.h),
-                                          Text(
-                                            "Search events",
-                                            style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontFamily: 'Gilroy'),
-                                          )
-                                        ],
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                        child: Row(
+                                          children: [
+                                            getSvg("search.svg",
+                                                height: 24.h, width: 24.h),
+                                            getHorSpace(12.h),
+                                            Expanded(
+                                              child: Text(
+                                                "Search events".tr(),
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    fontFamily: 'Gilroy'),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   )),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(right: 15.0),
+                              padding: const EdgeInsets.only(right: 10.0),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                      PageRouteBuilder(
+                                          pageBuilder: (_, __, ___) =>
+                                              MapsScreenT1()));
+                                },
+                                child: Container(
+                                  height: 47.0,
+                                  width: 47.0,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(50.0)),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey
+                                            .withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 7,
+                                        offset: Offset(0,
+                                            3), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: getSvg("map.svg",
+                                        height: 24.h, width: 24.h),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10.0),
                               child: InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(
@@ -591,7 +622,7 @@ class _TabHomeState extends State<TabHome> {
                       getSvg("search.svg", height: 24.h, width: 24.h),
                       getHorSpace(18.h),
                       Text(
-                        "Search events",
+                        "Search events".tr(),
                         style: TextStyle(fontSize: 16.sp, fontFamily: 'Gilroy'),
                       )
                     ],
@@ -719,7 +750,7 @@ class buildUserEventList extends StatelessWidget {
             return EventBaru.fromFirestore(e,1);
           }).toList();
           DateTime? dateTime = events![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+          String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
 
           return Container(
             margin: EdgeInsets.only(
@@ -750,55 +781,65 @@ class buildUserEventList extends StatelessWidget {
                     child: Padding(
                       padding:
                           const EdgeInsets.only(left: 5.0, right: 5.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Row(
                         children: [
-                          Container(
-                            width: 210.w,
-                            child: getCustomFont(events?[i].title ?? "",
-                                20.5.sp, Colors.black, 1,
-                                fontWeight: FontWeight.w700,
-                                overflow: TextOverflow.ellipsis,
-                                txtHeight: 1.5.h),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          ),
-                          Row(
+                          events[i].image != null ? Row(
                             children: [
-                              getSvg("calender.svg",
-                                  color: Colors.grey[400],
-                                  width: 16.h,
-                                  height: 16.h),
-                              getHorSpace(5.h),
-                              getCustomFont(date.toString() ?? "", 15.sp,
-                                  greyColor, 1,
-                                  fontWeight: FontWeight.w500,
-                                  txtHeight: 1.5.h),
+                              Image.network(events[i].image!, width: 50, height: 50,),
+                              SizedBox(width: 16)
                             ],
-                          ),
-                          getVerSpace(5.h),
-                          Row(
+                          ) : Container(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              getSvg("Location.svg",
-                                  color: Colors.grey[400],
-                                  width: 18.h,
-                                  height: 18.h),
-                              getHorSpace(5.h),
                               Container(
-                                width: 150.w,
-                                child: getCustomFont(
-                                    events?[i].location ?? "",
-                                    15.sp,
-                                    greyColor,
-                                    1,
-                                    fontWeight: FontWeight.w500,
+                                width: 210.w,
+                                child: getCustomFont(events?[i].title ?? "",
+                                    20.5.sp, Colors.black, 1,
+                                    fontWeight: FontWeight.w700,
+                                    overflow: TextOverflow.ellipsis,
                                     txtHeight: 1.5.h),
                               ),
+                              SizedBox(
+                                height: 5.0,
+                              ),
+                              Row(
+                                children: [
+                                  getSvg("calender.svg",
+                                      color: Colors.grey[400],
+                                      width: 16.h,
+                                      height: 16.h),
+                                  getHorSpace(5.h),
+                                  getCustomFont(date.toString() ?? "", 15.sp,
+                                      greyColor, 1,
+                                      fontWeight: FontWeight.w500,
+                                      txtHeight: 1.5.h),
+                                ],
+                              ),
+                              getVerSpace(5.h),
+                              Row(
+                                children: [
+                                  getSvg("Location.svg",
+                                      color: Colors.grey[400],
+                                      width: 18.h,
+                                      height: 18.h),
+                                  getHorSpace(5.h),
+                                  Container(
+                                    width: 150.w,
+                                    child: getCustomFont(
+                                        events?[i].location ?? "",
+                                        15.sp,
+                                        greyColor,
+                                        1,
+                                        fontWeight: FontWeight.w500,
+                                        txtHeight: 1.5.h),
+                                  ),
+                                ],
+                              ),
+                              getVerSpace(7.h),
                             ],
                           ),
-                          getVerSpace(7.h),
                         ],
                       ),
                     ),
@@ -1062,7 +1103,7 @@ class TrendingEventCard extends StatelessWidget {
             return EventBaru.fromFirestore(e, 1);
           }).toList();
           DateTime? dateTime = events![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+          String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
           return SizedBox(
             height: 309.h,
             child: GestureDetector(
@@ -1235,7 +1276,7 @@ class TrendingEventCard2 extends StatelessWidget {
             return EventBaru.fromFirestore(e, 1);
           }).toList();
           DateTime? dateTime = events![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+          String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
           return SizedBox(
             height: 309.h,
             child: GestureDetector(
@@ -1421,12 +1462,12 @@ class buildFeaturedEventList extends StatelessWidget {
 
   const buildFeaturedEventList({required this.list});
 
-  String getDate(Timestamp? timestamp) {
+  String getDate(Timestamp? timestamp, BuildContext context) {
     DateTime? dateTime = timestamp?.toDate();
     if (dateTime == null) {
       return "";
     } else {
-      String date = DateFormat('d MMMM, yyyy').format(dateTime);
+      String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime);
       return date;
     }
   }
@@ -1497,7 +1538,7 @@ class buildFeaturedEventList extends StatelessWidget {
                                 getVerSpace(4.h),
                                 Container(
                                   width: 200.w,
-                                  child: getCustomFont(getDate(event?.date),
+                                  child: getCustomFont(getDate(event?.date, context),
                                       15.sp, Colors.white, 1,
                                       fontWeight: FontWeight.w500,
                                       txtHeight: 1.5.h),

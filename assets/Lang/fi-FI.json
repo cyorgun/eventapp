@@ -1,10 +1,23 @@
 {
   "@@locale": "fi", 
   "language": "Suomi",
+
+  "Chat": "Keskustelu",
+  "Type a message": "Kirjoita viesti",
+  "No messages yet": "Ei viestejä vielä",
+  "other": "Muu",
+  "Featured Events": "Esittelyssä olevat tapahtumat",
+  "User Events": "Käyttäjätapahtumat",
+  "Very soon!": "Hyvin pian!",
+  "latitude": "Leveyspiiri",
+  "longitude": "Pituuspiiri",
+  "Capacity": "Kapasiteetti",
+  "turkish": "Turkki",
+
   "changeLanguage":"Vaihda kieltä",
   "contohKata":"Example Text for show multiple language",
   "english":"Suomi",
-  
+
   "descCard":"vahvista kielen vaihto",
   "ok":"kylä",
 
@@ -18,8 +31,6 @@
   "Performing & Visual Arts ":"Esittävä & Kuvataide",
   "Religion":"Uskonto",
   "Others":"Muut",
-
-
 
   "noInternet":"ei Internetiä",
   "uploadSuccess":"Lähetys onnistui",

@@ -1,4 +1,4 @@
-import 'package:event_app/app/view/login/login_screens.dart';
+import 'package:event_app/app/view/login/login_screen.dart';
 import 'package:event_app/base/color_data.dart';
 import 'package:event_app/base/widget_utils.dart';
 import 'package:flutter/material.dart';

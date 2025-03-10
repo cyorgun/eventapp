@@ -27,7 +27,6 @@ import 'app/provider/theme_provider.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/view/featured_event/featured_event_detail.dart';
-import 'app/view/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding
@@ -87,6 +86,7 @@ void main() async {
       Locale('hi', 'IN'),
       Locale('zh', 'CN'),
       Locale('fr', 'CH'),
+      Locale('tr', 'TR'),
     ],
     child: MaterialApp(debugShowCheckedModeBanner: false, home: const MyApp()),
   ));
@@ -142,6 +142,7 @@ class _MyAppState extends State<MyApp> {
             providers: [
               ChangeNotifierProvider<SignInProvider>(
                 create: (context) => SignInProvider(),
+                lazy: false,
               ),
               ChangeNotifierProvider<BookmarkProvider>(
                 create: (context) => BookmarkProvider(),
@@ -179,6 +180,7 @@ class _MyAppState extends State<MyApp> {
               debugShowCheckedModeBanner: false,
               initialRoute: Routes.splashScreen,
               theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                 pageTransitionsTheme: PageTransitionsTheme(builders: {
                   TargetPlatform.android: CupertinoPageTransitionsBuilder(),
                   TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),

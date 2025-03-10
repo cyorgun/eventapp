@@ -88,9 +88,62 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
-                  flag: "https://thumbs2.imgbox.com/83/76/MhtndBd1_t.png",
+                child: CardName(
+                  flag: "assets/images/america.png",
                   title: ('english').tr(),
+                )),
+            InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        backgroundColor: Colors.white,
+                        title: Text(('changeLanguage').tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontFamily: "Gilroy",
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w800))
+                            .tr(),
+                        content: Text(
+                          ('descCard').tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: "Gilroy",
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ).tr(),
+                        actions: [
+                          Column(
+                            children: [
+                              Container(
+                                height: 1.0,
+                                width: double.infinity,
+                                color: Colors.black12,
+                              ),
+                              Center(
+                                child: TextButton(
+                                  child: Text(
+                                    "Ok",
+                                    style: TextStyle(color: Colors.blue),
+                                  ).tr(),
+                                  onPressed: () {
+                                    Navigator.pop(_);
+                                    context.setLocale(
+                                        const Locale('tr', 'TR'));
+                                  },
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ));
+                },
+                child: CardName(
+                  flag: "assets/images/turkey.png",
+                  title: ('turkish').tr(),
                 )),
             InkWell(
                 onTap: () {
@@ -141,14 +194,11 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
-                  flag2: true,
-                  width: 30.0,
+                child: CardName(
                   flag:
-                      "https://www.countryflags.com/wp-content/uploads/spain-flag-png-xl.png",
+                      "assets/images/spain.png",
                   title: ('spanish').tr(),
                 )),
-
             InkWell(
                 onTap: () {
                   showDialog(
@@ -198,14 +248,11 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
+                child: CardName(
                   flag:
-                      "https://img.freepik.com/free-vector/illustration-france-flag_53876-27099.jpg",
-                  flag2: true,
-                  width: 25.0,
+                      "assets/images/france.png",
                   title: ('french').tr(),
                 )),
-
             InkWell(
                 onTap: () {
                   showDialog(
@@ -255,12 +302,10 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
+                child: CardName(
                   flag: "assets/images/germany.png",
                   title: ('germany').tr(),
-                  flag1: false,
                 )),
-
             InkWell(
                 onTap: () {
                   showDialog(
@@ -308,12 +353,10 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
+                child: CardName(
                   flag: "assets/images/india.png",
                   title: ('india').tr(),
-                  flag1: false,
                 )),
-
             InkWell(
                 onTap: () {
                   showDialog(
@@ -363,8 +406,8 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
-                  flag: "https://thumbs2.imgbox.com/83/f5/y4BZ7a3i_t.png",
+                child: CardName(
+                  flag: "assets/images/arabic.png",
                   title: ('arabic').tr(),
                 )),
             InkWell(
@@ -416,148 +459,10 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
                             ],
                           ));
                 },
-                child: cardName(
+                child: CardName(
                   flag: "assets/images/finland.png",
                   title: ('finland').tr(),
-                  flag1: false,
                 )),
-            // InkWell(
-            //     onTap: () {
-
-            //       showDialog(
-            //           context: context,
-            //           builder: (_) => AlertDialog(
-            //             backgroundColor: Colors.white,
-            //                 title:  Text(('changeLanguage').tr(),
-            //                         textAlign: TextAlign.center,
-            //                         style: TextStyle(
-            //                           color: Colors.black,
-            //                             fontSize: 18.0,
-            //                             fontWeight: FontWeight.w800))
-            //                     .tr(),
-            //                 content:  Text(
-            //                   ('descCard').tr(),
-            //                   textAlign: TextAlign.center,
-            //                   style: TextStyle(
-            //                           color: Colors.black54,
-            //                       fontWeight: FontWeight.w300,),
-            //                 ).tr(),
-            //                 actions: [
-            //                   Column(
-            //                     children: [
-
-            //                   Container(height: 1.0,width: double.infinity,color: Colors.black12,),
-            //                       Center(
-            //                         child: TextButton(
-            //                           child:  Text("Ok",style: TextStyle(color: Colors.blue),).tr(),
-            //                           onPressed: () {
-            //                             // Close;
-            //                             Navigator.pop(_);
-            //                             // Navigator.of(context).pop();
-            //                             context.setLocale(const Locale('ar', 'DZ'));
-            //                           },
-            //                         ),
-            //                       ),
-            //                     ],
-            //                   )
-            //                 ],
-            //               ));
-            //     },
-            //     child: cardName(
-            //       flag: "https://thumbs2.imgbox.com/83/f5/y4BZ7a3i_t.png",
-            //       title: ('arabic').tr(),
-            //     )),
-
-            // InkWell(
-            //     onTap: () {
-            //       showDialog(
-            //           context: context,
-            //           builder: (_) => AlertDialog(
-            //             backgroundColor: Colors.white,
-            //                 title:  Text(('changeLanguage').tr(),
-            //                         textAlign: TextAlign.center,
-            //                         style: TextStyle(
-            //                           color: Colors.black,
-            //                             fontSize: 18.0,
-            //                             fontWeight: FontWeight.w800))
-            //                     .tr(),
-            //                 content:  Text(
-            //                   ('descCard').tr(),
-            //                   textAlign: TextAlign.center,
-            //                   style: TextStyle(
-            //                           color: Colors.black54,
-            //                       fontWeight: FontWeight.w300,),
-            //                 ).tr(),
-            //                 actions: [
-            //                   Column(
-            //                     children: [
-
-            //                   Container(height: 1.0,width: double.infinity,color: Colors.black12,),
-            //                       Center(
-            //                         child: TextButton(
-            //                           child:  Text("Ok",style: TextStyle(color: Colors.blue),).tr(),
-            //                           onPressed: () {
-            //                             context.setLocale(const Locale('Fi', 'Fi'));
-            //                             Navigator.pop(context);
-            //                           },
-            //                         ),
-            //                       ),
-            //                     ],
-            //                   )
-            //                 ],
-            //               ));
-            //     },
-            //     child:  cardName(
-            //       flag: "https://thumbs2.imgbox.com/83/76/MhtndBd1_t.png",
-            //       title: ('Finnish').tr(),
-            //     )
-
-            //     ),
-
-            //        InkWell(
-            //     onTap: () {
-            //       showDialog(
-            //           context: context,
-            //           builder: (_) => AlertDialog(
-            //             backgroundColor: Colors.white,
-            //                 title:  Text(('changeLanguage').tr(),
-            //                         textAlign: TextAlign.center,
-            //                         style: TextStyle(
-            //                           color: Colors.black,
-            //                             fontSize: 18.0,
-            //                             fontWeight: FontWeight.w800))
-            //                     .tr(),
-            //                 content:  Text(
-            //                   ('descCard').tr(),
-            //                   textAlign: TextAlign.center,
-            //                   style: TextStyle(
-            //                           color: Colors.black54,
-            //                       fontWeight: FontWeight.w300,),
-            //                 ).tr(),
-            //                 actions: [
-            //                   Column(
-            //                     children: [
-
-            //                   Container(height: 1.0,width: double.infinity,color: Colors.black12,),
-            //                       Center(
-            //                         child: TextButton(
-            //                           child:  Text("Ok",style: TextStyle(color: Colors.blue),).tr(),
-            //                           onPressed: () {
-            //                             context.setLocale(const Locale('id', 'ID'));
-            //                             Navigator.pop(context);
-            //                           },
-            //                         ),
-            //                       ),
-            //                     ],
-            //                   )
-            //                 ],
-            //               ));
-            //     },
-            //     child:  cardName(
-            //       flag: "https://thumbs2.imgbox.com/83/76/MhtndBd1_t.png",
-            //       title: ('indonesia').tr(),
-            //     )),
-            //
           ]),
         ),
       ),
@@ -565,18 +470,12 @@ class _MultipleLanguageScreenState extends State<MultipleLanguageScreen> {
   }
 }
 
-class cardName extends StatelessWidget {
-  double? width = 0;
-  String title, flag;
-  bool flag1 = true;
-  bool? flag2 = true;
+class CardName extends StatelessWidget {
+  final String title, flag;
 
-  cardName(
-      {this.width,
-      this.flag2,
-      required this.title,
-      required this.flag,
-      this.flag1 = true});
+  CardName(
+      {required this.title,
+      required this.flag});
 
   @override
   Widget build(BuildContext context) {
@@ -597,35 +496,19 @@ class cardName extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 15.0),
           child: Row(children: <Widget>[
-            flag1
-                ? Container(
-                    decoration: BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        color: Colors.black12.withOpacity(0.06),
-                        spreadRadius: 10.0,
-                      )
-                    ]),
-                    child: Image.network(
-                      flag,
-                      height: flag2 == true ? width : 41.0,
-
-                      // width: 100.0,
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        color: Colors.black12.withOpacity(0.06),
-                        spreadRadius: 10.0,
-                      )
-                    ]),
-                    child: Image.asset(
-                      flag,
-                      height: 41.0,
-                    ),
-                  ),
+            Container(
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                  blurRadius: 10.0,
+                  color: Colors.black12.withOpacity(0.06),
+                  spreadRadius: 10.0,
+                )
+              ]),
+              child: Image.asset(
+                flag,
+                width: 41.0,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Text(

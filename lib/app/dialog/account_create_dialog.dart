@@ -33,7 +33,7 @@ class _AccountCreateDialogState extends State<AccountCreateDialog> {
                 color: lightColor,
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(34.h))),
-            child: getAssetImage("user.png", height: 114.h, width: 114.h),
+            child: getAssetImage("admin_specific.png", height: 114.h, width: 114.h),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 30.h),

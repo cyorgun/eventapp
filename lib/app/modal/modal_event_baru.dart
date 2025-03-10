@@ -14,6 +14,7 @@ class EventBaru {
   String? type;
   String? userDesc;
   String? userName;
+  String? uid;
   String? time;
   String? userProfile;
   String? image;
@@ -41,6 +42,7 @@ class EventBaru {
       this.type,
       this.userDesc,
       this.userName,
+        this.uid,
       this.join,
       this.image,
       this.count,
@@ -72,6 +74,7 @@ class EventBaru {
         join: data['join'],
         userDesc: data['userDesc'],
         userName: data['userName'],
+        uid: data['uid'],
         userProfile: data['userProfile'],
         capacity: data['capacity'],
         joinEvent: data['joinEvent'] ?? [],

@@ -11,7 +11,7 @@ import '../../widget/card4.dart';
 import '../../widget/empty_screen.dart';
 
 class SearchPage extends StatefulWidget {
-  SearchPage({Key? key}) : super(key: key);
+  const SearchPage({Key? key}) : super(key: key);
 
   _SearchPageState createState() => _SearchPageState();
 }

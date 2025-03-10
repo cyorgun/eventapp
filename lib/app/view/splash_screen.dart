@@ -34,7 +34,11 @@ class _SplashScreenState extends State<SplashScreen> {
       //await b.getInterestDataFromFirebase(sb.uid);
     }
     Timer(const Duration(seconds: 2), () {
-      Navigator.popAndPushNamed(context, Routes.homeScreenRoute);
+      if (sb.role == "user") {
+        Navigator.popAndPushNamed(context, Routes.homeScreenRoute);
+      } else {
+        Navigator.popAndPushNamed(context, Routes.adminHomeScreenRoute);
+      }
     });
   }
 
@@ -44,6 +48,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _decideRoute() async {
     final SignInProvider sb = context.read<SignInProvider>();
+    if (sb.isSignedIn && !await SignInProvider().isUserVerified()) {
+      await sb.userSignOut().then(await sb.afterUserSignOut());
+    }
     bool isIntro = await PrefData.isFirstTime();
     //bool isSelect = await PrefData.getSelectInterest();
     if (isIntro) {

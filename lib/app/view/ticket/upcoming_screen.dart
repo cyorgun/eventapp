@@ -183,7 +183,7 @@ class itemData extends StatelessWidget {
           }).toList();
 
           DateTime? dateTime = tickets![i].date?.toDate();
-          String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+          String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 15.0),

@@ -68,7 +68,7 @@ class IntroViewsFlutter extends StatefulWidget {
   /// landscape view wraps around [title] [body]
   final MainAxisAlignment columnMainAxisAlignment;
 
-  /// ajust how how much the user most drag for a full page transition
+  /// ajust how how much the admin_specific most drag for a full page transition
   ///
   /// default to 300.0
   final double fullTransition;
@@ -101,10 +101,10 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
     with TickerProviderStateMixin {
   StreamController<SlideUpdate>?
       // ignore: close_sinks
-      slideUpdateStream; //Stream controller is used to get all the updates when user slides across screen.
+      slideUpdateStream; //Stream controller is used to get all the updates when admin_specific slides across screen.
 
   AnimatedPageDragger?
-      animatedPageDragger; //When user stops dragging then by using this page automatically drags.
+      animatedPageDragger; //When admin_specific stops dragging then by using this page automatically drags.
 
   int activePageIndex = 0; //active page index
   int nextPageIndex = 0; //next page index
@@ -121,7 +121,7 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
       setState(() {
         //setState is used to change the values dynamically
 
-        //if the user is dragging then
+        //if the admin_specific is dragging then
         if (event.updateType == UpdateType.dragging) {
           slideDirection = event.direction;
           slidePercent = event.slidePercent;
@@ -135,7 +135,7 @@ class _IntroViewsFlutterState extends State<IntroViewsFlutter>
             nextPageIndex = activePageIndex;
           }
         }
-        //if the user has done dragging
+        //if the admin_specific has done dragging
         else if (event.updateType == UpdateType.doneDragging) {
           //Auto completion of event using Animated page dragger.
           if (slidePercent! > 0.5) {

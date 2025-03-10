@@ -7,7 +7,7 @@ import '../Constants/constants.dart';
 import '../Models/slide_update_model.dart';
 
 /// This class provides the animation controller
-/// used when then user stops dragging and page
+/// used when then admin_specific stops dragging and page
 /// reveal is not completed.
 
 class AnimatedPageDragger {

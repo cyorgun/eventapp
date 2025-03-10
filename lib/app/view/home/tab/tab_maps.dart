@@ -203,7 +203,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
         Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 27.0),
+              padding: const EdgeInsets.only(top: 40.0),
               child: Container(
                 height: 55.0,
                 width: double.infinity,
@@ -213,7 +213,18 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
+                      child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            size: 21,
+                            color: Colors.grey[800],
+                          )),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 20.0, right: 20.0, top: 0.0),
@@ -342,7 +353,7 @@ class _MapsScreenT1State extends State<MapsScreenT1> {
 
   Widget card(lokasiList, i) {
     DateTime? dateTime = lokasiList![i].date?.toDate();
-    String date = DateFormat('d MMMM, yyyy').format(dateTime!);
+    String date = DateFormat('d MMMM, yyyy', context.locale.toString()).format(dateTime!);
 
     return Padding(
       padding:
