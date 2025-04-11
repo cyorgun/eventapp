@@ -1,16 +1,11 @@
 # event_app
 
-A new Flutter project.
+![Screenshot 2025-04-11 155726](https://github.com/user-attachments/assets/df363ee9-7cc0-4a84-a1f1-a1bbd6682c6d)
 
-## Getting Started
+![Screenshot 2025-04-11 155756](https://github.com/user-attachments/assets/9b2f7bea-9d3c-43db-8b76-901f45e30ddb)
 
-This project is a starting point for a Flutter application.
+![Screenshot 2025-04-11 155807](https://github.com/user-attachments/assets/e2a79ab0-fd6c-4927-b734-b2a9263cc0ea)
 
-A few resources to get you started if this is your first Flutter project:
+![Screenshot 2025-04-11 155828](https://github.com/user-attachments/assets/f89e79fc-4a97-4ebf-ab42-0ccdf74dd192)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Screenshot 2025-04-11 155909](https://github.com/user-attachments/assets/1cef091f-0170-4fdc-bbdf-ea4086baab77)
