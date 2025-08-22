@@ -1,5 +1,7 @@
 # event_app
 
+Removed firebase docs.
+
 ![Screenshot 2025-04-11 155726](https://github.com/user-attachments/assets/df363ee9-7cc0-4a84-a1f1-a1bbd6682c6d)
 
 ![Screenshot 2025-04-11 155756](https://github.com/user-attachments/assets/9b2f7bea-9d3c-43db-8b76-901f45e30ddb)
